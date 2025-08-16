@@ -1,3 +1,5 @@
+//! Num
+
 macro_rules! common_const {
     ($($n:literal)*) => {
         ::paste::paste!(
@@ -308,9 +310,9 @@ where
     Self: ::core::convert::TryInto<u64>,
     Self: ::core::convert::TryInto<u128>,
     Self: ::core::convert::TryInto<usize>,
-    Self: ::core::ops::Shl<Output = Self>,
+    Self: ::core::ops::Shl<u32, Output = Self>,
     Self: ::core::ops::ShlAssign,
-    Self: ::core::ops::Shr<Output = Self>,
+    Self: ::core::ops::Shr<u32, Output = Self>,
     Self: ::core::ops::ShrAssign,
     Self: ::core::ops::BitAnd<Output = Self>,
     Self: ::core::ops::BitAndAssign,
