@@ -132,6 +132,52 @@ macro_rules! common_impl {
     };
 }
 
+macro_rules! signed_impl {
+    ($ty:ident) => {
+        impl Int for $ty {
+            const SIGNED: bool = true;
+            const BITS: Self = $ty::BITS as Self;
+            const BITS_U128: u128 = Self::BITS as u128;
+            const BITS_I128: i128 = Self::BITS as i128;
+            const MAX: Self = $ty::MAX as Self;
+            const MAX_U128: u128 = Self::MAX as u128;
+            const MAX_I128: i128 = Self::MAX as i128;
+            const MIN: Self = $ty::MIN as Self;
+            const MIN_U128: u128 = Self::MIN as u128;
+            const MIN_I128: i128 = Self::MIN as i128;
+            common_impl!();
+        }
+    };
+    ($($ty:ident)*) => {
+        $(
+            signed_impl!($ty);
+        )*
+    };
+}
+
+macro_rules! unsigned_impl {
+    ($ty:ident) => {
+        impl Int for $ty {
+            const SIGNED: bool = false;
+            const BITS: Self = $ty::BITS as Self;
+            const BITS_U128: u128 = Self::BITS as u128;
+            const BITS_I128: i128 = Self::BITS as i128;
+            const MAX: Self = $ty::MAX as Self;
+            const MAX_U128: u128 = Self::MAX as u128;
+            const MAX_I128: i128 = Self::MAX as i128;
+            const MIN: Self = $ty::MIN as Self;
+            const MIN_U128: u128 = Self::MIN as u128;
+            const MIN_I128: i128 = Self::MIN as i128;
+            common_impl!();
+        }
+    };
+    ($($ty:ident)*) => {
+        $(
+            unsigned_impl!($ty);
+        )*
+    };
+}
+
 pub trait Int 
 where
     Self: Sized,
@@ -237,72 +283,20 @@ where
     fn sqrt(self) -> Self;
 }
 
-impl Int for i8 {
-    const SIGNED: bool = true;
-    const BITS: Self = 8;
-    const BITS_U128: u128 = 8;
-    const BITS_I128: i128 = 8;
-    const MAX: Self = i8::MAX;
-    const MAX_U128: u128 = i8::MAX as u128;
-    const MAX_I128: i128 = i8::MAX as i128;
-    const MIN: Self = i8::MIN;
-    const MIN_U128: u128 = i8::MIN as u128;
-    const MIN_I128: i128 = i8::MIN as i128;
-    common_impl!();
-}
+signed_impl!(
+    i8
+    i16
+    i32
+    i64
+    i128
+    isize
+);
 
-impl Int for i16 {
-    const SIGNED: bool = true;
-    const BITS: Self = 16;
-    const BITS_U128: u128 = 16;
-    const BITS_I128: i128 = 16;
-    const MAX: Self = i16::MAX;
-    const MAX_U128: u128 = i16::MAX as u128;
-    const MAX_I128: i128 = i16::MAX as i128;
-    const MIN: Self = i16::MIN;
-    const MIN_U128: u128 = i16::MIN as u128;
-    const MIN_I128: i128 = i16::MIN as i128;
-    common_impl!();
-}
-
-impl Int for i32 {
-    const SIGNED: bool = true;
-    const BITS: Self = 32;
-    const BITS_U128: u128 = 32;
-    const BITS_I128: i128 = 32;
-    const MAX: Self = i32::MAX;
-    const MAX_U128: u128 = i32::MAX as u128;
-    const MAX_I128: i128 = i32::MAX as i128;
-    const MIN: Self = i32::MIN;
-    const MIN_U128: u128 = i32::MIN as u128;
-    const MIN_I128: i128 = i32::MIN as i128;
-    common_impl!();
-}
-
-impl Int for i64 {
-    const SIGNED: bool = true;
-    const BITS: Self = 64;
-    const BITS_U128: u128 = 64;
-    const BITS_I128: i128 = 64;
-    const MAX: Self = i64::MAX;
-    const MAX_U128: u128 = i64::MAX as u128;
-    const MAX_I128: i128 = i64::MAX as i128;
-    const MIN: Self = i64::MIN;
-    const MIN_U128: u128 = i64::MIN as u128;
-    const MIN_I128: i128 = i64::MIN as i128;
-    common_impl!();
-}
-
-impl Int for i128 {
-    const SIGNED: bool = true;
-    const BITS: Self = 128;
-    const BITS_U128: u128 = 128;
-    const BITS_I128: i128 = 128;
-    const MAX: Self = i128::MAX;
-    const MAX_U128: u128 = i128::MAX as u128;
-    const MAX_I128: i128 = i128::MAX;
-    const MIN: Self = i128::MIN;
-    const MIN_U128: u128 = i128::MIN as u128;
-    const MIN_I128: i128 = i128::MIN;
-    common_impl!();
-}
+unsigned_impl!(
+    u8 
+    u16 
+    u32 
+    u64 
+    u128
+    usize
+);
