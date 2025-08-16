@@ -1,4 +1,4 @@
-macro_rules! const_as {
+macro_rules! const_trait_fragment {
     ($($n:literal)*) => {
         paste::paste!(
             $(
@@ -8,7 +8,7 @@ macro_rules! const_as {
     };
 }
 
-macro_rules! const_as_impl {
+macro_rules! const_impl_fragment {
     ($($n:literal)*) => {
         paste::paste!(
             $(
@@ -18,9 +18,9 @@ macro_rules! const_as_impl {
     };
 }
 
-macro_rules! common_impl {
+macro_rules! common_impl_fragment {
     () => {
-        const_as_impl!(
+        const_impl_fragment!(
             0 1 2 3 4 5 6 7 8 9
             10 11 12 13 14 15 16 17 18 19 
             20 21 22 23 24 25 26 27 28 29 
@@ -145,7 +145,7 @@ macro_rules! signed_impl {
             const MIN: Self = $ty::MIN as Self;
             const MIN_U128: u128 = Self::MIN as u128;
             const MIN_I128: i128 = Self::MIN as i128;
-            common_impl!();
+            common_impl_fragment!();
         }
     };
     ($($ty:ident)*) => {
@@ -168,7 +168,7 @@ macro_rules! unsigned_impl {
             const MIN: Self = $ty::MIN as Self;
             const MIN_U128: u128 = Self::MIN as u128;
             const MIN_I128: i128 = Self::MIN as i128;
-            common_impl!();
+            common_impl_fragment!();
         }
     };
     ($($ty:ident)*) => {
@@ -244,7 +244,7 @@ where
     const MIN: Self;
     const MIN_U128: u128 = 0;
     const MIN_I128: i128 = 0;
-    const_as!(
+    const_trait_fragment!(
         0 1 2 3 4 5 6 7 8 9
         10 11 12 13 14 15 16 17 18 19 
         20 21 22 23 24 25 26 27 28 29 
