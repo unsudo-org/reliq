@@ -1,3 +1,5 @@
+use super::*;
+
 macro_rules! const_trait_fragment {
     ($($n:literal)*) => {
         paste::paste!(
@@ -181,14 +183,10 @@ macro_rules! unsigned_impl {
 pub trait Int 
 where
     Self: Sized,
+    Self: num::Num,
     Self: ::core::fmt::Debug,
     Self: ::core::fmt::Display,
-    Self: Default,
-    Self: Clone,
-    Self: Copy,
-    Self: PartialEq,
     Self: Eq,
-    Self: PartialOrd,
     Self: Ord,
     Self: TryFrom<i8>,
     Self: TryFrom<i16>,
@@ -214,16 +212,6 @@ where
     Self: TryInto<u64>,
     Self: TryInto<u128>,
     Self: TryInto<usize>,
-    Self: ::core::ops::Add<Output = Self>,
-    Self: ::core::ops::AddAssign,
-    Self: ::core::ops::Sub<Output = Self>,
-    Self: ::core::ops::SubAssign,
-    Self: ::core::ops::Mul<Output = Self>,
-    Self: ::core::ops::MulAssign,
-    Self: ::core::ops::Div<Output = Self>,
-    Self: ::core::ops::DivAssign,
-    Self: ::core::ops::Rem<Output = Self>,
-    Self: ::core::ops::RemAssign,
     Self: ::core::ops::Shl<Output = Self>,
     Self: ::core::ops::ShlAssign,
     Self: ::core::ops::Shr<Output = Self>,

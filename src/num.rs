@@ -1,8 +1,11 @@
 pub trait Num
 where
     Self: Sized,
+    Self: ::core::fmt::Debug,
+    Self: ::core::fmt::Display,
     Self: Clone,
     Self: Copy,
+    Self: Default,
     Self: PartialEq,
     Self: PartialOrd,
     Self: ::core::ops::Add<Output = Self>,
@@ -20,8 +23,11 @@ where
 impl<T> Num for T
 where
     T: Sized,
+    T: ::core::fmt::Debug,
+    T: ::core::fmt::Display,
     T: Clone,
     T: Copy,
+    T: Default,
     T: PartialEq,
     T: PartialOrd,
     T: ::core::ops::Add<Output = Self>,
