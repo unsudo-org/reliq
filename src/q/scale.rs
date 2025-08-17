@@ -45,7 +45,8 @@ const LOOK_UP: [u128; 38] = [
 pub fn scale<const A: u8, B>() -> B 
 where 
     B: num::Int,
-    (): Precision<A> {
+    (): Precision<A>,
+    (): N<B> {
     unsafe {
         LOOK_UP[(A - 1) as usize].try_into().unwrap_unchecked()
     }
