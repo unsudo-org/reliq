@@ -3,6 +3,12 @@
 version = 4
 
 [[package]]
+name = "modwire"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "db7268cd704daa19a00fbd5b36a06a78fbc77e9c26a250e81c5e76e92bfc809d"
+
+[[package]]
 name = "paste"
 version = "1.0.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -12,5 +18,6 @@ checksum = "57c0d7b74b563b49d38dae00a0c37d4d6de9b432382b2892f0574ddcae73fd0a"
 name = "reliq"
 version = "0.1.0"
 dependencies = [
+ "modwire",
  "paste",
 ]
