@@ -1,10 +1,50 @@
 use super::*;
 
 type F<T> = T;
+type Deg<T> = T;
+type Rad<T> = T;
 
 pub struct DefaultEngine; 
 
 pub trait Engine {
+    #[inline]
+    fn to_rad<const A: u8, B>(angle: Deg<B>) -> Result<Rad<B>>
+    where
+        B: num::Int,
+        (): Precision<A> {
+        Ok(Self::muldiv(angle, pi::<A, _>(), n180::<B>() * scale::<A, B>())?)
+    }
+
+    #[inline]
+    fn to_deg<const A: u8, B>(angle: Rad<B>) -> Result<Deg<B>>
+    where
+        B: num::Int,
+        (): Precision<A> {
+        Ok(Self::muldiv(angle, n180::<B>() * scale::<A, B>(), pi())?)
+    }
+
+    #[inline]
+    fn to_negative<T>(n: F<T>) -> T
+    where
+        T: num::Int {
+        if n == T::AS_0 {
+            n
+        } else {
+            T::AS_0 - n
+        }
+    }
+
+    #[inline]
+    fn to_positive<T>(n: F<T>) -> T
+    where
+        T: num::Int {
+        if n >= T::AS_0 {
+            n
+        } else {
+            T::AS_0 - n
+        }
+    }
+
     #[inline]
     fn add<T>(x: F<T>, y: F<T>) -> Result<F<T>>
     where
@@ -20,10 +60,25 @@ pub trait Engine {
     }
 
     #[inline]
-    fn mul<T>(X: F<T>, y: F<T>) -> Result<F<T>>
+    fn mul<const A: u8, B>(x: F<B>, y: F<B>) -> Result<F<B>>
     where
-        T: num::Int {
-        Ok(Self::muldiv(x, y, s))
+        B: num::Int,
+        (): Precision<A> {
+        Ok(Self::muldiv(x, y, scale::<A, _>())?)
+    }
+
+    #[inline]
+    fn div<const A: u8, B>(x: F<B>, y: F<B>) -> Result<F<B>>
+    where
+        B: num::Int,
+        (): Precision<A> {
+        let ret: u128 = scale::<A, _>();
+        if ret.is_power_of_two() {
+            let ret: B = x << ret.trailing_zeros().try_into().unwrap();
+            Ok(ret)
+        } else {
+            Ok(Self::muldiv(x, scale::<A, _>(), y)?)
+        }
     }
 
     #[inline]

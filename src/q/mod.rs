@@ -3,6 +3,7 @@ use super::*;
 ::modwire::expose!(
     pub engine
         fold
+        n
         pi
     pub precision
         scale
@@ -58,13 +59,58 @@ pub enum Error {
     DivisionByZero
 }
 
+#[repr(transparent)]
 #[derive(Debug)]
 #[derive(Clone)]
 #[derive(Copy)]
 pub struct Q<const A: u8, B = usize, C = DefaultEngine>
 where
     B: num::Int,
-    C: Engine {
+    C: Engine,
+    (): Precision<A>,
+    (): N<B> {
     v: B,
     engine: ::core::marker::PhantomData<C>
+}
+
+impl<const A: u8, B, C> Q<A, B, C> 
+where
+    B: num::Int,
+    C: Engine,
+    (): Precision<A>,
+    (): N<B> {
+    pub fn new(v: B) -> Self {
+        Self {
+            v,
+            engine: ::core::marker::PhantomData
+        }
+    }
+}
+
+impl<const A: u8, B, C> ::core::ops::Add for Q<A, B, C>
+where
+    B: num::Int,
+    C: Engine,
+    (): Precision<A>,
+    (): N<B> {
+    type Output = Result<Self>;
+
+    #[inline]
+    fn add(self, rhs: Self) -> Self::Output {
+        Ok(Q::new(C::add(self.v, rhs.v)?))
+    }
+}
+
+impl<const A: u8, B, C> ::core::ops::Sub for Q<A, B, C>
+where
+    B: num::Int,
+    C: Engine,
+    (): Precision<A>,
+    (): N<B> {
+    type Output = Result<Self>;
+
+    #[inline]
+    fn sub(self, rhs: Self) -> Self::Output {
+        Ok(Q::new(C::sub(self.v, rhs.v)?))
+    }
 }
