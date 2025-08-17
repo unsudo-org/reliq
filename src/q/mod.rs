@@ -114,3 +114,83 @@ where
         Ok(Q::new(C::sub(self.v, rhs.v)?))
     }
 }
+
+impl<const A: u8, B, C> ::core::ops::Mul for Q<A, B, C>
+where
+    B: num::Int,
+    C: Engine,
+    (): Precision<A>,
+    (): N<B> {
+    type Output = Result<Self>;
+
+    #[inline]
+    fn mul(self, rhs: Self) -> Self::Output {
+        Ok(Q::new(C::mul::<A, _>(self.v, rhs.v)?))
+    }
+}
+
+impl<const A: u8, B, C> ::core::ops::Div for Q<A, B, C>
+where
+    B: num::Int,
+    C: Engine,
+    (): Precision<A>,
+    (): N<B> {
+    type Output = Result<Self>;
+
+    #[inline]
+    fn div(self, rhs: Self) -> Self::Output {
+        Ok(Q::new(C::div::<A, _>(self.v, rhs.v)?))
+    }
+}
+
+impl<const A: u8, B, C> Eq for Q<A, B, C>
+where
+    B: num::Int,
+    C: Engine,
+    (): Precision<A>,
+    (): N<B> 
+{}
+
+impl<const A: u8, B, C> PartialEq for Q<A, B, C>
+where
+    B: num::Int,
+    C: Engine,
+    (): Precision<A>,
+    (): N<B> {
+    #[inline]
+    fn eq(&self, other: &Self) -> bool {
+        self.v == other.v
+    }
+}
+
+impl<const A: u8, B, C> Ord for Q<A, B, C>
+where
+    B: num::Int,
+    C: Engine,
+    (): Precision<A>,
+    (): N<B> {
+    #[inline]
+    fn cmp(&self, other: &Self) -> ::core::cmp::Ordering {
+        let x: B = self.v;
+        let y: B = other.v;
+        if x > y {
+            ::core::cmp::Ordering::Greater
+        } else if x < y {
+            ::core::cmp::Ordering::Less
+        } else {
+            ::core::cmp::Ordering::Equal
+        }
+    }
+}
+
+impl<const A: u8, B, C> PartialOrd for Q<A, B, C>
+where
+    B: num::Int,
+    C: Engine,
+    (): Precision<A>,
+    (): N<B> {
+    #[inline]
+    fn partial_cmp(&self, other: &Self) -> Option<::core::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
