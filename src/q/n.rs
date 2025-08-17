@@ -1,6 +1,6 @@
 use super::*;
 
-/// `T` must be able to support a `180`.
+/// `T` must be able to support `180`.
 pub trait N<T> 
 where
     T: num::Int {}

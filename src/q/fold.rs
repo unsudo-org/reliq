@@ -3,7 +3,8 @@ use super::*;
 #[inline]
 pub fn fold<T>(x: T, y: T, z: T) -> Result<T> 
 where 
-    T: num::Int {
+    T: num::Int,
+    (): N<T> {
     if T::SIGNED {
         a(x, y, z)
     } else {

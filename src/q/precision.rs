@@ -1,5 +1,5 @@
-/// `A` must not overflow or panic on any op.
-pub trait Precision<const A: u8> {}
+/// `T` must not overflow or panic on any op.
+pub trait Precision<const T: u8> {}
 impl Precision<1> for () {}
 impl Precision<2> for () {}
 impl Precision<3> for () {}

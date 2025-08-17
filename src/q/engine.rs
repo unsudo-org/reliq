@@ -1,19 +1,75 @@
 use super::*;
 
-type F<T> = T;
-type Deg<T> = T;
-type Rad<T> = T;
-
 pub struct DefaultEngine; 
 
 pub trait Engine {
+    #[inline]
+    fn tan<const A: u8, B>(angle: Rad<B>) -> Result<Ratio<B>>
+    where
+        B: num::Int,
+        (): Precision<A>,
+        (): N<B> {
+        Self::div(Self::sin(angle)?, Self::cos(angle)?)
+    }
+
+    #[inline]
+    fn sin<const A: u8, B>(angle: Rad<B>) -> Result<Ratio<B>>
+    where
+        B: num::Int,
+        (): Precision<A>,
+        (): N<B> {
+        Self::cos(Self::sub(Self::to_rad(deg90()?)?, angle)?)
+    }
+
+    #[inline]
+    fn cos<const A: u8, B>(angle: Rad<B>) -> Result<Ratio<B>>
+    where
+        B: num::Int,
+        (): Precision<A>,
+        (): N<B> {
+        let (scale, pi, pi_2) = {
+            let scale: B = scale::<A, _>();
+            let pi: B = pi::<A, _>();
+            let pi_2: B = pi.checked_mul(B::AS_2).ok_or(Error::Overflow)?;
+            (scale, pi, pi_2)
+        };
+        let mut n: B = angle % pi_2;
+        if n < B::AS_0 {
+            n = n.checked_add(pi_2).ok_or(Error::Overflow)?;
+        }
+        if n > pi {
+            n = n.checked_sub(pi_2).ok_or(Error::Underflow)?;
+        }
+        let mut ret: B = scale;
+        let mut term: B = scale;
+        let mut sign: bool = true;
+        let mut k: B = B::AS_1;
+        loop {
+            let f: B = (B::AS_2 * k - B::AS_1) * (B::AS_2 * k);
+            term = Self::muldiv(term, n, scale)?;
+            term = Self::muldiv(term, n, scale)?;
+            term = term.checked_div(f).ok_or(Error::DivisionByZero)?;
+            if term == B::AS_0 {
+                break
+            }
+            ret = if sign {
+                ret.checked_sub(term).ok_or(Error::Underflow)?
+            } else {
+                ret.checked_add(term).ok_or(Error::Overflow)?
+            };
+            sign = !sign;
+            k = k.checked_add(B::AS_1).ok_or(Error::Overflow)?;
+        }
+        Ok(ret)
+    }
+
     #[inline]
     fn to_rad<const A: u8, B>(angle: Deg<B>) -> Result<Rad<B>>
     where
         B: num::Int,
         (): Precision<A>,
         (): N<B> {
-        Ok(Self::muldiv(angle, pi::<A, _>(), n180::<B>() * scale::<A, B>())?)
+        Self::muldiv(angle, pi::<A, _>(), n180::<B>() * scale::<A, B>())
     }
 
     #[inline]
@@ -22,7 +78,7 @@ pub trait Engine {
         B: num::Int,
         (): Precision<A>,
         (): N<B> {
-        Ok(Self::muldiv(angle, n180::<B>() * scale::<A, B>(), pi())?)
+        Self::muldiv(angle, n180::<B>() * scale::<A, B>(), pi())
     }
 
     #[inline]
@@ -71,7 +127,7 @@ pub trait Engine {
         B: num::Int,
         (): Precision<A>,
         (): N<B> {
-        Ok(Self::muldiv(x, y, scale::<A, _>())?)
+        Self::muldiv(x, y, scale::<A, _>())
     }
 
     #[inline]
@@ -82,7 +138,7 @@ pub trait Engine {
         (): N<B> {
         let ret: u128 = scale::<A, u128>();
         if ret.is_power_of_two() {
-            let ret: B = x << ret.trailing_zeros().try_into().unwrap();
+            let ret: B = x << ret.trailing_zeros();
             Ok(ret)
         } else {
             Ok(Self::muldiv(x, scale::<A, _>(), y)?)

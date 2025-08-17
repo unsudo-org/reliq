@@ -3,7 +3,8 @@ use super::*;
 #[inline]
 pub fn wide_mul<T>(x: T, y: T) -> Result<(T, T)>
 where 
-    T: num::Int {
+    T: num::Int,
+    (): N<T> {
     if T::SIGNED {
         a(x, y)
     } else {
@@ -18,7 +19,9 @@ where
     assert!(T::SIGNED);
     assert!(T::BITS_U128 <= 64);
     let a: usize = T::BITS_U128 as usize;
-    let b: u8 = T::AS_2.try_into().unwrap();
+    let b: u8 = unsafe {
+        T::AS_2.try_into().unwrap_unchecked()
+    };
     let b: usize = b as usize;
     let n: u32 = (a / b).try_into().unwrap();
     let mask: T = (T::AS_1 << n) - T::AS_1;
