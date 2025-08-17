@@ -20,6 +20,13 @@ pub trait Engine {
     }
 
     #[inline]
+    fn mul<T>(X: F<T>, y: F<T>) -> Result<F<T>>
+    where
+        T: num::Int {
+        Ok(Self::muldiv(x, y, s))
+    }
+
+    #[inline]
     fn muldiv<T>(x: T, y: T, z: T) -> Result<T> 
     where 
         T: num::Int {
