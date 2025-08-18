@@ -1,5 +1,7 @@
 use super::*;
 
+type Deg<T> = T;
+
 #[inline]
 pub fn deg90<const A: u8, B>() -> Result<Deg<B>>
 where

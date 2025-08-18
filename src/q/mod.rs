@@ -92,61 +92,20 @@ where
     m_1: ::core::marker::PhantomData<D>
 }
 
-
-impl<const A: u8, B, C> ::core::ops::Sub for Q<A, B, C>
+impl<const A: u8, B, C, D> Eq for Q<A, B, C, D>
 where
     B: num::Int,
-    C: Engine,
-    (): Precision<A>,
-    (): N<B> {
-    type Output = Result<Self>;
-
-    #[inline]
-    fn sub(self, rhs: Self) -> Self::Output {
-        Ok(Q::new(C::sub(self.n, rhs.n)?))
-    }
-}
-
-impl<const A: u8, B, C> ::core::ops::Mul for Q<A, B, C>
-where
-    B: num::Int,
-    C: Engine,
-    (): Precision<A>,
-    (): N<B> {
-    type Output = Result<Self>;
-
-    #[inline]
-    fn mul(self, rhs: Self) -> Self::Output {
-        Ok(Q::new(C::mul::<A, _>(self.n, rhs.n)?))
-    }
-}
-
-impl<const A: u8, B, C> ::core::ops::Div for Q<A, B, C>
-where
-    B: num::Int,
-    C: Engine,
-    (): Precision<A>,
-    (): N<B> {
-    type Output = Result<Self>;
-
-    #[inline]
-    fn div(self, rhs: Self) -> Self::Output {
-        Ok(Q::new(C::div::<A, _>(self.n, rhs.n)?))
-    }
-}
-
-impl<const A: u8, B, C> Eq for Q<A, B, C>
-where
-    B: num::Int,
-    C: Engine,
+    C: Mode,
+    D: Engine,
     (): Precision<A>,
     (): N<B> 
 {}
 
-impl<const A: u8, B, C> PartialEq for Q<A, B, C>
+impl<const A: u8, B, C, D> PartialEq for Q<A, B, C, D>
 where
     B: num::Int,
-    C: Engine,
+    C: Mode,
+    D: Engine,
     (): Precision<A>,
     (): N<B> {
     #[inline]
@@ -155,10 +114,11 @@ where
     }
 }
 
-impl<const A: u8, B, C> Ord for Q<A, B, C>
+impl<const A: u8, B, C, D> Ord for Q<A, B, C, D>
 where
     B: num::Int,
-    C: Engine,
+    C: Mode,
+    D: Engine,
     (): Precision<A>,
     (): N<B> {
     #[inline]
@@ -175,10 +135,11 @@ where
     }
 }
 
-impl<const A: u8, B, C> PartialOrd for Q<A, B, C>
+impl<const A: u8, B, C, D> PartialOrd for Q<A, B, C, D>
 where
     B: num::Int,
-    C: Engine,
+    C: Mode,
+    D: Engine,
     (): Precision<A>,
     (): N<B> {
     #[inline]
@@ -194,6 +155,7 @@ where
 
 
 
+// ===
 
 #[repr(transparent)]
 pub struct DefaultMode;
@@ -204,6 +166,7 @@ where
     C: Engine,
     (): Precision<A>,
     (): N<B> {
+    #[inline]
     fn from(n: B) -> Self {
         Self {
             n,
@@ -213,27 +176,60 @@ where
     }
 }
 
-impl<const A: u8, B, C> From<Q<A, B, RadMode, C>> for Q<A, B, DefaultMode, C>
+impl<const A: u8, const B: u8, C, D> TryFrom<Q<A, C, RadMode, D>> for Q<B, C, DefaultMode, D>
 where
-    B: num::Int,
-    C: Engine,
+    C: num::Int,
+    D: Engine,
     (): Precision<A>,
-    (): N<B> {
-    fn from(n: Q<A, B, RadMode, C>) -> Self {
-        n.n.into()
+    (): Precision<B>,
+    (): N<C> {
+    type Error = Error;
+
+    #[inline]
+    fn try_from(q: Q<A, C, RadMode, D>) -> ::core::result::Result<Self, Self::Error> {
+        let n: C = q.n;
+        let n: C = D::cast::<A, B, _>(n)?;
+        let n: Self = Self {
+            n,
+            m_0: ::core::marker::PhantomData,
+            m_1: ::core::marker::PhantomData
+        };
+        Ok(n)
     }
 }
 
-impl<const A: u8, B, C> From<Q<A, B, DegMode, C>> for Q<A, B, DefaultMode, C>
+impl<const A: u8, const B: u8, C, D> TryFrom<Q<A, C, DegMode, D>> for Q<B, C, DefaultMode, D>
 where
-    B: num::Int,
-    C: Engine,
+    C: num::Int,
+    D: Engine,
     (): Precision<A>,
-    (): N<B> {
-    fn from(n: Q<A, B, DegMode, C>) -> Self {
-        n.n.into()
+    (): Precision<B>,
+    (): N<C> {
+    type Error = Error;
+
+    #[inline]
+    fn try_from(q: Q<A, C, DegMode, D>) -> ::core::result::Result<Self, Self::Error> {
+        let n: C = q.n;
+        let n: C = D::cast::<A, B, _>(n)?;
+        let n: Self = Self {
+            n,
+            m_0: ::core::marker::PhantomData,
+            m_1: ::core::marker::PhantomData
+        };
+        Ok(n)
     }
 }
+
+
+
+
+
+
+
+
+
+
+
 
 impl<const A: u8, B, C> ::core::ops::Add for Q<A, B, DefaultMode, C>
 where
@@ -269,27 +265,44 @@ where
     }
 }
 
-
-
-
-
-
-
-
-
-
-// ===
-
-pub struct RatioMode;
-
-impl<const A: u8, B, C> Q<A, B, RatioMode, C>
+impl<const A: u8, B, C> ::core::ops::Mul for Q<A, B, DefaultMode, C>
 where
     B: num::Int,
     C: Engine,
     (): Precision<A>,
     (): N<B> {
-    
+    type Output = Result<Self>;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        let x: B = self.n;
+        let y: B = rhs.n;
+        let ret: B = C::mul(x, y)?;
+        let ret: Self = ret.into();
+        Ok(ret)   
+    }
 }
+
+impl<const A: u8, B, C> ::core::ops::Div for Q<A, B, DefaultMode, C>
+where
+    B: num::Int,
+    C: Engine,
+    (): Precision<A>,
+    (): N<B> {
+    type Output = Result<Self>;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        let x: B = self.n;
+        let y: B = rhs.n;
+        let ret: B = C::div(x, y)?;
+        let ret: Self = ret.into();
+        Ok(ret)   
+    }
+}
+
+
+// ===
+
+pub struct RatioMode;
 
 impl<const A: u8, B, C> From<Q<A, B, DefaultMode, C>> for Q<A, B, RatioMode, C> 
 where

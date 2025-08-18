@@ -1,10 +1,15 @@
 use super::*;
 
+type F<T> = T;
+type Rad<T> = T;
+type Deg<T> = T;
+type Ratio<T> = T;
+
 pub struct DefaultEngine; 
 
 pub trait Engine {
     #[inline]
-    fn tan<const A: u8, B>(angle: Rad<B>) -> Result<Ratio<B>>
+    fn tan<const A: u8, B>(angle: Rad<F<B>>) -> Result<Ratio<F<B>>>
     where
         B: num::Int,
         (): Precision<A>,
@@ -13,16 +18,16 @@ pub trait Engine {
     }
 
     #[inline]
-    fn sin<const A: u8, B>(angle: Rad<B>) -> Result<Ratio<B>>
+    fn sin<const A: u8, B>(angle: Rad<F<B>>) -> Result<Ratio<F<B>>>
     where
         B: num::Int,
         (): Precision<A>,
         (): N<B> {
-        Self::cos(Self::sub(Self::to_rad(deg90()?)?, angle)?)
+        Self::cos(Self::sub(Self::to_rad::<A, B>(deg90()?)?, angle)?)
     }
 
     #[inline]
-    fn cos<const A: u8, B>(angle: Rad<B>) -> Result<Ratio<B>>
+    fn cos<const A: u8, B>(angle: Rad<F<B>>) -> Result<Ratio<F<B>>>
     where
         B: num::Int,
         (): Precision<A>,
@@ -64,7 +69,7 @@ pub trait Engine {
     }
 
     #[inline]
-    fn to_rad<const A: u8, B>(angle: Deg<B>) -> Result<Rad<B>>
+    fn to_rad<const A: u8, B>(angle: Deg<F<B>>) -> Result<Rad<F<B>>>
     where
         B: num::Int,
         (): Precision<A>,
@@ -73,7 +78,7 @@ pub trait Engine {
     }
 
     #[inline]
-    fn to_deg<const A: u8, B>(angle: Rad<B>) -> Result<Deg<B>>
+    fn to_deg<const A: u8, B>(angle: Rad<F<B>>) -> Result<Deg<F<B>>>
     where
         B: num::Int,
         (): Precision<A>,
@@ -82,7 +87,19 @@ pub trait Engine {
     }
 
     #[inline]
-    fn to_negative<T>(n: F<T>) -> T
+    fn cast<const A: u8, const B: u8, C>(n: F<C>) -> Result<F<C>>
+    where
+        C: num::Int,
+        (): Precision<A>,
+        (): Precision<B>,
+        (): N<C> {
+        let old_scale: C = scale::<A, _>();
+        let new_scale: C = scale::<B, _>();
+        Self::muldiv(n, new_scale, old_scale)
+    }
+
+    #[inline]
+    fn to_negative<T>(n: F<T>) -> F<T>
     where
         T: num::Int,
         (): N<T> {
@@ -94,7 +111,7 @@ pub trait Engine {
     }
 
     #[inline]
-    fn to_positive<T>(n: F<T>) -> T
+    fn to_positive<T>(n: F<T>) -> F<T>
     where
         T: num::Int,
         (): N<T> {
