@@ -12,67 +12,58 @@ use super::*;
         wide_mul
 );
 
-type F<T> = T;
-type Deg<T> = T;
-type Rad<T> = T;
-type Ratio<T> = T;
+macro_rules! ty_q {
+    ($($n:literal)*) => {
+        $(
+            ::paste::paste!(
+                pub type [< Q $n >]<T> = Q<$n, T>;
+            );
+        )*
+    };
+}
 
-pub type Q1<T> = Q<1, T>;
-pub type Q2<T> = Q<2, T>;
-pub type Q3<T> = Q<3, T>;
-pub type Q4<T> = Q<4, T>;
-pub type Q5<T> = Q<5, T>;
-pub type Q6<T> = Q<6, T>;
-pub type Q7<T> = Q<7, T>;
-pub type Q8<T> = Q<8, T>;
-pub type Q9<T> = Q<9, T>;
-pub type Q10<T> = Q<10, T>;
-pub type Q11<T> = Q<11, T>;
-pub type Q12<T> = Q<12, T>;
-pub type Q13<T> = Q<13, T>;
-pub type Q14<T> = Q<14, T>;
-pub type Q15<T> = Q<15, T>;
-pub type Q16<T> = Q<16, T>;
-pub type Q17<T> = Q<17, T>;
-pub type Q18<T> = Q<18, T>;
-pub type Q19<T> = Q<19, T>;
-pub type Q20<T> = Q<20, T>;
-pub type Q21<T> = Q<21, T>;
-pub type Q22<T> = Q<22, T>;
-pub type Q23<T> = Q<23, T>;
-pub type Q24<T> = Q<24, T>;
-pub type Q25<T> = Q<25, T>;
-pub type Q26<T> = Q<26, T>;
-pub type Q27<T> = Q<27, T>;
-pub type Q28<T> = Q<28, T>;
-pub type Q29<T> = Q<29, T>;
-pub type Q30<T> = Q<30, T>;
-pub type Q31<T> = Q<31, T>;
-pub type Q32<T> = Q<32, T>;
-pub type Q33<T> = Q<33, T>;
-pub type Q34<T> = Q<34, T>;
-pub type Q35<T> = Q<35, T>;
-pub type Q36<T> = Q<36, T>;
-pub type Q37<T> = Q<37, T>;
+macro_rules! ty_deg {
+    ($($n:literal)*) => {
+        pub type Deg<const A: u8, B> = Q<A, B, DegMode>;
+        $(
+            ::paste::paste!(
+                pub type [< Deg $n >]<T> = Q<$n, T, DegMode>;
+            );
+        )*
+    };
+}
 
-pub type Deg1<T> = Q<1, T, DegMode>;
-pub type Deg2<T> = Q<2, T, DegMode>;
-pub type Deg3<T> = Q<3, T, DegMode>;
-pub type Deg4<T> = Q<4, T, DegMode>;
-pub type Deg5<T> = Q<5, T, DegMode>;
-pub type Deg6<T> = Q<6, T, DegMode>;
-pub type Deg7<T> = Q<7, T, DegMode>;
-pub type Deg8<T> = Q<8, T, DegMode>;
-pub type Deg9<T> = Q<9, T, DegMode>;
-pub type Deg10<T> = Q<10, T, DegMode>;
-pub type Deg11<T> = Q<11, T, DegMode>;
-pub type Deg12<T> = Q<12, T, DegMode>;
-pub type Deg13<T> = Q<13, T, DegMode>;
-pub type Deg14<T> = Q<14, T, DegMode>;
-pub type Deg15<T> = Q<15, T, DegMode>;
-pub type Deg16<T> = Q<16, T, DegMode>;
-pub type Deg17<T> = Q<17, T, DegMode>;
-pub type Deg18<T> = Q<18, T, DegMode>;
+macro_rules! ty_rad {
+    ($($n:literal)*) => {
+        pub type Rad<const A: u8, B> = Q<A, B, RadMode>;
+        $(
+            ::paste::paste!(
+                pub type [< Rad $n >]<T> = Q<$n, T, RadMode>;
+            );
+        )*
+    };
+}
+
+ty_q!(
+    1 2 3 4 5 6 7 8 9
+    10 11 12 13 14 15 16 17 18 19
+    20 21 22 23 24 25 26 27 28 29
+    30 31 32 33 34 35 36 37
+);
+
+ty_deg!(
+    1 2 3 4 5 6 7 8 9
+    10 11 12 13 14 15 16 17 18 19
+    20 21 22 23 24 25 26 27 28 29
+    30 31 32 33 34 35 36 37
+);
+
+ty_rad!(
+    1 2 3 4 5 6 7 8 9
+    10 11 12 13 14 15 16 17 18 19
+    20 21 22 23 24 25 26 27 28 29
+    30 31 32 33 34 35 36 37
+);
 
 pub type Result<T> = ::core::result::Result<T, Error>;
 
@@ -96,40 +87,11 @@ where
     D: Engine,
     (): Precision<A>,
     (): N<B> {
-    v: B,
+    n: B,
     m_0: ::core::marker::PhantomData<C>,
     m_1: ::core::marker::PhantomData<D>
 }
 
-impl<const A: u8, B, C, D> Q<A, B, C, D> 
-where
-    B: num::Int,
-    C: Mode,
-    D: Engine,
-    (): Precision<A>,
-    (): N<B> {
-    pub fn new(v: B) -> Self {
-        Self {
-            v,
-            m_0: ::core::marker::PhantomData,
-            m_1: ::core::marker::PhantomData
-        }
-    }
-}
-
-impl<const A: u8, B, C> ::core::ops::Add for Q<A, B, C>
-where
-    B: num::Int,
-    C: Engine,
-    (): Precision<A>,
-    (): N<B> {
-    type Output = Result<Self>;
-
-    #[inline]
-    fn add(self, rhs: Self) -> Self::Output {
-        Ok(Q::new(C::add(self.v, rhs.v)?))
-    }
-}
 
 impl<const A: u8, B, C> ::core::ops::Sub for Q<A, B, C>
 where
@@ -141,7 +103,7 @@ where
 
     #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
-        Ok(Q::new(C::sub(self.v, rhs.v)?))
+        Ok(Q::new(C::sub(self.n, rhs.n)?))
     }
 }
 
@@ -155,7 +117,7 @@ where
 
     #[inline]
     fn mul(self, rhs: Self) -> Self::Output {
-        Ok(Q::new(C::mul::<A, _>(self.v, rhs.v)?))
+        Ok(Q::new(C::mul::<A, _>(self.n, rhs.n)?))
     }
 }
 
@@ -169,7 +131,7 @@ where
 
     #[inline]
     fn div(self, rhs: Self) -> Self::Output {
-        Ok(Q::new(C::div::<A, _>(self.v, rhs.v)?))
+        Ok(Q::new(C::div::<A, _>(self.n, rhs.n)?))
     }
 }
 
@@ -189,7 +151,7 @@ where
     (): N<B> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
-        self.v == other.v
+        self.n == other.n
     }
 }
 
@@ -201,8 +163,8 @@ where
     (): N<B> {
     #[inline]
     fn cmp(&self, other: &Self) -> ::core::cmp::Ordering {
-        let x: B = self.v;
-        let y: B = other.v;
+        let x: B = self.n;
+        let y: B = other.n;
         if x > y {
             ::core::cmp::Ordering::Greater
         } else if x < y {
@@ -226,15 +188,91 @@ where
 }
 
 
+
+
+
+
+
+
+
+#[repr(transparent)]
 pub struct DefaultMode;
 
-impl<const A: u8, B, C> Q<A, B, DefaultMode, C> 
+impl<const A: u8, B, C> From<B> for Q<A, B, DefaultMode, C> 
 where
     B: num::Int,
     C: Engine,
     (): Precision<A>,
     (): N<B> {
+    fn from(n: B) -> Self {
+        Self {
+            n,
+            m_0: ::core::marker::PhantomData,
+            m_1: ::core::marker::PhantomData
+        }
+    }
 }
+
+impl<const A: u8, B, C> From<Q<A, B, RadMode, C>> for Q<A, B, DefaultMode, C>
+where
+    B: num::Int,
+    C: Engine,
+    (): Precision<A>,
+    (): N<B> {
+    fn from(n: Q<A, B, RadMode, C>) -> Self {
+        n.n.into()
+    }
+}
+
+impl<const A: u8, B, C> From<Q<A, B, DegMode, C>> for Q<A, B, DefaultMode, C>
+where
+    B: num::Int,
+    C: Engine,
+    (): Precision<A>,
+    (): N<B> {
+    fn from(n: Q<A, B, DegMode, C>) -> Self {
+        n.n.into()
+    }
+}
+
+impl<const A: u8, B, C> ::core::ops::Add for Q<A, B, DefaultMode, C>
+where
+    B: num::Int,
+    C: Engine,
+    (): Precision<A>,
+    (): N<B> {
+    type Output = Result<Self>;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        let x: B = self.n;
+        let y: B = rhs.n;
+        let ret: B = C::add(x, y)?;
+        let ret: Self = ret.into();
+        Ok(ret)
+    }
+}
+
+impl<const A: u8, B, C> ::core::ops::Sub for Q<A, B, DefaultMode, C>
+where
+    B: num::Int,
+    C: Engine,
+    (): Precision<A>,
+    (): N<B> {
+    type Output = Result<Self>;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        let x: B = self.n;
+        let y: B = rhs.n;
+        let ret: B = C::sub(x, y)?;
+        let ret: Self = ret.into();
+        Ok(ret)
+    }
+}
+
+
+
+
+
 
 
 
@@ -260,7 +298,7 @@ where
     (): Precision<A>,
     (): N<B> {
     fn from(value: Q<A, B, DefaultMode, C>) -> Self {
-        Q::new(value.v)
+        Q::new(value.n)
     }
 }
 
@@ -328,17 +366,17 @@ where
     (): N<B> {
     #[inline]
     pub fn tan(self) -> Result<Q<A, B, RatioMode, C>> {
-        Ok(Q::new(C::tan(self.v)?))
+        Ok(Q::new(C::tan(self.n)?))
     }
 
     #[inline]
     pub fn sin(self) -> Result<Q<A, B, RatioMode, C>> {
-        Ok(Q::new(C::sin(self.v)?))
+        Ok(Q::new(C::sin(self.n)?))
     }
 
     #[inline]
     pub fn cos(self) -> Result<Q<A, B, RatioMode, C>> {
-        Ok(Q::new(C::cos(self.v)?))
+        Ok(Q::new(C::cos(self.n)?))
     }
 }
 
@@ -351,7 +389,7 @@ where
     type Error = Error;
 
     fn try_from(value: Q<A, B, DegMode, C>) -> ::core::result::Result<Self, Self::Error> {
-        Ok(Q::new(C::to_rad(value.v)?))
+        Ok(Q::new(C::to_rad(value.n)?))
     }
 }
 
@@ -378,7 +416,7 @@ where
     (): Precision<A>,
     (): N<B> {
     fn from(n: Q<A, B, DefaultMode, C>) -> Self {
-        Q::new(n.v)
+        Q::new(n.n)
     }
 }
 
@@ -391,12 +429,14 @@ where
     type Error = Error;
 
     fn try_from(value: Q<A, B, RadMode, C>) -> ::core::result::Result<Self, Self::Error> {
-        Ok(Q::new(C::to_deg(value.v)?))
+        Ok(Q::new(C::to_deg(value.n)?))
     }
 }
 
 
 fn t() {
     let x: Q2<u128> = 50.into();
-    let y: Deg2<u128> = 200.into();
+    let y: Deg2<u128> = x.into();
+    let y: Rad2<u128> = y.try_into().ok().unwrap();
+    y.cos();
 }
