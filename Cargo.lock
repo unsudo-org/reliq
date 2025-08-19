@@ -351,7 +351,6 @@ dependencies = [
  "criterion",
  "modwire",
  "paste",
- "toga",
 ]
 
 [[package]]
@@ -426,17 +425,6 @@ checksum = "be4d6b5f19ff7664e8c98d03e2139cb510db9b0a60b55f8e8709b689d939b6bc"
 dependencies = [
  "serde",
  "serde_json",
-]
-
-[[package]]
-name = "toga"
-version = "1.0.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d9a7a6701928dd7cc873a380ba956bf4c91f2997b51492adbc63070df87f65eb"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]

@@ -23,12 +23,47 @@ pub struct DegMode;
 
 impl Mode for DegMode {}
 
+impl<const A: u8, B, C> Q<A, B, DegMode, C>
+where
+    B: num::Int,
+    C: Engine,
+    (): Precision<A>,
+    (): N<B> {
+    #[inline]
+    pub fn tan(self) -> Result<Q<A, B, RatioMode, C>> {
+        let q: Q<A, B, RadMode, C> = self.try_into()?;
+        let n: B = q.n;
+        let n: B = C::tan(n)?;
+        let n: Q<A, B, RatioMode, C> = n.into();
+        Ok(n)
+    }
+
+    #[inline]
+    pub fn sin(self) -> Result<Q<A, B, RatioMode, C>> {
+        let q: Q<A, B, RadMode, C> = self.try_into()?;
+        let n: B = q.n;
+        let n: B = C::sin(n)?;
+        let n: Q<A, B, RatioMode, C> = n.into();
+        Ok(n)
+    }
+
+    #[inline]
+    pub fn cos(self) -> Result<Q<A, B, RatioMode, C>> {
+        let q: Q<A, B, RadMode, C> = self.try_into()?;
+        let n: B = q.n;
+        let n: B = C::cos(n)?;
+        let n: Q<A, B, RatioMode, C> = n.into();
+        Ok(n)
+    }
+}
+
 impl<const A: u8, B, C> From<B> for Q<A, B, DegMode, C>
 where
     B: num::Int,
     C: Engine,
     (): Precision<A>,
     (): N<B> {
+    #[inline]
     fn from(n: B) -> Self {
         Self {
             n,
@@ -38,36 +73,30 @@ where
     } 
 }
 
-impl<const A: u8, const B: u8, C, D> TryFrom<Q<B, C, DefaultMode, D>> for Q<A, C, DegMode, D>
+impl<const A: u8, B, C> From<Q<A, B, DefaultMode, C>> for Q<A, B, DegMode, C>
 where
-    C: num::Int,
-    D: Engine,
+    B: num::Int,
+    C: Engine,
     (): Precision<A>,
-    (): Precision<B>,
-    (): N<C> {
-    type Error = Error;
-
-    fn try_from(q: Q<B, C, DefaultMode, D>) -> ::core::result::Result<Self, Self::Error> {
-        let n: C = q.n;
-        let n: C = D::cast::<A, B, _>(n)?;
-        let n: Self = n.into();
-        Ok(n)
+    (): N<B> {
+    #[inline]
+    fn from(q: Q<A, B, DefaultMode, C>) -> Self {
+        q.n.into()
     }
 }
 
-impl<const A: u8, const B: u8, C, D> TryFrom<Q<B, C, RadMode, D>> for Q<A, C, DegMode, D>
+impl<const A: u8, B, C> TryFrom<Q<A, B, RadMode, C>> for Q<A, B, DegMode, C>
 where
-    C: num::Int,
-    D: Engine,
+    B: num::Int,
+    C: Engine,
     (): Precision<A>,
-    (): Precision<B>,
-    (): N<C> {
+    (): N<B> {
     type Error = Error;
-    
-    fn try_from(q: Q<B, C, RadMode, D>) -> ::core::result::Result<Self, Self::Error> {
-        let n: C = q.n;
-        let n: C = D::cast::<A, B, _>(n)?;
-        let n: C = D::to_deg::<B, _>(n)?;
+
+    #[inline]
+    fn try_from(q: Q<A, B, RadMode, C>) -> ::core::result::Result<Self, Self::Error> {
+        let n: B = q.n;
+        let n: B = C::to_deg(n)?;
         let n: Self = n.into();
         Ok(n)
     }

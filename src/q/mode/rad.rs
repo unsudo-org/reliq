@@ -21,6 +21,8 @@ ty!(
 #[repr(transparent)]
 pub struct RadMode;
 
+impl Mode for RadMode {}
+
 impl<const A: u8, B, C> Q<A, B, RadMode, C> 
 where
     B: num::Int,
@@ -29,17 +31,52 @@ where
     (): N<B> {
     #[inline]
     pub fn tan(self) -> Result<Q<A, B, RatioMode, C>> {
-        Ok(Q::new(C::tan(self.n)?))
+        let n: B = self.n;
+        let n: B = C::tan(n)?;
+        let n: Q<A, B, RatioMode, C> = n.into();
+        Ok(n)
     }
 
     #[inline]
     pub fn sin(self) -> Result<Q<A, B, RatioMode, C>> {
-        Ok(Q::new(C::sin(self.n)?))
+        let n: B = self.n;
+        let n: B = C::sin(n)?;
+        let n: Q<A, B, RatioMode, C> = n.into();
+        Ok(n)
     }
 
     #[inline]
     pub fn cos(self) -> Result<Q<A, B, RatioMode, C>> {
-        Ok(Q::new(C::cos(self.n)?))
+        let n: B = self.n;
+        let n: B = C::cos(n)?;
+        let n: Q<A, B, RatioMode, C> = n.into();
+        Ok(n)
+    }
+}
+
+impl<const A: u8, B, C> From<B> for Q<A, B, RadMode, C>
+where
+    B: num::Int,
+    C: Engine,
+    (): Precision<A>,
+    (): N<B> {
+    fn from(n: B) -> Self {
+        Self {
+            n,
+            m_0: ::core::marker::PhantomData,
+            m_1: ::core::marker::PhantomData
+        }
+    }
+}
+
+impl<const A: u8, B, C> From<Q<A, B, DefaultMode, C>> for Q<A, B, RadMode, C>
+where
+    B: num::Int,
+    C: Engine,
+    (): Precision<A>,
+    (): N<B> {
+    fn from(q: Q<A, B, DefaultMode, C>) -> Self {
+        q.n.into()
     }
 }
 
@@ -51,7 +88,10 @@ where
     (): N<B> {
     type Error = Error;
 
-    fn try_from(value: Q<A, B, DegMode, C>) -> ::core::result::Result<Self, Self::Error> {
-        Ok(Q::new(C::to_rad(value.n)?))
+    fn try_from(q: Q<A, B, DegMode, C>) -> ::core::result::Result<Self, Self::Error> {
+        let n: B = q.n;
+        let n: B = C::to_rad(n)?;
+        let n: Self = n.into();
+        Ok(n)
     }
 }
