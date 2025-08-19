@@ -1,191 +1,191 @@
 use super::*;
 
-pub trait ScaleCompatible<const A: u8, B> {}
+macro_rules! whitelist {
+    ($($n:literal $ty:ty)*) => {
+        $(
+            impl ScaleCompatible<$n, $ty> for () {}
+        )*
+    };
+}
 
-// u8: 10^2
-impl ScaleCompatible<1, u8> for () {}
-impl ScaleCompatible<2, u8> for () {}
+/// `A` & `B` can safely hold `10^A`.
+pub trait ScaleCompatible<const A: u8, B> where B: num::Int {}
 
-// u16: 10^4
-impl ScaleCompatible<1, u16> for () {}
-impl ScaleCompatible<2, u16> for () {}
-impl ScaleCompatible<3, u16> for () {}
-impl ScaleCompatible<4, u16> for () {}
+whitelist!(
+    1 u8
+    2 u8
 
-// u32: 10^9
-impl ScaleCompatible<1, u32> for () {}
-impl ScaleCompatible<2, u32> for () {}
-impl ScaleCompatible<3, u32> for () {}
-impl ScaleCompatible<4, u32> for () {}
-impl ScaleCompatible<5, u32> for () {}
-impl ScaleCompatible<6, u32> for () {}
-impl ScaleCompatible<7, u32> for () {}
-impl ScaleCompatible<8, u32> for () {}
-impl ScaleCompatible<9, u32> for () {}
+    1 u16
+    2 u16
+    3 u16
+    4 u16
 
-// u64: 10^19
-impl ScaleCompatible<1, u64> for () {}
-impl ScaleCompatible<2, u64> for () {}
-impl ScaleCompatible<3, u64> for () {}
-impl ScaleCompatible<4, u64> for () {}
-impl ScaleCompatible<5, u64> for () {}
-impl ScaleCompatible<6, u64> for () {}
-impl ScaleCompatible<7, u64> for () {}
-impl ScaleCompatible<8, u64> for () {}
-impl ScaleCompatible<9, u64> for () {}
-impl ScaleCompatible<10, u64> for () {}
-impl ScaleCompatible<11, u64> for () {}
-impl ScaleCompatible<12, u64> for () {}
-impl ScaleCompatible<13, u64> for () {}
-impl ScaleCompatible<14, u64> for () {}
-impl ScaleCompatible<15, u64> for () {}
-impl ScaleCompatible<16, u64> for () {}
-impl ScaleCompatible<17, u64> for () {}
-impl ScaleCompatible<18, u64> for () {}
-impl ScaleCompatible<19, u64> for () {}
+    1 u32
+    2 u32
+    3 u32
+    4 u32
+    5 u32
+    6 u32
+    7 u32
+    8 u32
+    9 u32
 
-// u128: 10^38
-impl ScaleCompatible<1, u128> for () {}
-impl ScaleCompatible<2, u128> for () {}
-impl ScaleCompatible<3, u128> for () {}
-impl ScaleCompatible<4, u128> for () {}
-impl ScaleCompatible<5, u128> for () {}
-impl ScaleCompatible<6, u128> for () {}
-impl ScaleCompatible<7, u128> for () {}
-impl ScaleCompatible<8, u128> for () {}
-impl ScaleCompatible<9, u128> for () {}
-impl ScaleCompatible<10, u128> for () {}
-impl ScaleCompatible<11, u128> for () {}
-impl ScaleCompatible<12, u128> for () {}
-impl ScaleCompatible<13, u128> for () {}
-impl ScaleCompatible<14, u128> for () {}
-impl ScaleCompatible<15, u128> for () {}
-impl ScaleCompatible<16, u128> for () {}
-impl ScaleCompatible<17, u128> for () {}
-impl ScaleCompatible<18, u128> for () {}
-impl ScaleCompatible<19, u128> for () {}
-impl ScaleCompatible<20, u128> for () {}
-impl ScaleCompatible<21, u128> for () {}
-impl ScaleCompatible<22, u128> for () {}
-impl ScaleCompatible<23, u128> for () {}
-impl ScaleCompatible<24, u128> for () {}
-impl ScaleCompatible<25, u128> for () {}
-impl ScaleCompatible<26, u128> for () {}
-impl ScaleCompatible<27, u128> for () {}
-impl ScaleCompatible<28, u128> for () {}
-impl ScaleCompatible<29, u128> for () {}
-impl ScaleCompatible<30, u128> for () {}
-impl ScaleCompatible<31, u128> for () {}
-impl ScaleCompatible<32, u128> for () {}
-impl ScaleCompatible<33, u128> for () {}
-impl ScaleCompatible<34, u128> for () {}
-impl ScaleCompatible<35, u128> for () {}
-impl ScaleCompatible<36, u128> for () {}
-impl ScaleCompatible<37, u128> for () {}
-impl ScaleCompatible<38, u128> for () {}
+    1 u64
+    2 u64
+    3 u64
+    4 u64
+    5 u64
+    6 u64
+    7 u64
+    8 u64
+    9 u64
+    10 u64
+    11 u64
+    12 u64
+    13 u64
+    14 u64
+    15 u64
+    16 u64
+    17 u64
+    18 u64
+    19 u64
 
-// usize: 10^9
-// platform-dependent, but 32-bit for safety
-impl ScaleCompatible<1, usize> for () {}
-impl ScaleCompatible<2, usize> for () {}
-impl ScaleCompatible<3, usize> for () {}
-impl ScaleCompatible<4, usize> for () {}
-impl ScaleCompatible<5, usize> for () {}
-impl ScaleCompatible<6, usize> for () {}
-impl ScaleCompatible<7, usize> for () {}
-impl ScaleCompatible<8, usize> for () {}
-impl ScaleCompatible<9, usize> for () {}
+    1 u128
+    2 u128
+    3 u128
+    4 u128
+    5 u128
+    6 u128
+    7 u128
+    8 u128
+    9 u128
+    10 u128
+    11 u128
+    12 u128
+    13 u128
+    14 u128
+    15 u128
+    16 u128
+    17 u128
+    18 u128
+    19 u128
+    20 u128
+    21 u128
+    22 u128
+    23 u128
+    24 u128
+    25 u128
+    26 u128
+    27 u128
+    28 u128
+    29 u128
+    30 u128
+    31 u128
+    32 u128
+    33 u128
+    34 u128
+    35 u128
+    36 u128
+    37 u128
+    38 u128
 
-// i8 - 10^1
-impl ScaleCompatible<1, i8> for () {}
+    // platform-dependent, 32-bit for safety
+    1 usize
+    2 usize
+    3 usize
+    4 usize
+    5 usize
+    6 usize
+    7 usize
+    8 usize
+    9 usize
 
-// i16 - 10^4
-impl ScaleCompatible<1, i16> for () {}
-impl ScaleCompatible<2, i16> for () {}
-impl ScaleCompatible<3, i16> for () {}
-impl ScaleCompatible<4, i16> for () {}
+    1 i8
 
-// i32 - 10^9
-impl ScaleCompatible<1, i32> for () {}
-impl ScaleCompatible<2, i32> for () {}
-impl ScaleCompatible<3, i32> for () {}
-impl ScaleCompatible<4, i32> for () {}
-impl ScaleCompatible<5, i32> for () {}
-impl ScaleCompatible<6, i32> for () {}
-impl ScaleCompatible<7, i32> for () {}
-impl ScaleCompatible<8, i32> for () {}
-impl ScaleCompatible<9, i32> for () {}
+    1 i16
+    2 i16
+    3 i16
+    4 i16
 
-// i64 - 10^18
-impl ScaleCompatible<1, i64> for () {}
-impl ScaleCompatible<2, i64> for () {}
-impl ScaleCompatible<3, i64> for () {}
-impl ScaleCompatible<4, i64> for () {}
-impl ScaleCompatible<5, i64> for () {}
-impl ScaleCompatible<6, i64> for () {}
-impl ScaleCompatible<7, i64> for () {}
-impl ScaleCompatible<8, i64> for () {}
-impl ScaleCompatible<9, i64> for () {}
-impl ScaleCompatible<10, i64> for () {}
-impl ScaleCompatible<11, i64> for () {}
-impl ScaleCompatible<12, i64> for () {}
-impl ScaleCompatible<13, i64> for () {}
-impl ScaleCompatible<14, i64> for () {}
-impl ScaleCompatible<15, i64> for () {}
-impl ScaleCompatible<16, i64> for () {}
-impl ScaleCompatible<17, i64> for () {}
-impl ScaleCompatible<18, i64> for () {}
+    1 i32
+    2 i32
+    3 i32
+    4 i32
+    5 i32
+    6 i32
+    7 i32
+    8 i32
+    9 i32
 
-// i128 - 10^38
-impl ScaleCompatible<1, i128> for () {}
-impl ScaleCompatible<2, i128> for () {}
-impl ScaleCompatible<3, i128> for () {}
-impl ScaleCompatible<4, i128> for () {}
-impl ScaleCompatible<5, i128> for () {}
-impl ScaleCompatible<6, i128> for () {}
-impl ScaleCompatible<7, i128> for () {}
-impl ScaleCompatible<8, i128> for () {}
-impl ScaleCompatible<9, i128> for () {}
-impl ScaleCompatible<10, i128> for () {}
-impl ScaleCompatible<11, i128> for () {}
-impl ScaleCompatible<12, i128> for () {}
-impl ScaleCompatible<13, i128> for () {}
-impl ScaleCompatible<14, i128> for () {}
-impl ScaleCompatible<15, i128> for () {}
-impl ScaleCompatible<16, i128> for () {}
-impl ScaleCompatible<17, i128> for () {}
-impl ScaleCompatible<18, i128> for () {}
-impl ScaleCompatible<19, i128> for () {}
-impl ScaleCompatible<20, i128> for () {}
-impl ScaleCompatible<21, i128> for () {}
-impl ScaleCompatible<22, i128> for () {}
-impl ScaleCompatible<23, i128> for () {}
-impl ScaleCompatible<24, i128> for () {}
-impl ScaleCompatible<25, i128> for () {}
-impl ScaleCompatible<26, i128> for () {}
-impl ScaleCompatible<27, i128> for () {}
-impl ScaleCompatible<28, i128> for () {}
-impl ScaleCompatible<29, i128> for () {}
-impl ScaleCompatible<30, i128> for () {}
-impl ScaleCompatible<31, i128> for () {}
-impl ScaleCompatible<32, i128> for () {}
-impl ScaleCompatible<33, i128> for () {}
-impl ScaleCompatible<34, i128> for () {}
-impl ScaleCompatible<35, i128> for () {}
-impl ScaleCompatible<36, i128> for () {}
-impl ScaleCompatible<37, i128> for () {}
-impl ScaleCompatible<38, i128> for () {}
+    1 i64
+    2 i64
+    3 i64
+    4 i64
+    5 i64
+    6 i64
+    7 i64
+    8 i64
+    9 i64
+    10 i64
+    11 i64
+    12 i64
+    13 i64
+    14 i64
+    15 i64
+    16 i64
+    17 i64
+    18 i64
 
-// platform-dependent, but 32-bit for safety
-impl ScaleCompatible<1, isize> for () {}
-impl ScaleCompatible<2, isize> for () {}
-impl ScaleCompatible<3, isize> for () {}
-impl ScaleCompatible<4, isize> for () {}
-impl ScaleCompatible<5, isize> for () {}
-impl ScaleCompatible<6, isize> for () {}
-impl ScaleCompatible<7, isize> for () {}
-impl ScaleCompatible<8, isize> for () {}
-impl ScaleCompatible<9, isize> for () {}
+    1 i128
+    2 i128
+    3 i128
+    4 i128
+    5 i128
+    6 i128
+    7 i128
+    8 i128
+    9 i128
+    10 i128
+    11 i128
+    12 i128
+    13 i128
+    14 i128
+    15 i128
+    16 i128
+    17 i128
+    18 i128
+    19 i128
+    20 i128
+    21 i128
+    22 i128
+    23 i128
+    24 i128
+    25 i128
+    26 i128
+    27 i128
+    28 i128
+    29 i128
+    30 i128
+    31 i128
+    32 i128
+    33 i128
+    34 i128
+    35 i128
+    36 i128
+    37 i128
+    38 i128
+
+    // platform-dependent, 32-bit for safety
+    1 isize
+    2 isize
+    3 isize
+    4 isize
+    5 isize
+    6 isize
+    7 isize
+    8 isize
+    9 isize
+);
 
 const LOOK_UP: [u128; 38] = [
     10u128.pow(1),
@@ -237,6 +237,11 @@ where
     (): N<B>,
     (): ScaleCompatible<A, B> {
     unsafe {
-        LOOK_UP[(A - 1) as usize].try_into().unwrap_unchecked()
+        look_up::<A>().try_into().unwrap_unchecked()
     }
+}
+
+#[inline]
+const fn look_up<const T: u8>() -> u128 {
+    LOOK_UP[(T - 1) as usize]
 }

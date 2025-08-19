@@ -9,7 +9,7 @@ macro_rules! whitelist {
 }
 
 /// `A` & `B` can safely hold `π`.
-pub trait PICompatible<const A: u8, B> {}
+pub trait PICompatible<const A: u8, B> where B: num::Int {}
 
 whitelist!(
     1 u8
