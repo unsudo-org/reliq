@@ -17,6 +17,13 @@ impl N<i128> for () {}
 impl N<isize> for () {}
 
 #[inline]
+pub fn n0<T>() -> T
+where
+    T: num::Int {
+    T::AS_0
+}
+
+#[inline]
 pub fn n100<T>() -> T
 where
     T: num::Int {

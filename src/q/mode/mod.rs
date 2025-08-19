@@ -48,91 +48,71 @@ where
     }
 }
 
-impl<const A: u8, const B: u8, C, D> TryFrom<Q<A, C, PercentageMode, D>> for Q<B, C, DefaultMode, D>
+impl<const A: u8, B, C> From<Q<A, B, PercentageMode, C>> for Q<A, B, DefaultMode, C>
 where
-    C: num::Int,
-    D: Engine,
+    B: num::Int,
+    C: Engine,
     (): Precision<A>,
-    (): Precision<B>,
-    (): N<C> {
-    type Error = Error;
-
+    (): N<B> {
     #[inline]
-    fn try_from(q: Q<B, C, PercentageMode, D>) -> ::core::result::Result<Self, Self::Error> {
-        let n: C = q.n;
-        let n: C = D::cast::<A, B, _>(n)?;
-        let n: Self = Self {
+    fn from(q: Q<A, B, PercentageMode, C>) -> Self {
+        let n: B = q.n;
+        Self {
             n,
             m_0: ::core::marker::PhantomData,
             m_1: ::core::marker::PhantomData
-        };
-        Ok(n)
+        }
     }
 }
 
-impl<const A: u8, const B: u8, C, D> TryFrom<Q<A, C, RatioMode, D>> for Q<B, C, DefaultMode, D>
+impl<const A: u8, B, C> From<Q<A, B, RatioMode, C>> for Q<A, B, DefaultMode, C>
 where
-    C: num::Int,
-    D: Engine,
+    B: num::Int,
+    C: Engine,
     (): Precision<A>,
-    (): Precision<B>,
-    (): N<C> {
-    type Error = Error;
-
+    (): N<B> {
     #[inline]
-    fn try_from(q: Q<B, C, PercentageMode, D>) -> ::core::result::Result<Self, Self::Error> {
-        let n: C = q.n;
-        let n: C = D::cast::<A, B, _>(n)?;
-        let n: Self = Self {
+    fn from(q: Q<A, B, RatioMode, C>) -> Self {
+        let n: B = q.n;
+        Self {
             n,
             m_0: ::core::marker::PhantomData,
             m_1: ::core::marker::PhantomData
-        };
-        Ok(n)
+        }
     }
 }
 
-impl<const A: u8, const B: u8, C, D> TryFrom<Q<A, C, RadMode, D>> for Q<B, C, DefaultMode, D>
+impl<const A: u8, B, C> From<Q<A, B, RadMode, C>> for Q<A, B, DefaultMode, C>
 where
-    C: num::Int,
-    D: Engine,
+    B: num::Int,
+    C: Engine,
     (): Precision<A>,
-    (): Precision<B>,
-    (): N<C> {
-    type Error = Error;
-
+    (): N<B> {
     #[inline]
-    fn try_from(q: Q<B, C, PercentageMode, D>) -> ::core::result::Result<Self, Self::Error> {
-        let n: C = q.n;
-        let n: C = D::cast::<A, B, _>(n)?;
-        let n: Self = Self {
+    fn from(q: Q<A, B, RadMode, C>) -> Self {
+        let n: B = q.n;
+        Self {
             n,
             m_0: ::core::marker::PhantomData,
             m_1: ::core::marker::PhantomData
-        };
-        Ok(n)
+        }
     }
 }
 
-impl<const A: u8, const B: u8, C, D> TryFrom<Q<A, C, DegMode, D>> for Q<B, C, DefaultMode, D>
+impl<const A: u8, B, C> From<Q<A, B, DegMode, C>> for Q<A, B, DefaultMode, C>
 where
-    C: num::Int,
-    D: Engine,
+    B: num::Int,
+    C: Engine,
     (): Precision<A>,
-    (): Precision<B>,
-    (): N<C> {
-    type Error = Error;
-
+    (): N<B> {
     #[inline]
-    fn try_from(q: Q<B, C, PercentageMode, D>) -> ::core::result::Result<Self, Self::Error> {
-        let n: C = q.n;
-        let n: C = D::cast::<A, B, _>(n)?;
-        let n: Self = Self {
+    fn from(q: Q<A, B, DegMode, C>) -> Self {
+        let n: B = q.n;
+        Self {
             n,
             m_0: ::core::marker::PhantomData,
             m_1: ::core::marker::PhantomData
-        };
-        Ok(n)
+        }
     }
 }
 

@@ -22,3 +22,31 @@ ty!(
 pub struct PercentageMode;
 
 impl Mode for PercentageMode {}
+
+impl<const A: u8, B, C> From<B> for Q<A, B, PercentageMode, C>
+where
+    B: num::Int,
+    C: Engine,
+    (): Precision<A>,
+    (): N<B> {
+    #[inline]
+    fn from(n: B) -> Self {
+        Self {
+            n,
+            m_0: ::core::marker::PhantomData,
+            m_1: ::core::marker::PhantomData
+        }
+    }
+}
+
+impl<const A: u8, B, C> From<Q<A, B, DefaultMode, C>> for Q<A, B, PercentageMode, C>
+where
+    B: num::Int,
+    C: Engine,
+    (): Precision<A>,
+    (): N<B> {
+    #[inline]
+    fn from(q: Q<A, B, DefaultMode, C>) -> Self {
+        q.n.into()
+    }
+}
