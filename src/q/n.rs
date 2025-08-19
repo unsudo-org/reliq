@@ -17,6 +17,17 @@ impl N<i128> for () {}
 impl N<isize> for () {}
 
 #[inline]
+pub fn n100<T>() -> T
+where
+    T: num::Int {
+    let ret: u8 = 100;
+    let ret: T = unsafe {
+        ret.try_into().unwrap_unchecked()
+    };
+    ret
+}
+
+#[inline]
 pub fn n180<T>() -> T
 where
     T: num::Int {
