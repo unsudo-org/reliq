@@ -5,67 +5,55 @@ pub struct RatioMode;
 
 impl Mode for RatioMode {}
 
-impl<const A: u8, B, C> From<B> for Q<A, B, RatioMode, C>
+impl<const A: u8, B, C> TryFrom<Q<A, B, DefaultMode, C>> for Q<A, B, RatioMode, C>
 where
     B: num::Int,
     C: Engine,
     (): Precision<A>,
     (): N<B> {
-    #[inline]
-    fn from(n: B) -> Self {
-        Self {
-            n,
-            m_0: ::core::marker::PhantomData,
-            m_1: ::core::marker::PhantomData
+    type Error = Error;
+
+    fn try_from(q: Q<A, B, DefaultMode, C>) -> ::core::result::Result<Self, Self::Error> {
+        let n: B = q.n;
+        if n < B::AS_0 {
+            return Err()
         }
-    }
-}
-
-impl<const A: u8, const B: u8, C, D> TryFrom<Q<A, C, DefaultMode, D>> for Q<B, C, RatioMode, D>
-where
-    C: num::Int,
-    D: Engine,
-    (): Precision<A>,
-    (): Precision<B>,
-    (): N<C> {
-    type Error = Error;
-
-    #[inline]
-    fn try_from(q: Q<A, C, DefaultMode, D>) -> ::core::result::Result<Self, Self::Error> {
-        let n: C = q.n;
-        let n: C = D::cast::<A, B, _>(n)?;
-        let n: Self = Self {
+        if n > n100() {
+            return Err()
+        }
+        Ok(Self {
             n,
             m_0: ::core::marker::PhantomData,
             m_1: ::core::marker::PhantomData
-        };
-        Ok(n)
+        })
     }
 }
 
-
-impl<const A: u8, const B: u8, C, D> TryFrom<Q<A, C, PercentageMode, D>> for Q<B, C, RatioMode, D>
+impl<const A: u8, B, C> TryFrom<Q<A, B, PercentageMode, C>> for Q<A, B, RatioMode, C>
 where
-    C: num::Int,
-    D: Engine,
+    B: num::Int,
+    C: Engine,
     (): Precision<A>,
-    (): Precision<B>,
-    (): N<C> {
+    (): N<B> {
     type Error = Error;
 
-    #[inline]
-    fn try_from(q: Q<A, C, PercentageMode, D>) -> ::core::result::Result<Self, Self::Error> {
-        let n: C = q.n;
-        let n: C = D::cast::<A, B, _>(n)?;
-        let n: C = D::div::<B, _>(n, n100())?;
-        let n: Self = Self {
+    fn try_from(q: Q<A, B, PercentageMode, C>) -> ::core::result::Result<Self, Self::Error> {
+        let n: B = q.n;
+        let n: B = unsafe {
+            // y is never `0`
+            C::div(n, n100()).unwrap_unchecked()
+        };
+        Ok(Self {
             n,
             m_0: ::core::marker::PhantomData,
             m_1: ::core::marker::PhantomData
-        };
-        Ok(n)   
+        })
     }
 }
+
+
+
+
 
 impl<const A: u8, B, C> ::core::fmt::Debug for Q<A, B, RatioMode, C>
 where

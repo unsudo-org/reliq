@@ -73,7 +73,8 @@ pub trait Engine {
     where
         B: num::Int,
         (): Precision<A>,
-        (): N<B> {
+        (): N<B>,
+        (): ScaleCompatible<A, B> {
         Self::muldiv(angle, pi::<A, _>(), n180::<B>() * scale::<A, B>())
     }
 
@@ -82,7 +83,8 @@ pub trait Engine {
     where
         B: num::Int,
         (): Precision<A>,
-        (): N<B> {
+        (): N<B>,
+        (): ScaleCompatible<A, B> {
         Self::muldiv(angle, n180::<B>() * scale::<A, B>(), pi())
     }
 
@@ -92,7 +94,9 @@ pub trait Engine {
         C: num::Int,
         (): Precision<A>,
         (): Precision<B>,
-        (): N<C> {
+        (): N<C>,
+        (): ScaleCompatible<A, C>,
+        (): ScaleCompatible<B, C> {
         let old_scale: C = scale::<A, _>();
         let new_scale: C = scale::<B, _>();
         Self::muldiv(n, new_scale, old_scale)
@@ -143,7 +147,8 @@ pub trait Engine {
     where
         B: num::Int,
         (): Precision<A>,
-        (): N<B> {
+        (): N<B>,
+        (): ScaleCompatible<A, B> {
         Self::muldiv(x, y, scale::<A, _>())
     }
 
@@ -152,14 +157,10 @@ pub trait Engine {
     where
         B: num::Int,
         (): Precision<A>,
-        (): N<B> {
-        let ret: u128 = scale::<A, u128>();
-        if ret.is_power_of_two() {
-            let ret: B = x << ret.trailing_zeros();
-            Ok(ret)
-        } else {
-            Ok(Self::muldiv(x, scale::<A, _>(), y)?)
-        }
+        (): N<B>,
+        (): ScaleCompatible<A, B>,
+        (): PICompatible<A, B> {
+        Self::muldiv(x, scale::<A, _>(), y)
     }
 
     #[inline]

@@ -19,14 +19,16 @@ impl N<isize> for () {}
 #[inline]
 pub fn n0<T>() -> T
 where
-    T: num::Int {
+    T: num::Int,
+    (): N<T> {
     T::AS_0
 }
 
 #[inline]
 pub fn n100<T>() -> T
 where
-    T: num::Int {
+    T: num::Int,
+    (): N<T> {
     let ret: u8 = 100;
     let ret: T = unsafe {
         ret.try_into().unwrap_unchecked()
@@ -37,10 +39,8 @@ where
 #[inline]
 pub fn n180<T>() -> T
 where
-    T: num::Int {
-    if T::SIGNED {
-        assert!(T::BITS_U128 <= 8);
-    }
+    T: num::Int,
+    (): N<T> {
     let ret: u8 = 180;
     let ret: T = unsafe {
         ret.try_into().unwrap_unchecked()
