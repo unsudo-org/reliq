@@ -281,6 +281,27 @@ where
     Self: for<'a> ::core::ops::RemAssign<&'a Self>
 {}
 
+common_num_float_impl!(
+    f32
+    f64
+);
+
+common_num_int_impl!(
+    i8
+    i16
+    i32
+    i64
+    i128
+    isize
+    u8
+    u16
+    u32
+    u64
+    u128
+    usize
+);
+
+
 pub trait Int 
 where
     Self: Num,
@@ -356,32 +377,6 @@ where
     fn sqrt(self) -> Self;
 }
 
-pub trait Float
-where
-    Self: Sized,
-    Self: Num
-{}
-
-common_num_float_impl!(
-    f32
-    f64
-);
-
-common_num_int_impl!(
-    i8
-    i16
-    i32
-    i64
-    i128
-    isize
-    u8
-    u16
-    u32
-    u64
-    u128
-    usize
-);
-
 common_signed_int_impl!(
     i8
     i16
@@ -400,5 +395,32 @@ common_unsigned_int_impl!(
     usize
 );
 
+
+pub trait Float
+where
+    Self: Sized,
+    Self: Num
+{}
+
 impl Float for f32 {}
 impl Float for f64 {}
+
+
+pub trait Prim 
+where
+    Self: Sized,
+    Self: Copy{}
+impl Prim for u8 {}
+impl Prim for u16 {}
+impl Prim for u32 {}
+impl Prim for u64 {}
+impl Prim for u128 {}
+impl Prim for usize {}
+impl Prim for i8 {}
+impl Prim for i16 {}
+impl Prim for i32 {}
+impl Prim for i64 {}
+impl Prim for i128 {}
+impl Prim for isize {}
+impl Prim for f32 {}
+impl Prim for f64 {}

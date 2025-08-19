@@ -1,15 +1,29 @@
 use super::*;
 
 ::modwire::expose!(
-    pub mode
     pub engine
-        fold
         n
         pi
     pub precision
         scale
         trig
-        wide_mul
+);
+
+macro_rules! ty {
+    ($($n:literal)*) => {
+        $(
+            ::paste::paste!(
+                pub type [< Q $n >]<T> = Q<$n, T>;
+            );
+        )*
+    };
+}
+
+ty!(
+    1 2 3 4 5 6 7 8 9
+    10 11 12 13 14 15 16 17 18 19
+    20 21 22 23 24 25 26 27 28 29
+    30 31 32 33 34 35 36 37
 );
 
 pub type Result<T> = ::core::result::Result<T, Error>;
@@ -23,66 +37,166 @@ pub enum Error {
     DivisionByZero
 }
 
+/// # Where
+/// * A - Precision
+/// * B - Int
+/// * C - Engine
 #[repr(transparent)]
-#[derive(Debug)]
 #[derive(Clone)]
 #[derive(Copy)]
-pub struct Q<const A: u8, B = usize, C = DefaultMode, D = DefaultEngine>
+pub struct Q<const A: u8, B = usize, C = DefaultEngine>
 where
     B: num::Int,
-    C: Mode,
-    D: Engine,
+    B: num::Prim,
+    C: Engine,
     (): Precision<A>,
     (): N<B>,
     (): ScaleCompatible<A, B>,
     (): PICompatible<A, B> {
     n: B,
-    m_0: ::core::marker::PhantomData<C>,
-    m_1: ::core::marker::PhantomData<D>
+    m_0: ::core::marker::PhantomData<C>
 }
 
-impl<const A: u8, B, C, D> Q<A, B, C, D>
+impl<const A: u8, B, C> Q<A, B, C>
 where
     B: num::Int,
-    C: Mode,
-    D: Engine,
+    B: num::Prim,
+    C: Engine,
     (): Precision<A>,
     (): N<B>,
     (): ScaleCompatible<A, B>,
     (): PICompatible<A, B> {
     #[inline]
-    pub fn cast<const E: u8>(self) -> Result<Q<E, B, C, D>> 
+    pub fn cast<const D: u8>(self) -> Result<Q<D, B, C>> 
     where
-        (): Precision<E>,
-        (): ScaleCompatible<E, B>,
-        (): PICompatible<E, B> {
-        let n: B = self.n;
-        let n: B = D::cast::<A, E, _>(n)?;
-        let n: Q<E, B, C, D> = Q {
-            n,
-            m_0: ::core::marker::PhantomData,
-            m_1: ::core::marker::PhantomData
-        };
-        Ok(n)
+        (): Precision<D>,
+        (): ScaleCompatible<D, B>,
+        (): PICompatible<D, B> {
+        let ret: B = self.n;
+        let ret: B = C::cast::<A, D, _>(ret)?;
+        let ret: Q<D, B, C> = ret.into();
+        Ok(ret)
     }
 }
 
-impl<const A: u8, B, C, D> Eq for Q<A, B, C, D>
+impl<const A: u8, B, C> From<B> for Q<A, B, C>
 where
     B: num::Int,
-    C: Mode,
-    D: Engine,
+    B: num::Prim,
+    C: Engine,
+    (): Precision<A>,
+    (): N<B>,
+    (): ScaleCompatible<A, B>,
+    (): PICompatible<A, B> {
+    #[inline]
+    fn from(n: B) -> Self {
+        Self {
+            n,
+            m_0: ::core::marker::PhantomData
+        }
+    }
+}
+
+impl<const A: u8, B, C> ::core::ops::Add for Q<A, B, C>
+where
+    B: num::Int,
+    B: num::Prim,
+    C: Engine,
+    (): Precision<A>,
+    (): N<B>,
+    (): ScaleCompatible<A, B>,
+    (): PICompatible<A, B> {
+    type Output = Result<Self>;
+
+    #[inline]
+    fn add(self, rhs: Self) -> Self::Output {
+        let x: B = self.n;
+        let y: B = rhs.n;
+        let ret: B = C::add(x, y)?;
+        let ret: Self = ret.into();
+        Ok(ret)
+    }
+}
+
+impl<const A: u8, B, C> ::core::ops::Sub for Q<A, B, C>
+where
+    B: num::Int,
+    B: num::Prim,
+    C: Engine,
+    (): Precision<A>,
+    (): N<B>,
+    (): ScaleCompatible<A, B>,
+    (): PICompatible<A, B> {
+    type Output = Result<Self>;
+
+    #[inline]
+    fn sub(self, rhs: Self) -> Self::Output {
+        let x: B = self.n;
+        let y: B = rhs.n;
+        let ret: B = C::sub(x, y)?;
+        let ret: Self = ret.into();
+        Ok(ret)
+    }
+}
+
+impl<const A: u8, B, C> ::core::ops::Mul for Q<A, B, C>
+where
+    B: num::Int,
+    B: num::Prim,
+    C: Engine,
+    (): Precision<A>,
+    (): N<B>,
+    (): ScaleCompatible<A, B>,
+    (): PICompatible<A, B> {
+    type Output = Result<Self>;
+
+    #[inline]
+    fn mul(self, rhs: Self) -> Self::Output {
+        let x: B = self.n;
+        let y: B = rhs.n;
+        let ret: B = C::mul(x, y)?;
+        let ret: Self = ret.into();
+        Ok(ret)
+    }
+}
+
+impl<const A: u8, B, C> ::core::ops::Div for Q<A, B, C>
+where
+    B: num::Int,
+    B: num::Prim,
+    C: Engine,
+    (): Precision<A>,
+    (): N<B>,
+    (): ScaleCompatible<A, B>,
+    (): PICompatible<A, B> {
+    type Output = Result<Self>;
+
+    #[inline]
+    fn div(self, rhs: Self) -> Self::Output {
+        let x: B = self.n;
+        let y: B = rhs.n;
+        let ret: B = C::div(x, y)?;
+        let ret: Self = ret.into();
+        Ok(ret)
+    }
+}
+
+impl<const A: u8, B, C> Eq for Q<A, B, C>
+where
+    B: num::Int,
+    B: num::Prim,
+    C: Engine,
     (): Precision<A>,
     (): N<B>,
     (): ScaleCompatible<A, B>,
     (): PICompatible<A, B>
     {}
 
-impl<const A: u8, B, C, D> PartialEq for Q<A, B, C, D>
+impl<const A: u8, B, C> PartialEq for Q<A, B, C>
 where
     B: num::Int,
-    C: Mode,
-    D: Engine,
+    B: num::Prim,
+    C: Engine,
     (): Precision<A>,
     (): N<B>,
     (): ScaleCompatible<A, B>,
@@ -93,11 +207,11 @@ where
     }
 }
 
-impl<const A: u8, B, C, D> Ord for Q<A, B, C, D>
+impl<const A: u8, B, C> Ord for Q<A, B, C>
 where
     B: num::Int,
-    C: Mode,
-    D: Engine,
+    B: num::Prim,
+    C: Engine,
     (): Precision<A>,
     (): N<B>,
     (): ScaleCompatible<A, B>,
@@ -151,11 +265,11 @@ where
     }
 }
 
-impl<const A: u8, B, C, D> PartialOrd for Q<A, B, C, D>
+impl<const A: u8, B, C> PartialOrd for Q<A, B, C>
 where
     B: num::Int,
-    C: Mode,
-    D: Engine,
+    B: num::Prim,
+    C: Engine,
     (): Precision<A>,
     (): N<B>,
     (): ScaleCompatible<A, B>,
