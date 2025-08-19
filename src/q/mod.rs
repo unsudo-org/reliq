@@ -44,6 +44,17 @@ macro_rules! ty_rad {
     };
 }
 
+macro_rules! ty_percentage {
+    ($($n:literal)*) => {
+        pub type Percentage<const A: u8, B> = Q<A, B, PercentageMode>;
+        $(
+            ::paste::paste!(
+                pub type [< Percentage $n >]<T> = Q<$n, T, PercentageMode>;
+            );
+        )*
+    };
+}
+
 ty_q!(
     1 2 3 4 5 6 7 8 9
     10 11 12 13 14 15 16 17 18 19
@@ -59,6 +70,13 @@ ty_deg!(
 );
 
 ty_rad!(
+    1 2 3 4 5 6 7 8 9
+    10 11 12 13 14 15 16 17 18 19
+    20 21 22 23 24 25 26 27 28 29
+    30 31 32 33 34 35 36 37
+);
+
+ty_percentage!(
     1 2 3 4 5 6 7 8 9
     10 11 12 13 14 15 16 17 18 19
     20 21 22 23 24 25 26 27 28 29
@@ -176,6 +194,50 @@ where
     }
 }
 
+impl<const A: u8, const B: u8, C, D> TryFrom<Q<A, C, PercentageMode, D>> for Q<B, C, DefaultMode, D>
+where
+    C: num::Int,
+    D: Engine,
+    (): Precision<A>,
+    (): Precision<B>,
+    (): N<C> {
+    type Error = Error;
+
+    #[inline]
+    fn try_from(q: Q<A, C, PercentageMode, D>) -> ::core::result::Result<Self, Self::Error> {
+        let n: C = q.n;
+        let n: C = D::cast::<A, B, _>(n)?;
+        let n: Self = Self {
+            n,
+            m_0: ::core::marker::PhantomData,
+            m_1: ::core::marker::PhantomData
+        };
+        Ok(n)
+    }
+}
+
+impl<const A: u8, const B: u8, C, D> TryFrom<Q<A, C, RatioMode, D>> for Q<B, C, DefaultMode, D>
+where
+    C: num::Int,
+    D: Engine,
+    (): Precision<A>,
+    (): Precision<B>,
+    (): N<C> {
+    type Error = Error;
+
+    #[inline]
+    fn try_from(q: Q<A, C, RatioMode, D>) -> ::core::result::Result<Self, Self::Error> {
+        let n: C = q.n;
+        let n: C = D::cast::<A, B, _>(n)?;
+        let n: Self = Self {
+            n,
+            m_0: ::core::marker::PhantomData,
+            m_1: ::core::marker::PhantomData
+        };
+        Ok(n)
+    }
+}
+
 impl<const A: u8, const B: u8, C, D> TryFrom<Q<A, C, RadMode, D>> for Q<B, C, DefaultMode, D>
 where
     C: num::Int,
@@ -220,17 +282,6 @@ where
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
 impl<const A: u8, B, C> ::core::ops::Add for Q<A, B, DefaultMode, C>
 where
     B: num::Int,
@@ -239,6 +290,7 @@ where
     (): N<B> {
     type Output = Result<Self>;
 
+    #[inline]
     fn add(self, rhs: Self) -> Self::Output {
         let x: B = self.n;
         let y: B = rhs.n;
@@ -256,6 +308,7 @@ where
     (): N<B> {
     type Output = Result<Self>;
 
+    #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
         let x: B = self.n;
         let y: B = rhs.n;
@@ -273,6 +326,7 @@ where
     (): N<B> {
     type Output = Result<Self>;
 
+    #[inline]
     fn mul(self, rhs: Self) -> Self::Output {
         let x: B = self.n;
         let y: B = rhs.n;
@@ -290,6 +344,7 @@ where
     (): N<B> {
     type Output = Result<Self>;
 
+    #[inline]
     fn div(self, rhs: Self) -> Self::Output {
         let x: B = self.n;
         let y: B = rhs.n;
