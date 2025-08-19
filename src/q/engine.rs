@@ -13,7 +13,9 @@ pub trait Engine {
     where
         B: num::Int,
         (): Precision<A>,
-        (): N<B> {
+        (): N<B>,
+        (): ScaleCompatible<A, B>,
+        (): PICompatible<A, B> {
         Self::div(Self::sin(angle)?, Self::cos(angle)?)
     }
 
@@ -22,7 +24,9 @@ pub trait Engine {
     where
         B: num::Int,
         (): Precision<A>,
-        (): N<B> {
+        (): N<B>,
+        (): ScaleCompatible<A, B>,
+        (): PICompatible<A, B> {
         Self::cos(Self::sub(Self::to_rad::<A, B>(deg90()?)?, angle)?)
     }
 
@@ -31,7 +35,9 @@ pub trait Engine {
     where
         B: num::Int,
         (): Precision<A>,
-        (): N<B> {
+        (): N<B>,
+        (): ScaleCompatible<A, B>,
+        (): PICompatible<A, B> {
         let (scale, pi, pi_2) = {
             let scale: B = scale::<A, _>();
             let pi: B = pi::<A, _>();
@@ -74,7 +80,8 @@ pub trait Engine {
         B: num::Int,
         (): Precision<A>,
         (): N<B>,
-        (): ScaleCompatible<A, B> {
+        (): ScaleCompatible<A, B>,
+        (): PICompatible<A, B> {
         Self::muldiv(angle, pi::<A, _>(), n180::<B>() * scale::<A, B>())
     }
 
@@ -84,7 +91,8 @@ pub trait Engine {
         B: num::Int,
         (): Precision<A>,
         (): N<B>,
-        (): ScaleCompatible<A, B> {
+        (): ScaleCompatible<A, B>,
+        (): PICompatible<A, B> {
         Self::muldiv(angle, n180::<B>() * scale::<A, B>(), pi())
     }
 
@@ -96,7 +104,9 @@ pub trait Engine {
         (): Precision<B>,
         (): N<C>,
         (): ScaleCompatible<A, C>,
-        (): ScaleCompatible<B, C> {
+        (): ScaleCompatible<B, C>,
+        (): PICompatible<A, C>,
+        (): PICompatible<B, C> {
         let old_scale: C = scale::<A, _>();
         let new_scale: C = scale::<B, _>();
         Self::muldiv(n, new_scale, old_scale)
@@ -148,7 +158,8 @@ pub trait Engine {
         B: num::Int,
         (): Precision<A>,
         (): N<B>,
-        (): ScaleCompatible<A, B> {
+        (): ScaleCompatible<A, B>,
+        (): PICompatible<A, B> {
         Self::muldiv(x, y, scale::<A, _>())
     }
 

@@ -7,7 +7,9 @@ pub fn deg90<const A: u8, B>() -> Result<Deg<B>>
 where
     B: num::Int,
     (): Precision<A>,
-    (): N<B> {
+    (): N<B>,
+    (): ScaleCompatible<A, B>,
+    (): PICompatible<A, B> {
     let deg: B = if B::SIGNED {
         let n: i128 = 90;
         let n: B = unsafe {

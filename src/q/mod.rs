@@ -33,7 +33,9 @@ where
     C: Mode,
     D: Engine,
     (): Precision<A>,
-    (): N<B> {
+    (): N<B>,
+    (): ScaleCompatible<A, B>,
+    (): PICompatible<A, B> {
     n: B,
     m_0: ::core::marker::PhantomData<C>,
     m_1: ::core::marker::PhantomData<D>
@@ -45,11 +47,15 @@ where
     C: Mode,
     D: Engine,
     (): Precision<A>,
-    (): N<B> {
+    (): N<B>,
+    (): ScaleCompatible<A, B>,
+    (): PICompatible<A, B> {
     #[inline]
     pub fn cast<const E: u8>(self) -> Result<Q<E, B, C, D>> 
     where
-        (): Precision<E> {
+        (): Precision<E>,
+        (): ScaleCompatible<E, B>,
+        (): PICompatible<E, B> {
         let n: B = self.n;
         let n: B = D::cast::<A, E, _>(n)?;
         let n: Q<E, B, C, D> = Q {
@@ -67,7 +73,9 @@ where
     C: Mode,
     D: Engine,
     (): Precision<A>,
-    (): N<B> 
+    (): N<B>,
+    (): ScaleCompatible<A, B>,
+    (): PICompatible<A, B>
     {}
 
 impl<const A: u8, B, C, D> PartialEq for Q<A, B, C, D>
@@ -76,7 +84,9 @@ where
     C: Mode,
     D: Engine,
     (): Precision<A>,
-    (): N<B> {
+    (): N<B>,
+    (): ScaleCompatible<A, B>,
+    (): PICompatible<A, B> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
         self.n == other.n
@@ -89,7 +99,44 @@ where
     C: Mode,
     D: Engine,
     (): Precision<A>,
-    (): N<B> {
+    (): N<B>,
+    (): ScaleCompatible<A, B>,
+    (): PICompatible<A, B> {
+    #[inline]
+    fn clamp(self, min: Self, max: Self) -> Self
+    where
+        Self: Sized {
+        if self < min {
+            min
+        } else if self > max {
+            max
+        } else {
+            self
+        }
+    }
+
+    #[inline]
+    fn max(self, other: Self) -> Self
+    where
+        Self: Sized {
+        if self > other {
+            self
+        } else {
+            other
+        }
+    }
+
+    #[inline]
+    fn min(self, other: Self) -> Self
+    where
+        Self: Sized {
+        if self < other {
+            self
+        } else {
+            other
+        }
+    }
+
     #[inline]
     fn cmp(&self, other: &Self) -> ::core::cmp::Ordering {
         let x: B = self.n;
@@ -110,7 +157,37 @@ where
     C: Mode,
     D: Engine,
     (): Precision<A>,
-    (): N<B> {
+    (): N<B>,
+    (): ScaleCompatible<A, B>,
+    (): PICompatible<A, B> {
+    #[inline]
+    fn ge(&self, other: &Self) -> bool {
+        let x: B = self.n;
+        let y: B = other.n;
+        x >= y
+    }
+
+    #[inline]
+    fn le(&self, other: &Self) -> bool {
+        let x: B = self.n;
+        let y: B = other.n;
+        x <= y
+    }
+
+    #[inline]
+    fn gt(&self, other: &Self) -> bool {
+        let x: B = self.n;
+        let y: B = other.n;
+        x > y
+    }
+
+    #[inline]
+    fn lt(&self, other: &Self) -> bool {
+        let x: B = self.n;
+        let y: B = other.n;
+        x < y
+    }
+
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<::core::cmp::Ordering> {
         Some(self.cmp(other))

@@ -232,7 +232,6 @@ const LOOK_UP: [u128; 38] = [
 pub fn scale<const A: u8, B>() -> B 
 where 
     B: num::Int,
-    // out of bounds guard is covered by `Precision<A>`
     (): Precision<A>,
     (): N<B>,
     (): ScaleCompatible<A, B> {

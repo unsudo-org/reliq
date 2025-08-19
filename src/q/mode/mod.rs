@@ -37,7 +37,9 @@ where
     B: num::Int,
     C: Engine,
     (): Precision<A>,
-    (): N<B> {
+    (): N<B>,
+    (): ScaleCompatible<A, B>,
+    (): PICompatible<A, B> {
     #[inline]
     fn from(n: B) -> Self {
         Self {
@@ -53,7 +55,9 @@ where
     B: num::Int,
     C: Engine,
     (): Precision<A>,
-    (): N<B> {
+    (): N<B>,
+    (): ScaleCompatible<A, B>,
+    (): PICompatible<A, B> {
     #[inline]
     fn from(q: Q<A, B, PercentageMode, C>) -> Self {
         let n: B = q.n;
@@ -70,7 +74,9 @@ where
     B: num::Int,
     C: Engine,
     (): Precision<A>,
-    (): N<B> {
+    (): N<B>,
+    (): ScaleCompatible<A, B>,
+    (): PICompatible<A, B> {
     #[inline]
     fn from(q: Q<A, B, RatioMode, C>) -> Self {
         let n: B = q.n;
@@ -87,7 +93,9 @@ where
     B: num::Int,
     C: Engine,
     (): Precision<A>,
-    (): N<B> {
+    (): N<B>,
+    (): ScaleCompatible<A, B>,
+    (): PICompatible<A, B> {
     #[inline]
     fn from(q: Q<A, B, RadMode, C>) -> Self {
         let n: B = q.n;
@@ -104,7 +112,9 @@ where
     B: num::Int,
     C: Engine,
     (): Precision<A>,
-    (): N<B> {
+    (): N<B>,
+    (): ScaleCompatible<A, B>,
+    (): PICompatible<A, B> {
     #[inline]
     fn from(q: Q<A, B, DegMode, C>) -> Self {
         let n: B = q.n;
@@ -121,7 +131,9 @@ where
     B: num::Int,
     C: Engine,
     (): Precision<A>,
-    (): N<B> {
+    (): N<B>,
+    (): ScaleCompatible<A, B>,
+    (): PICompatible<A, B> {
     type Output = Result<Self>;
 
     #[inline]
@@ -139,7 +151,9 @@ where
     B: num::Int,
     C: Engine,
     (): Precision<A>,
-    (): N<B> {
+    (): N<B>,
+    (): ScaleCompatible<A, B>,
+    (): PICompatible<A, B> {
     type Output = Result<Self>;
 
     #[inline]
@@ -157,7 +171,9 @@ where
     B: num::Int,
     C: Engine,
     (): Precision<A>,
-    (): N<B> {
+    (): N<B>,
+    (): ScaleCompatible<A, B>,
+    (): PICompatible<A, B> {
     type Output = Result<Self>;
 
     #[inline]
@@ -175,7 +191,9 @@ where
     B: num::Int,
     C: Engine,
     (): Precision<A>,
-    (): N<B> {
+    (): N<B>,
+    (): ScaleCompatible<A, B>,
+    (): PICompatible<A, B> {
     type Output = Result<Self>;
 
     #[inline]
