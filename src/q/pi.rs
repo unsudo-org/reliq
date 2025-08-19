@@ -1,133 +1,188 @@
 use super::*;
 
+macro_rules! whitelist {
+    ($($n:literal $ty:ty)*) => {
+        $(
+            impl PICompatible<$n, $ty> for () {}
+        )*
+    };
+}
+
+/// `A` & `B` can safely hold `π`.
 pub trait PICompatible<const A: u8, B> {}
 
-// u8 (can safely hold π * 10^2 = 314)
-impl PICompatible<1, u8> for () {}
-impl PICompatible<2, u8> for () {}
+whitelist!(
+    1 u8
+    2 u8
 
-// u16 (π * 10^4 = 31415)
-impl PICompatible<1, u16> for () {}
-impl PICompatible<2, u16> for () {}
-impl PICompatible<3, u16> for () {}
-impl PICompatible<4, u16> for () {}
+    1 u16
+    2 u16
+    3 u16
+    4 u16
 
-// u32 (π * 10^9 = 3141592653)
-impl PICompatible<1, u32> for () {}
-impl PICompatible<2, u32> for () {}
-impl PICompatible<3, u32> for () {}
-impl PICompatible<4, u32> for () {}
-impl PICompatible<5, u32> for () {}
-impl PICompatible<6, u32> for () {}
-impl PICompatible<7, u32> for () {}
-impl PICompatible<8, u32> for () {}
-impl PICompatible<9, u32> for () {}
+    1 u32
+    2 u32
+    3 u32
+    4 u32
+    5 u32
+    6 u32
+    7 u32
+    8 u32
+    9 u32
 
-// u64 (π * 10^18 = 3141592653589793238)
-impl PICompatible<1, u64> for () {}
-impl PICompatible<2, u64> for () {}
-impl PICompatible<3, u64> for () {}
-impl PICompatible<4, u64> for () {}
-impl PICompatible<5, u64> for () {}
-impl PICompatible<6, u64> for () {}
-impl PICompatible<7, u64> for () {}
-impl PICompatible<8, u64> for () {}
-impl PICompatible<9, u64> for () {}
-impl PICompatible<10, u64> for () {}
-impl PICompatible<11, u64> for () {}
-impl PICompatible<12, u64> for () {}
-impl PICompatible<13, u64> for () {}
-impl PICompatible<14, u64> for () {}
-impl PICompatible<15, u64> for () {}
-impl PICompatible<16, u64> for () {}
-impl PICompatible<17, u64> for () {}
-impl PICompatible<18, u64> for () {}
+    1 u64
+    2 u64
+    3 u64
+    4 u64
+    5 u64
+    6 u64
+    7 u64
+    8 u64
+    9 u64
+    10 u64
+    11 u64
+    12 u64
+    13 u64
+    14 u64
+    15 u64
+    16 u64
+    17 u64
+    18 u64
 
-// u128 (π * 10^38 = 31415926535897932384626433832795028841)
-impl PICompatible<1, u128> for () {}
-impl PICompatible<2, u128> for () {}
-impl PICompatible<3, u128> for () {}
-impl PICompatible<4, u128> for () {}
-impl PICompatible<5, u128> for () {}
-impl PICompatible<6, u128> for () {}
-impl PICompatible<7, u128> for () {}
-impl PICompatible<8, u128> for () {}
-impl PICompatible<9, u128> for () {}
-impl PICompatible<10, u128> for () {}
-impl PICompatible<11, u128> for () {}
-impl PICompatible<12, u128> for () {}
-impl PICompatible<13, u128> for () {}
-impl PICompatible<14, u128> for () {}
-impl PICompatible<15, u128> for () {}
-impl PICompatible<16, u128> for () {}
-impl PICompatible<17, u128> for () {}
-impl PICompatible<18, u128> for () {}
-impl PICompatible<19, u128> for () {}
-impl PICompatible<20, u128> for () {}
-impl PICompatible<21, u128> for () {}
-impl PICompatible<22, u128> for () {}
-impl PICompatible<23, u128> for () {}
-impl PICompatible<24, u128> for () {}
-impl PICompatible<25, u128> for () {}
-impl PICompatible<26, u128> for () {}
-impl PICompatible<27, u128> for () {}
-impl PICompatible<28, u128> for () {}
-impl PICompatible<29, u128> for () {}
-impl PICompatible<30, u128> for () {}
-impl PICompatible<31, u128> for () {}
-impl PICompatible<32, u128> for () {}
-impl PICompatible<33, u128> for () {}
-impl PICompatible<34, u128> for () {}
-impl PICompatible<35, u128> for () {}
-impl PICompatible<36, u128> for () {}
-impl PICompatible<37, u128> for () {}
+    1 u128
+    2 u128
+    3 u128
+    4 u128
+    5 u128
+    6 u128
+    7 u128
+    8 u128
+    9 u128
+    10 u128
+    11 u128
+    12 u128
+    13 u128
+    14 u128
+    15 u128
+    16 u128
+    17 u128
+    18 u128
+    19 u128
+    20 u128
+    21 u128
+    22 u128
+    23 u128
+    24 u128
+    25 u128
+    26 u128
+    27 u128
+    28 u128
+    29 u128
+    30 u128
+    31 u128
+    32 u128
+    33 u128
+    34 u128
+    35 u128
+    36 u128
+    37 u128
 
-// i8 can hold up to 31 -> 10^1, 10^2 would overflow
-impl PICompatible<1, i8> for () {}
+    // platform-dependent, 32-bit for safety
+    1 usize
+    2 usize
+    3 usize
+    4 usize
+    5 usize
+    6 usize
+    7 usize
+    8 usize
+    9 usize
 
-// i16 can hold up to 31415 -> 10^4
-impl PICompatible<1, i16> for () {}
-impl PICompatible<2, i16> for () {}
-impl PICompatible<3, i16> for () {}
-impl PICompatible<4, i16> for () {}
+    1 i8
 
-// i32 can hold up to 3141592653 -> 10^9
-impl PICompatible<1, i32> for () {}
-impl PICompatible<2, i32> for () {}
-impl PICompatible<3, i32> for () {}
-impl PICompatible<4, i32> for () {}
-impl PICompatible<5, i32> for () {}
-impl PICompatible<6, i32> for () {}
-impl PICompatible<7, i32> for () {}
-impl PICompatible<8, i32> for () {}
-impl PICompatible<9, i32> for () {}
+    1 i16
+    2 i16
+    3 i16
+    4 i16
 
-// i64
-impl PICompatible<1, i64> for () {}
-impl PICompatible<2, i64> for () {}
-impl PICompatible<3, i64> for () {}
-impl PICompatible<4, i64> for () {}
-impl PICompatible<5, i64> for () {}
-impl PICompatible<6, i64> for () {}
-impl PICompatible<7, i64> for () {}
-impl PICompatible<8, i64> for () {}
-impl PICompatible<9, i64> for () {}
-impl PICompatible<10, i64> for () {}
-impl PICompatible<11, i64> for () {}
-impl PICompatible<12, i64> for () {}
-impl PICompatible<13, i64> for () {}
-impl PICompatible<14, i64> for () {}
-impl PICompatible<15, i64> for () {}
-impl PICompatible<16, i64> for () {}
-impl PICompatible<17, i64> for () {}
-impl PICompatible<18, i64> for () {}
+    1 i32
+    2 i32
+    3 i32
+    4 i32
+    5 i32
+    6 i32
+    7 i32
+    8 i32
+    9 i32
 
-// i128 can hold up to 10^38
-impl PICompatible<1, i128> for () {}
-impl PICompatible<2, i128> for () {}
-impl PICompatible<3, i128> for () {}
+    1 i64
+    2 i64
+    3 i64
+    4 i64
+    5 i64
+    6 i64
+    7 i64
+    8 i64
+    9 i64
+    10 i64
+    11 i64
+    12 i64
+    13 i64
+    14 i64
+    15 i64
+    16 i64
+    17 i64
+    18 i64
 
-// ..=36
+    1 i128
+    2 i128
+    3 i128
+    4 i128
+    5 i128
+    6 i128
+    7 i128
+    8 i128
+    9 i128
+    10 i128
+    11 i128
+    12 i128
+    13 i128
+    14 i128
+    15 i128
+    16 i128
+    17 i128
+    18 i128
+    19 i128
+    20 i128
+    21 i128
+    22 i128
+    23 i128
+    24 i128
+    25 i128
+    26 i128
+    27 i128
+    28 i128
+    29 i128
+    30 i128
+    31 i128
+    32 i128
+    33 i128
+    34 i128
+    35 i128
+    36 i128
+    37 i128
+
+    // platform-dependent, 32-bit for safety
+    1 isize
+    2 isize
+    3 isize
+    4 isize
+    5 isize
+    6 isize
+    7 isize
+    8 isize
+    9 isize
+);
 
 const LOOK_UP: [u128; 37] = [
     31,
@@ -169,13 +224,19 @@ const LOOK_UP: [u128; 37] = [
     31415926535897932384626433832795028841
 ];
 
-#[inline(always)]
+#[inline]
 pub fn pi<const A: u8, B>() -> B
 where
     B: num::Int,
     (): Precision<A>,
-    (): N<B> {
-    unsafe {
-        LOOK_UP[(A - 1) as usize].try_into().unwrap_unchecked()
+    (): N<B>,
+    (): PICompatible<A, B> {
+    unsafe  {
+        look_up::<A>().try_into().unwrap_unchecked()
     }
+}
+
+#[inline]
+const fn look_up<const T: u8>() -> u128 {
+    LOOK_UP[(T - 1) as usize]
 }
