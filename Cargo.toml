@@ -5,3 +5,7 @@ dependencies.paste.version = "*"
 dependencies.modwire.version = "*"
 dependencies.toga.version = "*"
 dev-dependencies.criterion.version = "*"
+
+[[bench]]
+name = "q"
+harness = false

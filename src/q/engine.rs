@@ -404,3 +404,15 @@ where
     };
     Ok(n)
 }
+
+#[inline]
+fn n180<T>() -> T
+where
+    T: num::Int,
+    (): N<T> {
+    let ret: u8 = 180;
+    let ret: T = unsafe {
+        ret.try_into().unwrap_unchecked()
+    };
+    ret
+}
