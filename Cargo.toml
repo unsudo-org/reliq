@@ -1,6 +1,9 @@
 package.name = "reliq"
 package.version = "0.1.0"
 package.edition = "2024"
+package.keywords = [
+    "no-panic"
+]
 dependencies.paste.version = "*"
 dependencies.modwire.version = "*"
 dependencies.toga.version = "*"

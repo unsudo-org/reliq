@@ -1,12 +1,17 @@
 #![no_std]
 
-pub mod q;
-pub mod num;
+pub mod prim;
 
-fn do_something<const T: u8>(count: q::Q<T, u16>) 
-where
-    (): q::Precision<T>,
-    (): q::ScaleCompatible<T, u16>,
-    (): q::PICompatible<T, u16> {
-    
+pub type Result<T> = ::core::result::Result<T, Error>;
+
+#[derive(Debug)]
+#[derive(Clone)]
+#[derive(PartialEq)]
+pub enum Error {
+    Overflow,
+    Underflow,
+    DivisionByZero,
+    RemByZero
 }
+
+pub mod num;

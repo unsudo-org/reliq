@@ -307,30 +307,7 @@ where
     Self: Num,
     Self: ::core::cmp::Eq,
     Self: ::core::cmp::Ord,
-    Self: ::core::convert::TryFrom<i8>,
-    Self: ::core::convert::TryFrom<i16>,
-    Self: ::core::convert::TryFrom<i32>,
-    Self: ::core::convert::TryFrom<i64>,
-    Self: ::core::convert::TryFrom<i128>,
-    Self: ::core::convert::TryFrom<isize>,
-    Self: ::core::convert::TryFrom<u8>,
-    Self: ::core::convert::TryFrom<u16>,
-    Self: ::core::convert::TryFrom<u32>,
-    Self: ::core::convert::TryFrom<u64>,
-    Self: ::core::convert::TryFrom<u128>,
-    Self: ::core::convert::TryFrom<usize>,
-    Self: ::core::convert::TryInto<i8>,
-    Self: ::core::convert::TryInto<i16>,
-    Self: ::core::convert::TryInto<i32>,
-    Self: ::core::convert::TryInto<i64>,
-    Self: ::core::convert::TryInto<i128>,
-    Self: ::core::convert::TryInto<isize>,
-    Self: ::core::convert::TryInto<u8>,
-    Self: ::core::convert::TryInto<u16>,
-    Self: ::core::convert::TryInto<u32>,
-    Self: ::core::convert::TryInto<u64>,
-    Self: ::core::convert::TryInto<u128>,
-    Self: ::core::convert::TryInto<usize>,
+
     Self: ::core::ops::Shl<u32, Output = Self>,
     Self: ::core::ops::ShlAssign,
     Self: ::core::ops::Shr<u32, Output = Self>,
@@ -395,6 +372,33 @@ common_unsigned_int_impl!(
     usize
 );
 
+pub trait IntConversion
+where
+    Self: ::core::convert::TryFrom<i8>,
+    Self: ::core::convert::TryFrom<i16>,
+    Self: ::core::convert::TryFrom<i32>,
+    Self: ::core::convert::TryFrom<i64>,
+    Self: ::core::convert::TryFrom<i128>,
+    Self: ::core::convert::TryFrom<isize>,
+    Self: ::core::convert::TryFrom<u8>,
+    Self: ::core::convert::TryFrom<u16>,
+    Self: ::core::convert::TryFrom<u32>,
+    Self: ::core::convert::TryFrom<u64>,
+    Self: ::core::convert::TryFrom<u128>,
+    Self: ::core::convert::TryFrom<usize>,
+    Self: ::core::convert::TryInto<i8>,
+    Self: ::core::convert::TryInto<i16>,
+    Self: ::core::convert::TryInto<i32>,
+    Self: ::core::convert::TryInto<i64>,
+    Self: ::core::convert::TryInto<i128>,
+    Self: ::core::convert::TryInto<isize>,
+    Self: ::core::convert::TryInto<u8>,
+    Self: ::core::convert::TryInto<u16>,
+    Self: ::core::convert::TryInto<u32>,
+    Self: ::core::convert::TryInto<u64>,
+    Self: ::core::convert::TryInto<u128>,
+    Self: ::core::convert::TryInto<usize> {}
+
 
 pub trait Float
 where
@@ -424,3 +428,18 @@ impl Prim for i128 {}
 impl Prim for isize {}
 impl Prim for f32 {}
 impl Prim for f64 {}
+
+
+
+
+
+
+
+
+
+
+
+mod ops {
+
+
+}

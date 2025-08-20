@@ -1,0 +1,102 @@
+::modwire::expose!(
+    pub bits
+    pub bound
+    pub checked_add
+    pub checked_div
+    pub checked_mul
+    pub checked_neg
+    pub checked_rem
+    pub checked_shl
+    pub checked_shr
+    pub checked_sub
+    pub checked
+    pub float
+    pub int
+    pub overflowing_add
+    pub overflowing_div
+    pub overflowing_mul
+    pub overflowing_neg
+    pub overflowing_rem
+    pub overflowing_shl
+    pub overflowing_shr
+    pub overflowing_sub
+    pub overflowing
+    pub prim_float_conversion
+    pub prim_int_conversion
+    pub prim
+    pub quick_access
+    pub sign
+    pub signed
+    pub sqrt
+    pub unsigned
+    pub wrapping_add
+    pub wrapping_div
+    pub wrapping_mul
+    pub wrapping_neg
+    pub wrapping_pow
+    pub wrapping_rem
+    pub wrapping_sub
+    pub wrapping
+);
+
+pub trait Num
+where
+    Self: ::core::default::Default,
+    Self: ::core::clone::Clone,
+    Self: ::core::marker::Sized,
+    Self: ::core::marker::Copy,
+    Self: ::core::cmp::PartialEq,
+    Self: ::core::cmp::PartialOrd,
+    Self: ::core::fmt::Debug,
+    Self: ::core::fmt::Display,
+    Self: ::core::ops::Add<Output = Self>,
+    Self: ::core::ops::AddAssign,
+    Self: ::core::ops::Sub<Output = Self>,
+    Self: ::core::ops::SubAssign,
+    Self: ::core::ops::Mul<Output = Self>,
+    Self: ::core::ops::MulAssign,
+    Self: ::core::ops::Div<Output = Self>,
+    Self: ::core::ops::DivAssign,
+    Self: ::core::ops::Rem<Output = Self>,
+    Self: ::core::ops::RemAssign,
+    Self: for<'a> ::core::ops::Add<&'a Self, Output = Self>,
+    Self: for<'a> ::core::ops::AddAssign<&'a Self>,
+    Self: for<'a> ::core::ops::Sub<&'a Self, Output = Self>,
+    Self: for<'a> ::core::ops::SubAssign<&'a Self>,
+    Self: for<'a> ::core::ops::Mul<&'a Self, Output = Self>,
+    Self: for<'a> ::core::ops::MulAssign<&'a Self>,
+    Self: for<'a> ::core::ops::Div<&'a Self, Output = Self>,
+    Self: for<'a> ::core::ops::DivAssign<&'a Self>,
+    Self: for<'a> ::core::ops::Rem<&'a Self, Output = Self>,
+    Self: for<'a> ::core::ops::RemAssign<&'a Self> {}
+
+impl<T> Num for T
+where
+    T: ::core::default::Default,
+    T: ::core::clone::Clone,
+    T: ::core::marker::Sized,
+    T: ::core::marker::Copy,
+    T: ::core::cmp::PartialEq,
+    T: ::core::cmp::PartialOrd,
+    T: ::core::fmt::Debug,
+    T: ::core::fmt::Display,
+    T: ::core::ops::Add<Output = Self>,
+    T: ::core::ops::AddAssign,
+    T: ::core::ops::Sub<Output = Self>,
+    T: ::core::ops::SubAssign,
+    T: ::core::ops::Mul<Output = Self>,
+    T: ::core::ops::MulAssign,
+    T: ::core::ops::Div<Output = Self>,
+    T: ::core::ops::DivAssign,
+    T: ::core::ops::Rem<Output = Self>,
+    T: ::core::ops::RemAssign,
+    T: for<'a> ::core::ops::Add<&'a Self, Output = Self>,
+    T: for<'a> ::core::ops::AddAssign<&'a Self>,
+    T: for<'a> ::core::ops::Sub<&'a Self, Output = Self>,
+    T: for<'a> ::core::ops::SubAssign<&'a Self>,
+    T: for<'a> ::core::ops::Mul<&'a Self, Output = Self>,
+    T: for<'a> ::core::ops::MulAssign<&'a Self>,
+    T: for<'a> ::core::ops::Div<&'a Self, Output = Self>,
+    T: for<'a> ::core::ops::DivAssign<&'a Self>,
+    T: for<'a> ::core::ops::Rem<&'a Self, Output = Self>,
+    T: for<'a> ::core::ops::RemAssign<&'a Self> {}

@@ -1,80 +1,3 @@
-//! # Q
-//! 
-//! # Example: Compile-Time Guarantee
-//! ```rust
-//! // Will work.
-//! let x: ::reliq::q::Q28<u128>;
-//! 
-//! // Will fail at compile-time because `u16` cannot handle
-//! // a precision of `28` and would prematurely overflow.
-//! let x: ::reliq::q::Q28<u16>;
-//! ```
-//! 
-//! # Example: Simple Usage
-//! ```rust
-//! pub struct Person {
-//!     pub balance: ::reliq::q::Q2<u32>
-//! }
-//! ```
-//! 
-//! # Example
-//! ```rust
-//! // These bounds are required by `Q` to guarantee at compile
-//! // time that this combination of precision and size will
-//! // not prematurely overflow or underflow. Which enables it
-//! // to skip these checks at runtime entirely.
-//! fn add_to_balance<const A: u8, B>(amount: ::reliq::q::Q<A, B>)
-//! where
-//!     B: ::reliq::num::Int,
-//!     B: ::reliq::num::Prim,
-//!     (): ::reliq::q::Precision<A>,
-//!     (): ::reliq::q::N<B>,
-//!     (): ::reliq::q::ScaleCompatible<A, B>,
-//!     (): ::reliq::q::PICompatible<A, B> {
-//!     
-//! }
-//! ```
-//! 
-//! # Example
-//! If the operation is generic over the precision but the size
-//! is known before hand, then only a partial guard
-//! is required.
-//! ```rust
-//! fn partial_compatibility<const T: u8>(count: ::reliq::q::Q<T, u16>) 
-//! where
-//!     (): ::reliq::q::Precision<T>,
-//!     (): ::reliq::q::N<u16>,
-//!     (): ::reliq::q::ScaleCompatible<T, u16>,
-//!     (): ::reliq::q::PICompatible<T, u16> {
-//!     
-//! }
-//! ```
-//! 
-//! # Example
-//! ```rust
-//! use ::reliq::q;
-//! use ::reliq::num;
-//! 
-//! #[derive(Clone)]
-//! #[derive(Copy)]
-//! struct MySpecialEngine;
-//! 
-//! impl q::Engine for MySpecialEngine {
-//!     fn muldiv<T>(x: T, y: T, z: T) -> q::Result<T>
-//!     where
-//!         T: num::Int,
-//!         T: num::Prim,
-//!         (): q::N<T> {
-//!         let ret: T = x
-//!             .checked_mul(y)
-//!             .ok_or(q::Error::Overflow)?
-//!             .checked_div(z)
-//!             .ok_or(q::Error::DivisionByZero)?;
-//!         Ok(ret)
-//!     }
-//! }
-//! ```
-
 use super::*;
 
 ::modwire::expose!(
@@ -105,16 +28,9 @@ ty!(
     30 31 32 33 34 35 36 37
 );
 
-pub type Result<T> = ::core::result::Result<T, Error>;
-
-#[derive(Debug)]
-#[derive(Clone)]
-#[derive(PartialEq)]
-pub enum Error {
-    Overflow,
-    Underflow,
-    DivisionByZero
-}
+type Ratio<T> = T;
+type Deg<T> = T;
+type Rad<T> = T;
 
 /// # Where
 /// * A - Precision
@@ -145,6 +61,64 @@ where
     (): N<B>,
     (): ScaleCompatible<A, B>,
     (): PICompatible<A, B> {
+    #[inline]
+    pub fn tan(self) -> Result<Ratio<Self>> {
+        let ret: B = self.n;
+        let ret: B = C::tan(ret)?;
+        let ret: Self = ret.into();
+        Ok(ret)
+    }
+
+    #[inline]
+    pub fn sin(self) -> Result<Ratio<Self>> {
+        let ret: B = self.n;
+        let ret: B = C::sin(ret)?;
+        let ret: Self = ret.into();
+        Ok(ret)
+    }
+
+    /// Where `Self` is a radian
+    #[inline]
+    pub fn cos(self) -> Result<Ratio<Self>> {
+        let ret: B = self.n;
+        let ret: B = C::cos(ret)?;
+        let ret: Self = ret.into();
+        Ok(ret)
+    }
+    
+    // Should be degree
+    #[inline]
+    pub fn to_rad(self) -> Result<Deg<Self>> {
+        let ret: B = self.n;
+        let ret: B = C::to_rad(ret)?;
+        let ret: Self = ret.into();
+        Ok(ret)
+    }
+
+    #[inline]
+    pub fn to_deg(self) -> Result<Rad<Self>> {
+        let ret: B = self.n;
+        let ret: B = C::to_deg(ret)?;
+        let ret: Self = ret.into();
+        Ok(ret)
+    }
+
+    #[inline]
+    pub fn to_negative(self) -> Self {
+        let ret: B = self.n;
+        let ret: B = C::to_negative(ret);
+        let ret: Self = ret.into();
+        ret
+    }
+
+    #[inline]
+    pub fn to_positive(self) -> Self {
+        let ret: B = self.n;
+        let ret: B = C::to_positive(ret);
+        let ret: Self = ret.into();
+        ret
+    }
+
     #[inline]
     pub fn cast<const D: u8>(self) -> Result<Q<D, B, C>> 
     where
