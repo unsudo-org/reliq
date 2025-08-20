@@ -14,4 +14,4 @@ pub enum Error {
     RemByZero
 }
 
-pub mod num;
+pub mod ops;

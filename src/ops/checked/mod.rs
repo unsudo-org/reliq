@@ -1,5 +1,16 @@
 use super::*;
 
+::modwire::expose!(
+    pub add
+    pub div
+    pub mul
+    pub neg
+    pub rem
+    pub shl
+    pub shr
+    pub sub
+);
+
 pub trait Checked 
 where
     Self: CheckedAdd,
