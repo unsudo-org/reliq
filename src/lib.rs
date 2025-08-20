@@ -1,6 +1,6 @@
 #![no_std]
 
-pub mod prim;
+pub mod ops;
 
 pub type Result<T> = ::core::result::Result<T, Error>;
 
@@ -13,5 +13,3 @@ pub enum Error {
     DivisionByZero,
     RemByZero
 }
-
-pub mod ops;

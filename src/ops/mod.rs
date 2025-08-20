@@ -1,50 +1,219 @@
 ::modwire::expose!(
-    pub acos
-    pub asin
-    pub atan
     pub bits
     pub bound
-    pub checked_add
-    pub checked_div
-    pub checked_mul
-    pub checked_neg
-    pub checked_rem
-    pub checked_shl
-    pub checked_shr
-    pub checked_sub
     pub checked
-    pub cos
-    pub float
-    pub int
-    pub overflowing_add
-    pub overflowing_div
-    pub overflowing_mul
-    pub overflowing_neg
-    pub overflowing_rem
-    pub overflowing_shl
-    pub overflowing_shr
-    pub overflowing_sub
     pub overflowing
-    pub prim_float_conversion
-    pub prim_int_conversion
+    pub pow
     pub prim
     pub quick_access
+    pub root
     pub sign
     pub signed
-    pub sin
-    pub sqrt
-    pub tan
     pub trig
-    pub trig_hyperbolic
-    pub trig_reciprocal
     pub unsigned
-    pub wrapping_add
-    pub wrapping_div
-    pub wrapping_mul
-    pub wrapping_neg
-    pub wrapping_pow
-    pub wrapping_rem
-    pub wrapping_sub
     pub wrapping
 );
 
+pub trait Int 
+where
+    Self: ::core::marker::Sized,
+    Self: Num,
+    Self: ::core::cmp::Eq,
+    Self: ::core::cmp::Ord,
+    Self: CheckedAdd,
+    Self: CheckedDiv,
+    Self: CheckedMul,
+    Self: CheckedNeg,
+    Self: CheckedRem,
+    Self: CheckedShl,
+    Self: CheckedShr,
+    Self: CheckedSub,
+    Self: OverflowingAdd,
+    Self: OverflowingDiv,
+    Self: OverflowingMul,
+    Self: OverflowingNeg,
+    Self: OverflowingRem,
+    Self: OverflowingShl,
+    Self: OverflowingShr,
+    Self: OverflowingSub,
+    Self: WrappingAdd,
+    Self: WrappingDiv,
+    Self: WrappingMul,
+    Self: WrappingNeg,
+    Self: WrappingPow,
+    Self: WrappingRem,
+    Self: WrappingSub,
+    Self: ::core::convert::TryFrom<i8>,
+    Self: ::core::convert::TryFrom<i16>,
+    Self: ::core::convert::TryFrom<i32>,
+    Self: ::core::convert::TryFrom<i64>,
+    Self: ::core::convert::TryFrom<i128>,
+    Self: ::core::convert::TryFrom<isize>,
+    Self: ::core::convert::TryFrom<u8>,
+    Self: ::core::convert::TryFrom<u16>,
+    Self: ::core::convert::TryFrom<u32>,
+    Self: ::core::convert::TryFrom<u64>,
+    Self: ::core::convert::TryFrom<u128>,
+    Self: ::core::convert::TryFrom<usize>,
+    Self: ::core::convert::TryInto<i8>,
+    Self: ::core::convert::TryInto<i16>,
+    Self: ::core::convert::TryInto<i32>,
+    Self: ::core::convert::TryInto<i64>,
+    Self: ::core::convert::TryInto<i128>,
+    Self: ::core::convert::TryInto<isize>,
+    Self: ::core::convert::TryInto<u8>,
+    Self: ::core::convert::TryInto<u16>,
+    Self: ::core::convert::TryInto<u32>,
+    Self: ::core::convert::TryInto<u64>,
+    Self: ::core::convert::TryInto<u128>,
+    Self: ::core::convert::TryInto<usize> {}
+
+pub trait Float
+where
+    Self: ::core::marker::Sized,
+    Self: Num,
+    Self: QuickAccess,
+    Self: ArcTan,
+    Self: ArcSin,
+    Self: ArcCos,
+    Self: Tan,
+    Self: Sin,
+    Self: Cos,
+    Self: ToRad,
+    Self: ToDeg,
+    Self: PowF,
+    Self: PowI {}
+
+pub trait Num
+where
+    Self: Sqrt,
+    Self: ::core::default::Default,
+    Self: ::core::clone::Clone,
+    Self: ::core::marker::Sized,
+    Self: ::core::marker::Copy,
+    Self: ::core::cmp::PartialEq,
+    Self: ::core::cmp::PartialOrd,
+    Self: ::core::fmt::Debug,
+    Self: ::core::fmt::Display,
+    Self: ::core::ops::Add<Output = Self>,
+    Self: ::core::ops::AddAssign,
+    Self: ::core::ops::Sub<Output = Self>,
+    Self: ::core::ops::SubAssign,
+    Self: ::core::ops::Mul<Output = Self>,
+    Self: ::core::ops::MulAssign,
+    Self: ::core::ops::Div<Output = Self>,
+    Self: ::core::ops::DivAssign,
+    Self: ::core::ops::Rem<Output = Self>,
+    Self: ::core::ops::RemAssign,
+    Self: for<'a> ::core::ops::Add<&'a Self, Output = Self>,
+    Self: for<'a> ::core::ops::AddAssign<&'a Self>,
+    Self: for<'a> ::core::ops::Sub<&'a Self, Output = Self>,
+    Self: for<'a> ::core::ops::SubAssign<&'a Self>,
+    Self: for<'a> ::core::ops::Mul<&'a Self, Output = Self>,
+    Self: for<'a> ::core::ops::MulAssign<&'a Self>,
+    Self: for<'a> ::core::ops::Div<&'a Self, Output = Self>,
+    Self: for<'a> ::core::ops::DivAssign<&'a Self>,
+    Self: for<'a> ::core::ops::Rem<&'a Self, Output = Self>,
+    Self: for<'a> ::core::ops::RemAssign<&'a Self> {}
+
+impl<T> Int for T
+where
+    T: ::core::marker::Sized,
+    T: Num,
+    T: ::core::cmp::Eq,
+    T: ::core::cmp::Ord,
+    T: CheckedAdd,
+    T: CheckedDiv,
+    T: CheckedMul,
+    T: CheckedNeg,
+    T: CheckedRem,
+    T: CheckedShl,
+    T: CheckedShr,
+    T: CheckedSub,
+    T: OverflowingAdd,
+    T: OverflowingDiv,
+    T: OverflowingMul,
+    T: OverflowingNeg,
+    T: OverflowingRem,
+    T: OverflowingShl,
+    T: OverflowingShr,
+    T: OverflowingSub,
+    T: WrappingAdd,
+    T: WrappingDiv,
+    T: WrappingMul,
+    T: WrappingNeg,
+    T: WrappingPow,
+    T: WrappingRem,
+    T: WrappingSub,
+    T: ::core::convert::TryFrom<i8>,
+    T: ::core::convert::TryFrom<i16>,
+    T: ::core::convert::TryFrom<i32>,
+    T: ::core::convert::TryFrom<i64>,
+    T: ::core::convert::TryFrom<i128>,
+    T: ::core::convert::TryFrom<isize>,
+    T: ::core::convert::TryFrom<u8>,
+    T: ::core::convert::TryFrom<u16>,
+    T: ::core::convert::TryFrom<u32>,
+    T: ::core::convert::TryFrom<u64>,
+    T: ::core::convert::TryFrom<u128>,
+    T: ::core::convert::TryFrom<usize>,
+    T: ::core::convert::TryInto<i8>,
+    T: ::core::convert::TryInto<i16>,
+    T: ::core::convert::TryInto<i32>,
+    T: ::core::convert::TryInto<i64>,
+    T: ::core::convert::TryInto<i128>,
+    T: ::core::convert::TryInto<isize>,
+    T: ::core::convert::TryInto<u8>,
+    T: ::core::convert::TryInto<u16>,
+    T: ::core::convert::TryInto<u32>,
+    T: ::core::convert::TryInto<u64>,
+    T: ::core::convert::TryInto<u128>,
+    T: ::core::convert::TryInto<usize> {}
+
+impl<T> Float for T
+where
+    T: ::core::marker::Sized,
+    T: Num,
+    T: QuickAccess,
+    T: ArcTan,
+    T: ArcSin,
+    T: ArcCos,
+    T: Tan,
+    T: Sin,
+    T: Cos,
+    T: ToRad,
+    T: ToDeg,
+    T: PowF,
+    T: PowI {}
+
+impl<T> Num for T
+where
+    T: Sqrt,
+    T: ::core::default::Default,
+    T: ::core::clone::Clone,
+    T: ::core::marker::Sized,
+    T: ::core::marker::Copy,
+    T: ::core::cmp::PartialEq,
+    T: ::core::cmp::PartialOrd,
+    T: ::core::fmt::Debug,
+    T: ::core::fmt::Display,
+    T: ::core::ops::Add<Output = Self>,
+    T: ::core::ops::AddAssign,
+    T: ::core::ops::Sub<Output = Self>,
+    T: ::core::ops::SubAssign,
+    T: ::core::ops::Mul<Output = Self>,
+    T: ::core::ops::MulAssign,
+    T: ::core::ops::Div<Output = Self>,
+    T: ::core::ops::DivAssign,
+    T: ::core::ops::Rem<Output = Self>,
+    T: ::core::ops::RemAssign,
+    T: for<'a> ::core::ops::Add<&'a Self, Output = Self>,
+    T: for<'a> ::core::ops::AddAssign<&'a Self>,
+    T: for<'a> ::core::ops::Sub<&'a Self, Output = Self>,
+    T: for<'a> ::core::ops::SubAssign<&'a Self>,
+    T: for<'a> ::core::ops::Mul<&'a Self, Output = Self>,
+    T: for<'a> ::core::ops::MulAssign<&'a Self>,
+    T: for<'a> ::core::ops::Div<&'a Self, Output = Self>,
+    T: for<'a> ::core::ops::DivAssign<&'a Self>,
+    T: for<'a> ::core::ops::Rem<&'a Self, Output = Self>,
+    T: for<'a> ::core::ops::RemAssign<&'a Self> {}

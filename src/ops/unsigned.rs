@@ -1,4 +1,4 @@
-macro_rules! impl_for {
+macro_rules! r#impl {
     ($($ty:ident)*) => {
         $(
             impl Unsigned for $ty {}
@@ -8,7 +8,7 @@ macro_rules! impl_for {
 
 pub trait Unsigned {}
 
-impl_for!(
+r#impl!(
     u8
     u16
     u32

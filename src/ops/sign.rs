@@ -1,4 +1,4 @@
-macro_rules! impl_for_signed {
+macro_rules! signed_impl {
     ($($ty:ident)*) => {
         $(
             impl Sign for $ty {
@@ -8,7 +8,7 @@ macro_rules! impl_for_signed {
     };
 }
 
-macro_rules! impl_for_unsigned {
+macro_rules! unsigned_impl {
     ($($ty:ident)*) => {
         $(
             impl Sign for $ty {
@@ -22,7 +22,7 @@ pub trait Sign {
     const SIGNED: bool;
 }
 
-impl_for_unsigned!(
+unsigned_impl!(
     u8
     u16
     u32
@@ -31,7 +31,7 @@ impl_for_unsigned!(
     usize
 );
 
-impl_for_signed!(
+signed_impl!(
     i8
     i16
     i32

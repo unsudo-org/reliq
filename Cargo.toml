@@ -9,6 +9,12 @@ dependencies.modwire.version = "*"
 dependencies.toga.version = "*"
 dev-dependencies.criterion.version = "*"
 
+features.default = [
+    "unstable"
+]
+features.unstable = []
+
 [[bench]]
 name = "q"
 harness = false
+
