@@ -1,21 +1,23 @@
-package.name = "reliq"
-package.version = "0.1.0"
-package.edition = "2024"
-package.keywords = [
-    "no-panic"
+[package]
+name = "reliq"
+version = "0.1.0"
+edition = "2024"
+keywords = [
+    "arithmetic",
+    "math"
 ]
-dependencies.paste.version = "*"
-dependencies.modwire.version = "*"
-dependencies.toga.version = "*"
-dependencies.rstest.version = "*"
-dev-dependencies.criterion.version = "*"
 
-features.default = [
-    "unstable"
-]
-features.unstable = []
+[dependencies]
+modwire = { version = ">=0.1.0,<1.0.0" }
+paste = { version = ">=1.0.15,<2.0.0" }
+
+[dev-dependencies]
+criterion = { version = ">=0.7.0,<1.0.0" }
+rstest = { version = ">=0.26.1,<1.0.0" }
+
+[features]
+default = []
 
 [[bench]]
 name = "q"
 harness = false
-

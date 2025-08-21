@@ -2,6 +2,7 @@ use super::*;
 
 ::modwire::expose!(
     pub engine
+    pub mode
         pi
         scale
     pub supported
@@ -360,10 +361,14 @@ where
 
 
 #[repr(transparent)]
+#[derive(Clone)]
+#[derive(Copy)]
 pub struct DefaultMode;
 
 
 #[repr(transparent)]
+#[derive(Clone)]
+#[derive(Copy)]
 pub struct RadMode;
 
 impl<const A: u8, B, C> TryFrom<Q<A, B, DegMode, C>> for Q<A, B, RadMode, C>
@@ -424,6 +429,8 @@ where
 
 
 #[repr(transparent)]
+#[derive(Clone)]
+#[derive(Copy)]
 pub struct DegMode;
 
 impl<const A: u8, B, C> TryFrom<Q<A, B, RadMode, C>> for Q<A, B, DegMode, C>
@@ -450,17 +457,17 @@ where
     (): SupportedInt<B>,
     (): Supported<A, B> {
     #[inline]
-    pub fn tan(self) -> Result<Q<A, B, DefaultMode, C>> {
+    pub fn tan(self) -> Result<Ratio<Q<A, B, DefaultMode, C>>> {
         self.to_rad()?.tan()
     }
 
     #[inline]
-    pub fn sin(self) -> Result<Q<A, B, DefaultMode, C>> {
+    pub fn sin(self) -> Result<Ratio<Q<A, B, DefaultMode, C>>> {
         self.to_rad()?.sin()
     }
 
     #[inline]
-    pub fn cos(self) -> Result<Q<A, B, DefaultMode, C>> {
+    pub fn cos(self) -> Result<Ratio<Q<A, B, DefaultMode, C>>> {
         self.to_rad()?.cos()
     }
 
@@ -478,36 +485,32 @@ where
 mod test {
     use super::*;
 
-    type QI = Q0<u32>;
-    type QI2T = Q2<i32>;
-    type QU2T = Q2<u32>;
-    
-
     #[::rstest::rstest]
     #[case(1_00.into(), 1_00.into(), 2_00.into())]
-    fn add(#[case] x: QU2T, #[case] y: QU2T, #[case] expected: QU2T) {
-        let ret: QU2T = (x + y).unwrap();
+    fn add(#[case] x: Q2<u32>, #[case] y: Q2<u32>, #[case] expected: Q2<u32>) {
+        let ret: Q2<_> = (x + y).unwrap();
         assert_eq!(ret, expected);
     }
 
     #[::rstest::rstest]
     #[case(1_00.into(), 1_00.into(), 0_00.into())]
-    fn sub(#[case] x: QU2T, #[case] y: QU2T, #[case] expected: QU2T) {
-        let ret: QU2T = (x - y).unwrap();
+    fn sub(#[case] x: Q2<u32>, #[case] y: Q2<u32>, #[case] expected: Q2<u32>) {
+        let ret: Q2<_> = (x - y).unwrap();
         assert_eq!(ret, expected);
     }
 
     #[::rstest::rstest]
     #[case(1_00.into(), 1_00.into(), 1_00.into())]
-    fn mul(#[case] x: QU2T, #[case] y: QU2T, #[case] expected: QU2T) {
-        let ret: QU2T = (x * y).unwrap();
+    #[case(0_50.into(), 0_25.into(), 0_12.into())]
+    fn mul(#[case] x: Q2<u32>, #[case] y: Q2<u32>, #[case] expected: Q2<u32>) {
+        let ret: Q2<_> = (x * y).unwrap();
         assert_eq!(ret, expected);
     }
 
     #[::rstest::rstest]
     #[case(1_00.into(), 1_00.into(), 1_00.into())]
-    fn div(#[case] x: QU2T, #[case] y: QU2T, #[case] expected: QU2T) {
-        let ret: QU2T = (x / y).unwrap();
+    fn div(#[case] x: Q2<u32>, #[case] y: Q2<u32>, #[case] expected: Q2<u32>) {
+        let ret: Q2<_> = (x / y).unwrap();
         assert_eq!(ret, expected);
     }
 

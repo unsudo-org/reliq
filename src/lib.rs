@@ -1,5 +1,7 @@
 #![no_std]
 
+pub mod array;
+pub mod coordinate;
 pub mod ops;
 pub mod q;
 
@@ -14,4 +16,8 @@ pub enum Error {
     Underflow,
     DivisionByZero,
     RemByZero
+}
+
+pub mod prelude {
+    
 }

@@ -45,6 +45,8 @@ const LOOK_UP: [u128; 38] = [
 pub fn scale<const A: u8, B>() -> B 
 where 
     B: ops::Int,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
     (): Supported<A, B> {
     if A == 0 {
         return B::AS_1
