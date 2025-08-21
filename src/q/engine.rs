@@ -171,6 +171,9 @@ where
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
         (): Supported<A, B> {
+        if A == 0 {
+            return x.checked_mul(y).ok_or(Error::Overflow)
+        }
         Self::muldiv(x, y, scale::<A, _>())
     }
 
@@ -182,6 +185,9 @@ where
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
         (): Supported<A, B> {
+        if A == 0 {
+            return x.checked_div(y).ok_or(Error::DivisionByZero)
+        }
         Self::muldiv(x, scale::<A, _>(), y)
     }
 

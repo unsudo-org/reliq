@@ -28,10 +28,6 @@ type Ratio<T> = T;
 type Deg<T> = T;
 type Rad<T> = T;
 
-/// # Where
-/// * A - Precision
-/// * B - Int
-/// * C - Engine
 #[repr(transparent)]
 #[derive(Clone)]
 #[derive(Copy)]
@@ -44,7 +40,7 @@ where
     (): SupportedInt<B>,
     (): Supported<A, B> {
     n: B,
-    m_0: ::core::marker::PhantomData<C>
+    engine: ::core::marker::PhantomData<C>
 }
 
 impl<const A: u8, B, C> Q<A, B, C>
@@ -137,8 +133,21 @@ where
     fn from(n: B) -> Self {
         Self {
             n,
-            m_0: ::core::marker::PhantomData
+            engine: ::core::marker::PhantomData
         }
+    }
+}
+
+impl<const A: u8, B, C> ::core::fmt::Debug for Q<A, B, C>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "Q({})", self.n)
     }
 }
 
@@ -341,5 +350,75 @@ where
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<::core::cmp::Ordering> {
         Some(self.cmp(other))
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    type QI = Q0<u32>;
+    type QI2T = Q2<i32>;
+    type QU2T = Q2<u32>;
+
+    #[::rstest::rstest]
+    #[case(1_00.into(), 1_00.into(), 2_00.into())]
+    fn add(#[case] x: QU2T, #[case] y: QU2T, #[case] expected: QU2T) {
+        let ret: QU2T = (x + y).unwrap();
+        assert_eq!(ret, expected);
+    }
+
+    #[::rstest::rstest]
+    #[case(1_00.into(), 1_00.into(), 0_00.into())]
+    fn sub(#[case] x: QU2T, #[case] y: QU2T, #[case] expected: QU2T) {
+        let ret: QU2T = (x - y).unwrap();
+        assert_eq!(ret, expected);
+    }
+
+    #[::rstest::rstest]
+    #[case(1_00.into(), 1_00.into(), 1_00.into())]
+    fn mul(#[case] x: QU2T, #[case] y: QU2T, #[case] expected: QU2T) {
+        let ret: QU2T = (x * y).unwrap();
+        assert_eq!(ret, expected);
+    }
+
+    #[::rstest::rstest]
+    #[case(1_00.into(), 1_00.into(), 1_00.into())]
+    fn div(#[case] x: QU2T, #[case] y: QU2T, #[case] expected: QU2T) {
+        let ret: QU2T = (x / y).unwrap();
+        assert_eq!(ret, expected);
+    }
+
+    #[::rstest::rstest]
+    #[case(25_00.into(), 0_46.into())]
+    fn tan(#[case] deg: QU2T, #[case] expected: QU2T) {
+        let ret: QU2T = deg
+            .to_rad()
+            .unwrap()
+            .tan()
+            .unwrap();
+        assert_eq!(ret, expected);
+    }
+
+    #[::rstest::rstest]
+    #[case(25_00.into(), 0_42.into())]
+    fn sin(#[case] deg: QU2T, #[case] expected: QU2T) {
+        let ret: QU2T = deg
+            .to_rad()
+            .unwrap()
+            .sin()
+            .unwrap();
+        assert_eq!(ret, expected);
+    }
+
+    #[::rstest::rstest]
+    #[case(1_00.into(), 1_00.into())]
+    fn cos(#[case] deg: QU2T, #[case] expected: QU2T) {
+        let ret: QU2T = deg
+            .to_rad()
+            .unwrap()
+            .cos()
+            .unwrap();
+        assert_eq!(ret, expected);
     }
 }

@@ -7,6 +7,7 @@ package.keywords = [
 dependencies.paste.version = "*"
 dependencies.modwire.version = "*"
 dependencies.toga.version = "*"
+dependencies.rstest.version = "*"
 dev-dependencies.criterion.version = "*"
 
 features.default = [
