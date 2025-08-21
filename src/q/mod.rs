@@ -17,6 +17,28 @@ macro_rules! ty {
     };
 }
 
+macro_rules! rad_ty {
+    ($($n:literal)*) => {
+        ::paste::paste!(
+            pub type Rad<const A: u8, B> = Q<A, B, RadMode>;
+            $(
+                pub type [< Rad $n >]<T> = Q<$n, T, RadMode>;
+            )*
+        );
+    };
+}
+
+macro_rules! deg_ty {
+    ($($n:literal)*) => {
+        ::paste::paste!(
+            pub type Deg<const A: u8, B> = Q<A, B, DegMode>;
+            $(
+                pub type [< Deg $n >]<T> = Q<$n, T, DegMode>;
+            )*
+        );
+    };
+}
+
 ty!(
     0 1 2 3 4 5 6 7 8 9
     10 11 12 13 14 15 16 17 18 19
@@ -24,79 +46,72 @@ ty!(
     30 31 32 33 34 35 36 37
 );
 
+rad_ty!(
+    0 1 2 3 4 5 6 7 8 9
+    10 11 12 13 14 15 16 17 18 19
+    20 21 22 23 24 25 26 27 28 29
+    30 31 32 33 34 35 36 37
+);
+
+deg_ty!(
+    0 1 2 3 4 5 6 7 8 9
+    10 11 12 13 14 15 16 17 18 19
+    20 21 22 23 24 25 26 27 28 29
+    30 31 32 33 34 35 36 37
+);
+
 type Ratio<T> = T;
-type Deg<T> = T;
-type Rad<T> = T;
 
 #[repr(transparent)]
 #[derive(Clone)]
 #[derive(Copy)]
-pub struct Q<const A: u8, B = usize, C = DefaultEngine>
+pub struct Q<const A: u8, B = usize, C = DefaultMode, D = DefaultEngine>
 where
     B: ops::Int,
     B: ops::Prim,
-    C: Engine,
+    D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
     n: B,
-    engine: ::core::marker::PhantomData<C>
+    m_0: ::core::marker::PhantomData<C>,
+    m_1: ::core::marker::PhantomData<D>
 }
 
-impl<const A: u8, B, C> Q<A, B, C>
+impl<const A: u8, B, C, D> Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
-    C: Engine,
+    D: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+
+    #[inline]
+    pub fn cast<const E: u8>(self) -> Result<Q<E, B, C, D>> 
+    where
+        (): SupportedPrecision<E>,
+        (): Supported<E, B> {
+        let ret: B = self.n;
+        let ret: B = D::cast::<A, E, _>(ret)?;
+        let ret: Q<E, B, C, D> = ret.into();
+        Ok(ret)
+    }
+}
+
+impl<const A: u8, B, C, D> Q<A, B, C, D>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    B: ops::Signed,
+    D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
     #[inline]
-    pub fn tan(self) -> Result<Ratio<Self>> {
-        let ret: B = self.n;
-        let ret: B = C::tan(ret)?;
-        let ret: Self = ret.into();
-        Ok(ret)
-    }
-
-    #[inline]
-    pub fn sin(self) -> Result<Ratio<Self>> {
-        let ret: B = self.n;
-        let ret: B = C::sin(ret)?;
-        let ret: Self = ret.into();
-        Ok(ret)
-    }
-
-    /// Where `Self` is a radian
-    #[inline]
-    pub fn cos(self) -> Result<Ratio<Self>> {
-        let ret: B = self.n;
-        let ret: B = C::cos(ret)?;
-        let ret: Self = ret.into();
-        Ok(ret)
-    }
-    
-    // Should be degree
-    #[inline]
-    pub fn to_rad(self) -> Result<Deg<Self>> {
-        let ret: B = self.n;
-        let ret: B = C::to_rad(ret)?;
-        let ret: Self = ret.into();
-        Ok(ret)
-    }
-
-    #[inline]
-    pub fn to_deg(self) -> Result<Rad<Self>> {
-        let ret: B = self.n;
-        let ret: B = C::to_deg(ret)?;
-        let ret: Self = ret.into();
-        Ok(ret)
-    }
-
-    #[inline]
     pub fn to_negative(self) -> Self {
         let ret: B = self.n;
-        let ret: B = C::to_negative(ret);
+        let ret: B = D::to_negative(ret);
         let ret: Self = ret.into();
         ret
     }
@@ -104,28 +119,17 @@ where
     #[inline]
     pub fn to_positive(self) -> Self {
         let ret: B = self.n;
-        let ret: B = C::to_positive(ret);
+        let ret: B = D::to_positive(ret);
         let ret: Self = ret.into();
         ret
     }
-
-    #[inline]
-    pub fn cast<const D: u8>(self) -> Result<Q<D, B, C>> 
-    where
-        (): SupportedPrecision<D>,
-        (): Supported<D, B> {
-        let ret: B = self.n;
-        let ret: B = C::cast::<A, D, _>(ret)?;
-        let ret: Q<D, B, C> = ret.into();
-        Ok(ret)
-    }
 }
 
-impl<const A: u8, B, C> From<B> for Q<A, B, C>
+impl<const A: u8, B, C, D> From<B> for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
-    C: Engine,
+    D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
@@ -133,16 +137,17 @@ where
     fn from(n: B) -> Self {
         Self {
             n,
-            engine: ::core::marker::PhantomData
+            m_0: ::core::marker::PhantomData,
+            m_1: ::core::marker::PhantomData
         }
     }
 }
 
-impl<const A: u8, B, C> ::core::fmt::Debug for Q<A, B, C>
+impl<const A: u8, B, C, D> ::core::fmt::Debug for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
-    C: Engine,
+    D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
@@ -151,11 +156,11 @@ where
     }
 }
 
-impl<const A: u8, B, C> ::core::ops::Add for Q<A, B, C>
+impl<const A: u8, B, C, D> ::core::ops::Add for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
-    C: Engine,
+    D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
@@ -165,17 +170,17 @@ where
     fn add(self, rhs: Self) -> Self::Output {
         let x: B = self.n;
         let y: B = rhs.n;
-        let ret: B = C::add(x, y)?;
+        let ret: B = D::add(x, y)?;
         let ret: Self = ret.into();
         Ok(ret)
     }
 }
 
-impl<const A: u8, B, C> ::core::ops::Sub for Q<A, B, C>
+impl<const A: u8, B, C, D> ::core::ops::Sub for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
-    C: Engine,
+    D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
@@ -185,17 +190,17 @@ where
     fn sub(self, rhs: Self) -> Self::Output {
         let x: B = self.n;
         let y: B = rhs.n;
-        let ret: B = C::sub(x, y)?;
+        let ret: B = D::sub(x, y)?;
         let ret: Self = ret.into();
         Ok(ret)
     }
 }
 
-impl<const A: u8, B, C> ::core::ops::Mul for Q<A, B, C>
+impl<const A: u8, B, C, D> ::core::ops::Mul for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
-    C: Engine,
+    D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
@@ -205,17 +210,17 @@ where
     fn mul(self, rhs: Self) -> Self::Output {
         let x: B = self.n;
         let y: B = rhs.n;
-        let ret: B = C::mul(x, y)?;
+        let ret: B = D::mul(x, y)?;
         let ret: Self = ret.into();
         Ok(ret)
     }
 }
 
-impl<const A: u8, B, C> ::core::ops::Div for Q<A, B, C>
+impl<const A: u8, B, C, D> ::core::ops::Div for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
-    C: Engine,
+    D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
@@ -225,26 +230,26 @@ where
     fn div(self, rhs: Self) -> Self::Output {
         let x: B = self.n;
         let y: B = rhs.n;
-        let ret: B = C::div(x, y)?;
+        let ret: B = D::div(x, y)?;
         let ret: Self = ret.into();
         Ok(ret)
     }
 }
 
-impl<const A: u8, B, C> Eq for Q<A, B, C>
+impl<const A: u8, B, C, D> Eq for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
-    C: Engine,
+    D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {}
 
-impl<const A: u8, B, C> PartialEq for Q<A, B, C>
+impl<const A: u8, B, C, D> PartialEq for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
-    C: Engine,
+    D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
@@ -254,11 +259,11 @@ where
     }
 }
 
-impl<const A: u8, B, C> Ord for Q<A, B, C>
+impl<const A: u8, B, C, D> Ord for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
-    C: Engine,
+    D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
@@ -311,11 +316,11 @@ where
     }
 }
 
-impl<const A: u8, B, C> PartialOrd for Q<A, B, C>
+impl<const A: u8, B, C, D> PartialOrd for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
-    C: Engine,
+    D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
@@ -353,6 +358,122 @@ where
     }
 }
 
+
+#[repr(transparent)]
+pub struct DefaultMode;
+
+
+#[repr(transparent)]
+pub struct RadMode;
+
+impl<const A: u8, B, C> TryFrom<Q<A, B, DegMode, C>> for Q<A, B, RadMode, C>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    type Error = Error;
+
+    fn try_from(value: Q<A, B, DegMode, C>) -> ::core::result::Result<Self, Self::Error> {
+        value.to_rad()
+    }
+}
+
+impl<const A: u8, B, C> Q<A, B, RadMode, C> 
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    #[inline]
+    pub fn tan(self) -> Result<Ratio<Q<A, B, DefaultMode, C>>> {
+        let ret: B = self.n;
+        let ret: B = C::tan(ret)?;
+        let ret: Q<A, B, DefaultMode, C> = ret.into();
+        Ok(ret)
+    }
+
+    #[inline]
+    pub fn sin(self) -> Result<Ratio<Q<A, B, DefaultMode, C>>> {
+        let ret: B = self.n;
+        let ret: B = C::sin(ret)?;
+        let ret: Q<A, B, DefaultMode, C> = ret.into();
+        Ok(ret)
+    }
+
+    #[inline]
+    pub fn cos(self) -> Result<Ratio<Q<A, B, DefaultMode, C>>> {
+        let ret: B = self.n;
+        let ret: B = C::cos(ret)?;
+        let ret: Q<A, B, DefaultMode, C> = ret.into();
+        Ok(ret)
+    }
+
+    #[inline]
+    pub fn to_deg(self) -> Result<Q<A, B, DegMode, C>> {
+        let ret: B = self.n;
+        let ret: B = C::to_deg(ret)?;
+        let ret: Q<A, B, DegMode, C> = ret.into();
+        Ok(ret)
+    }
+}
+
+
+#[repr(transparent)]
+pub struct DegMode;
+
+impl<const A: u8, B, C> TryFrom<Q<A, B, RadMode, C>> for Q<A, B, DegMode, C>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    type Error = Error;
+
+    fn try_from(value: Q<A, B, RadMode, C>) -> ::core::result::Result<Self, Self::Error> {
+        value.to_deg()
+    }
+}
+
+impl<const A: u8, B, C> Q<A, B, DegMode, C> 
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    #[inline]
+    pub fn tan(self) -> Result<Q<A, B, DefaultMode, C>> {
+        self.to_rad()?.tan()
+    }
+
+    #[inline]
+    pub fn sin(self) -> Result<Q<A, B, DefaultMode, C>> {
+        self.to_rad()?.sin()
+    }
+
+    #[inline]
+    pub fn cos(self) -> Result<Q<A, B, DefaultMode, C>> {
+        self.to_rad()?.cos()
+    }
+
+    #[inline]
+    pub fn to_rad(self) -> Result<Q<A, B, RadMode, C>> {
+        let ret: B = self.n;
+        let ret: B = C::to_rad(ret)?;
+        let ret: Q<A, B, RadMode, C> = ret.into();
+        Ok(ret)
+    }
+}
+
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -360,6 +481,7 @@ mod test {
     type QI = Q0<u32>;
     type QI2T = Q2<i32>;
     type QU2T = Q2<u32>;
+    
 
     #[::rstest::rstest]
     #[case(1_00.into(), 1_00.into(), 2_00.into())]
@@ -391,34 +513,22 @@ mod test {
 
     #[::rstest::rstest]
     #[case(25_00.into(), 0_46.into())]
-    fn tan(#[case] deg: QU2T, #[case] expected: QU2T) {
-        let ret: QU2T = deg
-            .to_rad()
-            .unwrap()
-            .tan()
-            .unwrap();
+    fn tan(#[case] angle: Deg2<u32>, #[case] expected: Q2<u32>) {
+        let ret: Q2<_> = angle.tan().unwrap();
         assert_eq!(ret, expected);
     }
 
     #[::rstest::rstest]
     #[case(25_00.into(), 0_42.into())]
-    fn sin(#[case] deg: QU2T, #[case] expected: QU2T) {
-        let ret: QU2T = deg
-            .to_rad()
-            .unwrap()
-            .sin()
-            .unwrap();
+    fn sin(#[case] angle: Deg2<u32>, #[case] expected: Q2<u32>) {
+        let ret: Q2<_> = angle.sin().unwrap();
         assert_eq!(ret, expected);
     }
 
     #[::rstest::rstest]
     #[case(1_00.into(), 1_00.into())]
-    fn cos(#[case] deg: QU2T, #[case] expected: QU2T) {
-        let ret: QU2T = deg
-            .to_rad()
-            .unwrap()
-            .cos()
-            .unwrap();
+    fn cos(#[case] angle: Deg2<u32>, #[case] expected: Q2<u32>) {
+        let ret: Q2<_> = angle.cos().unwrap();
         assert_eq!(ret, expected);
     }
 }

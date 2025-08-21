@@ -124,6 +124,7 @@ where
     where
         T: ops::Int,
         T: ops::Prim,
+        T: ops::Signed,
         (): SupportedInt<T> {
         if n == T::AS_0 {
             n
@@ -137,6 +138,7 @@ where
     where
         T: ops::Int,
         T: ops::Prim,
+        T: ops::Signed,
         (): SupportedInt<T> {
         if n >= T::AS_0 {
             n
