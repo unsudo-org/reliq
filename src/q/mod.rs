@@ -63,6 +63,19 @@ deg_ty!(
 
 type Ratio<T> = T;
 
+pub type Result<T> = ::core::result::Result<T, Error>;
+
+#[repr(u8)]
+#[derive(Debug)]
+#[derive(Clone)]
+#[derive(PartialEq)]
+pub enum Error {
+    Overflow,
+    Underflow,
+    DivisionByZero,
+    RemByZero
+}
+
 #[repr(transparent)]
 #[derive(Clone)]
 #[derive(Copy)]
