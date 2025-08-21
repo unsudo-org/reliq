@@ -44,10 +44,11 @@ const LOOK_UP: [u128; 38] = [
 #[inline]
 pub fn scale<const A: u8, B>() -> B 
 where 
-    B: num::Int,
-    (): Precision<A>,
-    (): N<B>,
-    (): ScaleCompatible<A, B> {
+    B: ops::Int,
+    (): Supported<A, B> {
+    if A == 0 {
+        return B::AS_1
+    }
     unsafe {
         look_up::<A>().try_into().unwrap_unchecked()
     }

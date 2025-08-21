@@ -19,36 +19,33 @@ where
     #[inline]
     fn tan<const A: u8, B>(angle: Rad<F<B>>) -> Result<Ratio<F<B>>>
     where
-        B: num::Int,
-        B: num::Prim,
-        (): Precision<A>,
-        (): N<B>,
-        (): ScaleCompatible<A, B>,
-        (): PICompatible<A, B> {
+        B: ops::Int,
+        B: ops::Prim,
+        (): SupportedPrecision<A>,
+        (): SupportedInt<B>,
+        (): Supported<A, B> {
         Self::div(Self::sin(angle)?, Self::cos(angle)?)
     }
 
     #[inline]
     fn sin<const A: u8, B>(angle: Rad<F<B>>) -> Result<Ratio<F<B>>>
     where
-        B: num::Int,
-        B: num::Prim,
-        (): Precision<A>,
-        (): N<B>,
-        (): ScaleCompatible<A, B>,
-        (): PICompatible<A, B> {
+        B: ops::Int,
+        B: ops::Prim,
+        (): SupportedPrecision<A>,
+        (): SupportedInt<B>,
+        (): Supported<A, B> {
         Self::cos(Self::sub(Self::to_rad::<A, B>(deg90()?)?, angle)?)
     }
 
     #[inline]
     fn cos<const A: u8, B>(angle: Rad<F<B>>) -> Result<Ratio<F<B>>>
     where
-        B: num::Int,
-        B: num::Prim,
-        (): Precision<A>,
-        (): N<B>,
-        (): ScaleCompatible<A, B>,
-        (): PICompatible<A, B> {
+        B: ops::Int,
+        B: ops::Prim,
+        (): SupportedPrecision<A>,
+        (): SupportedInt<B>,
+        (): Supported<A, B> {
         let (scale, pi, pi_2) = {
             let scale: B = scale::<A, _>();
             let pi: B = pi::<A, _>();
@@ -88,39 +85,35 @@ where
     #[inline]
     fn to_rad<const A: u8, B>(angle: Deg<F<B>>) -> Result<Rad<F<B>>>
     where
-        B: num::Int,
-        B: num::Prim,
-        (): Precision<A>,
-        (): N<B>,
-        (): ScaleCompatible<A, B>,
-        (): PICompatible<A, B> {
+        B: ops::Int,
+        B: ops::Prim,
+        (): SupportedPrecision<A>,
+        (): SupportedInt<B>,
+        (): Supported<A, B> {
         Self::muldiv(angle, pi::<A, _>(), n180::<B>() * scale::<A, B>())
     }
 
     #[inline]
     fn to_deg<const A: u8, B>(angle: Rad<F<B>>) -> Result<Deg<F<B>>>
     where
-        B: num::Int,
-        B: num::Prim,
-        (): Precision<A>,
-        (): N<B>,
-        (): ScaleCompatible<A, B>,
-        (): PICompatible<A, B> {
+        B: ops::Int,
+        B: ops::Prim,
+        (): SupportedPrecision<A>,
+        (): SupportedInt<B>,
+        (): Supported<A, B> {
         Self::muldiv(angle, n180::<B>() * scale::<A, B>(), pi())
     }
 
     #[inline]
     fn cast<const A: u8, const B: u8, C>(n: F<C>) -> Result<F<C>>
     where
-        C: num::Int,
-        C: num::Prim,
-        (): Precision<A>,
-        (): Precision<B>,
-        (): N<C>,
-        (): ScaleCompatible<A, C>,
-        (): ScaleCompatible<B, C>,
-        (): PICompatible<A, C>,
-        (): PICompatible<B, C> {
+        C: ops::Int,
+        C: ops::Prim,
+        (): SupportedPrecision<A>,
+        (): SupportedPrecision<B>,
+        (): SupportedInt<C>,
+        (): Supported<A, C>,
+        (): Supported<B, C> {
         let old_scale: C = scale::<A, _>();
         let new_scale: C = scale::<B, _>();
         Self::muldiv(n, new_scale, old_scale)
@@ -129,9 +122,9 @@ where
     #[inline]
     fn to_negative<T>(n: F<T>) -> F<T>
     where
-        T: num::Int,
-        T: num::Prim,
-        (): N<T> {
+        T: ops::Int,
+        T: ops::Prim,
+        (): SupportedInt<T> {
         if n == T::AS_0 {
             n
         } else {
@@ -142,9 +135,9 @@ where
     #[inline]
     fn to_positive<T>(n: F<T>) -> F<T>
     where
-        T: num::Int,
-        T: num::Prim,
-        (): N<T> {
+        T: ops::Int,
+        T: ops::Prim,
+        (): SupportedInt<T> {
         if n >= T::AS_0 {
             n
         } else {
@@ -155,61 +148,59 @@ where
     #[inline]
     fn add<T>(x: F<T>, y: F<T>) -> Result<F<T>>
     where
-        T: num::Int,
-        T: num::Prim,
-        (): N<T> {
+        T: ops::Int,
+        T: ops::Prim,
+        (): SupportedInt<T> {
         x.checked_add(y).ok_or(Error::Overflow)
     }
 
     #[inline]
     fn sub<T>(x: F<T>, y: F<T>) -> Result<F<T>>
     where
-        T: num::Int,
-        T: num::Prim,
-        (): N<T> {
+        T: ops::Int,
+        T: ops::Prim,
+        (): SupportedInt<T> {
         x.checked_sub(y).ok_or(Error::Underflow)
     }
 
     #[inline]
     fn mul<const A: u8, B>(x: F<B>, y: F<B>) -> Result<F<B>>
     where
-        B: num::Int,
-        B: num::Prim,
-        (): Precision<A>,
-        (): N<B>,
-        (): ScaleCompatible<A, B>,
-        (): PICompatible<A, B> {
+        B: ops::Int,
+        B: ops::Prim,
+        (): SupportedPrecision<A>,
+        (): SupportedInt<B>,
+        (): Supported<A, B> {
         Self::muldiv(x, y, scale::<A, _>())
     }
 
     #[inline]
     fn div<const A: u8, B>(x: F<B>, y: F<B>) -> Result<F<B>>
     where
-        B: num::Int,
-        B: num::Prim,
-        (): Precision<A>,
-        (): N<B>,
-        (): ScaleCompatible<A, B>,
-        (): PICompatible<A, B> {
+        B: ops::Int,
+        B: ops::Prim,
+        (): SupportedPrecision<A>,
+        (): SupportedInt<B>,
+        (): Supported<A, B> {
         Self::muldiv(x, scale::<A, _>(), y)
     }
 
     #[inline]
     fn muldiv<T>(x: T, y: T, z: T) -> Result<T> 
     where 
-        T: num::Int,
-        T: num::Prim,
-        (): N<T> {
+        T: ops::Int,
+        T: ops::Prim,
+        (): SupportedInt<T> {
         if z == T::AS_0 {
             return Err(Error::DivisionByZero);
         }
-        match (T::BITS_U128, T::SIGNED) {
-            (_, true) if T::BITS_U128 <= 64 => {
+        match (T::BITS_AS_U128, T::SIGNED) {
+            (_, true) if T::BITS_AS_U128 <= 64 => {
                 let n: T = x.checked_mul(y).ok_or(Error::Overflow)?;
                 let n: T = n / z;
                 Ok(n)
             },
-            (_, false) if T::BITS_U128 < 128 => {
+            (_, false) if T::BITS_AS_U128 < 128 => {
                 let (a, b) = wide_mul(x, y)?;
                 if b >= z {
                     Err(Error::Overflow)
@@ -233,9 +224,9 @@ where
 #[inline]
 fn wide_mul<T>(x: T, y: T) -> Result<(T, T)>
 where 
-    T: num::Int,
-    T: num::Prim,
-    (): N<T> {
+    T: ops::Int,
+    T: ops::Prim,
+    (): SupportedInt<T> {
     if T::SIGNED {
         signed_wide_mul(x, y)
     } else {
@@ -246,17 +237,14 @@ where
 #[inline]
 fn signed_wide_mul<T>(x: T, y: T) -> Result<(T, T)> 
 where 
-    T: num::Int,
-    T: num::Prim,
-    (): N<T> {    
+    T: ops::Int,
+    T: ops::Prim,
+    (): SupportedInt<T> {    
     assert!(T::SIGNED);
-    assert!(T::BITS_U128 <= 64);
-    let a: usize = T::BITS_U128 as usize;
-    let b: u8 = unsafe {
-        T::AS_2.try_into().unwrap_unchecked()
-    };
-    let b: usize = b as usize;
-    let n: u32 = (a / b).try_into().unwrap();
+    assert!(T::BITS_AS_U128 <= 64);
+    let a: T = T::BITS;
+    let b: T = T::AS_2;
+    let n: T = a / b;
     let mask: T = (T::AS_1 << n) - T::AS_1;
     let (lo_lo, lo_hi, hi_lo, hi_hi) = {
         let x_lo: T = x & mask;
@@ -288,11 +276,11 @@ where
 #[inline]
 fn unsigned_wide_mul<T>(x: T, y: T) -> Result<(T, T)> 
 where 
-    T: num::Int,
-    T: num::Prim,
-    (): N<T> {
+    T: ops::Int,
+    T: ops::Prim,
+    (): SupportedInt<T> {
     assert!(!T::SIGNED);
-    assert!(T::BITS_U128 <= 64);
+    assert!(T::BITS_AS_U128 <= 64);
     let (x, y) = unsafe {
         let x: u128 = x.try_into().unwrap_unchecked();
         let y: u128 = y.try_into().unwrap_unchecked();
@@ -315,23 +303,23 @@ where
         let b: u128 = hi_hi + m_hi + c + ((a < lo_lo) as u128);
         (a, b)
     };
-    if T::BITS_U128 == 128 {
+    if T::BITS_AS_U128 == 128 {
         unsafe {
             let a: T = a.try_into().unwrap_unchecked();
             let b: T = b.try_into().unwrap_unchecked();
             return Ok((a, b))
         }
     }
-    if a > <T as num::Int>::MAX_U128 {
+    if a > T::MAX_AS_U128 {
         return Err(Error::Overflow)
     }
-    if a < <T as num::Int>::MIN_U128 {
+    if a < T::MIN_AS_U128 {
         return Err(Error::Underflow)
     }
-    if b > <T as num::Int>::MAX_U128 {
+    if b > T::MAX_AS_U128 {
         return Err(Error::Overflow)
     }
-    if b < <T as num::Int>::MIN_U128 {
+    if b < T::MIN_AS_U128 {
         return Err(Error::Underflow)
     }
     let (a, b) = unsafe {
@@ -345,9 +333,9 @@ where
 #[inline]
 fn fold<T>(x: T, y: T, z: T) -> Result<T> 
 where 
-    T: num::Int,
-    T: num::Prim,
-    (): N<T> {
+    T: ops::Int,
+    T: ops::Prim,
+    (): SupportedInt<T> {
     if T::SIGNED {
         signed_fold(x, y, z)
     } else {
@@ -358,9 +346,9 @@ where
 #[inline]
 fn signed_fold<T>(x: T, y: T, z: T) -> Result<T> 
 where 
-    T: num::Int,
-    T: num::Prim,
-    (): N<T> {    
+    T: ops::Int,
+    T: ops::Prim,
+    (): SupportedInt<T> {    
     let (x, y, z) = unsafe {
         let x: i128 = x.try_into().unwrap_unchecked();
         let y: i128 = y.try_into().unwrap_unchecked();
@@ -368,10 +356,10 @@ where
         (x, y, z)
     };
     let n: i128 = (((((y % z) << 64) | (x >> 64)) % z) << 64) | (x & 0xFFFFFFFFFFFFFFFF);
-    if n > <T as num::Int>::MAX_I128 {
+    if n > T::MAX_AS_I128 {
         return Err(Error::Overflow)
     }
-    if n < <T as num::Int>::MIN_I128 {
+    if n < T::MIN_AS_I128 {
         return Err(Error::Underflow)
     }
     let n: T = unsafe {
@@ -383,9 +371,9 @@ where
 #[inline]
 fn unsigned_fold<T>(x: T, y: T, z: T) -> Result<T> 
 where 
-    T: num::Int,
-    T: num::Prim,
-    (): N<T> {
+    T: ops::Int,
+    T: ops::Prim,
+    (): SupportedInt<T> {
     let (x, y, z) = unsafe {
         let x: u128 = x.try_into().unwrap_unchecked();
         let y: u128 = y.try_into().unwrap_unchecked();
@@ -393,10 +381,10 @@ where
         (x, y, z)
     };
     let n: u128 = (((((y % z) << 64) | (x >> 64)) % z) << 64) | (x & 0xFFFFFFFFFFFFFFFF);
-    if n > <T as num::Int>::MAX_U128 {
+    if n > T::MAX_AS_U128 {
         return Err(Error::Overflow)
     }
-    if n < <T as num::Int>::MIN_U128 {
+    if n < T::MIN_AS_U128 {
         return Err(Error::Underflow)
     }
     let n: T = unsafe {
@@ -408,11 +396,35 @@ where
 #[inline]
 fn n180<T>() -> T
 where
-    T: num::Int,
-    (): N<T> {
+    T: ops::Int,
+    (): SupportedInt<T> {
     let ret: u8 = 180;
     let ret: T = unsafe {
         ret.try_into().unwrap_unchecked()
     };
     ret
+}
+
+#[inline]
+pub fn deg90<const A: u8, B>() -> Result<Deg<B>>
+where
+    B: ops::Int,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    let deg: B = if B::SIGNED {
+        let n: i128 = 90;
+        let n: B = unsafe {
+            n.try_into().unwrap_unchecked()
+        };
+        n
+    } else {
+        let n: u128 = 90;
+        let n: B = unsafe {
+            n.try_into().unwrap_unchecked()
+        };
+        n
+    };
+    let ret: B = deg.checked_mul(scale()).ok_or(Error::Overflow)?;
+    Ok(ret)
 }

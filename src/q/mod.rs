@@ -2,13 +2,9 @@ use super::*;
 
 ::modwire::expose!(
     pub engine
-    pub n
-    pub pi_compatible
         pi
-    pub precision
-    pub scale_compatible
         scale
-        trig
+    pub supported
 );
 
 macro_rules! ty {
@@ -22,7 +18,7 @@ macro_rules! ty {
 }
 
 ty!(
-    1 2 3 4 5 6 7 8 9
+    0 1 2 3 4 5 6 7 8 9
     10 11 12 13 14 15 16 17 18 19
     20 21 22 23 24 25 26 27 28 29
     30 31 32 33 34 35 36 37
@@ -41,26 +37,24 @@ type Rad<T> = T;
 #[derive(Copy)]
 pub struct Q<const A: u8, B = usize, C = DefaultEngine>
 where
-    B: num::Int,
-    B: num::Prim,
+    B: ops::Int,
+    B: ops::Prim,
     C: Engine,
-    (): Precision<A>,
-    (): N<B>,
-    (): ScaleCompatible<A, B>,
-    (): PICompatible<A, B> {
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
     n: B,
     m_0: ::core::marker::PhantomData<C>
 }
 
 impl<const A: u8, B, C> Q<A, B, C>
 where
-    B: num::Int,
-    B: num::Prim,
+    B: ops::Int,
+    B: ops::Prim,
     C: Engine,
-    (): Precision<A>,
-    (): N<B>,
-    (): ScaleCompatible<A, B>,
-    (): PICompatible<A, B> {
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
     #[inline]
     pub fn tan(self) -> Result<Ratio<Self>> {
         let ret: B = self.n;
@@ -122,9 +116,8 @@ where
     #[inline]
     pub fn cast<const D: u8>(self) -> Result<Q<D, B, C>> 
     where
-        (): Precision<D>,
-        (): ScaleCompatible<D, B>,
-        (): PICompatible<D, B> {
+        (): SupportedPrecision<D>,
+        (): Supported<D, B> {
         let ret: B = self.n;
         let ret: B = C::cast::<A, D, _>(ret)?;
         let ret: Q<D, B, C> = ret.into();
@@ -134,13 +127,12 @@ where
 
 impl<const A: u8, B, C> From<B> for Q<A, B, C>
 where
-    B: num::Int,
-    B: num::Prim,
+    B: ops::Int,
+    B: ops::Prim,
     C: Engine,
-    (): Precision<A>,
-    (): N<B>,
-    (): ScaleCompatible<A, B>,
-    (): PICompatible<A, B> {
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
     #[inline]
     fn from(n: B) -> Self {
         Self {
@@ -152,13 +144,12 @@ where
 
 impl<const A: u8, B, C> ::core::ops::Add for Q<A, B, C>
 where
-    B: num::Int,
-    B: num::Prim,
+    B: ops::Int,
+    B: ops::Prim,
     C: Engine,
-    (): Precision<A>,
-    (): N<B>,
-    (): ScaleCompatible<A, B>,
-    (): PICompatible<A, B> {
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
     type Output = Result<Self>;
 
     #[inline]
@@ -173,13 +164,12 @@ where
 
 impl<const A: u8, B, C> ::core::ops::Sub for Q<A, B, C>
 where
-    B: num::Int,
-    B: num::Prim,
+    B: ops::Int,
+    B: ops::Prim,
     C: Engine,
-    (): Precision<A>,
-    (): N<B>,
-    (): ScaleCompatible<A, B>,
-    (): PICompatible<A, B> {
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
     type Output = Result<Self>;
 
     #[inline]
@@ -194,13 +184,12 @@ where
 
 impl<const A: u8, B, C> ::core::ops::Mul for Q<A, B, C>
 where
-    B: num::Int,
-    B: num::Prim,
+    B: ops::Int,
+    B: ops::Prim,
     C: Engine,
-    (): Precision<A>,
-    (): N<B>,
-    (): ScaleCompatible<A, B>,
-    (): PICompatible<A, B> {
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
     type Output = Result<Self>;
 
     #[inline]
@@ -215,13 +204,12 @@ where
 
 impl<const A: u8, B, C> ::core::ops::Div for Q<A, B, C>
 where
-    B: num::Int,
-    B: num::Prim,
+    B: ops::Int,
+    B: ops::Prim,
     C: Engine,
-    (): Precision<A>,
-    (): N<B>,
-    (): ScaleCompatible<A, B>,
-    (): PICompatible<A, B> {
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
     type Output = Result<Self>;
 
     #[inline]
@@ -236,24 +224,21 @@ where
 
 impl<const A: u8, B, C> Eq for Q<A, B, C>
 where
-    B: num::Int,
-    B: num::Prim,
+    B: ops::Int,
+    B: ops::Prim,
     C: Engine,
-    (): Precision<A>,
-    (): N<B>,
-    (): ScaleCompatible<A, B>,
-    (): PICompatible<A, B>
-    {}
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {}
 
 impl<const A: u8, B, C> PartialEq for Q<A, B, C>
 where
-    B: num::Int,
-    B: num::Prim,
+    B: ops::Int,
+    B: ops::Prim,
     C: Engine,
-    (): Precision<A>,
-    (): N<B>,
-    (): ScaleCompatible<A, B>,
-    (): PICompatible<A, B> {
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
         self.n == other.n
@@ -262,13 +247,12 @@ where
 
 impl<const A: u8, B, C> Ord for Q<A, B, C>
 where
-    B: num::Int,
-    B: num::Prim,
+    B: ops::Int,
+    B: ops::Prim,
     C: Engine,
-    (): Precision<A>,
-    (): N<B>,
-    (): ScaleCompatible<A, B>,
-    (): PICompatible<A, B> {
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
     #[inline]
     fn clamp(self, min: Self, max: Self) -> Self
     where
@@ -320,13 +304,12 @@ where
 
 impl<const A: u8, B, C> PartialOrd for Q<A, B, C>
 where
-    B: num::Int,
-    B: num::Prim,
+    B: ops::Int,
+    B: ops::Prim,
     C: Engine,
-    (): Precision<A>,
-    (): N<B>,
-    (): ScaleCompatible<A, B>,
-    (): PICompatible<A, B> {
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
     #[inline]
     fn ge(&self, other: &Self) -> bool {
         let x: B = self.n;

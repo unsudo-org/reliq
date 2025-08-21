@@ -1,25 +1,61 @@
-use super::*;
-
-macro_rules! whitelist {
-    ($($n:literal $ty:ty)*) => {
+macro_rules! precision_whitelist {
+    ($($n:literal)*) => {
         $(
-            impl PICompatible<$n, $ty> for () {}
+            impl SupportedPrecision<$n> for () {}
         )*
     };
 }
 
-/// `A` & `B` can safely hold `π`.
-pub trait PICompatible<const A: u8, B> where B: num::Int {}
+macro_rules! int_whitelist {
+    ($($ty:ident)*) => {
+        $(
+            impl SupportedInt<$ty> for () {}
+        )*
+    };
+}
+
+macro_rules! whitelist {
+    ($($n:literal $ty:ty)*) => {
+        $(
+            impl Supported<$n, $ty> for () {}
+        )*
+    };
+}
+
+/// `A` is a valid precision.
+pub trait SupportedPrecision<const T: u8> {}
+
+/// `T` must be able to support `180`.
+pub trait SupportedInt<T> {}
+
+/// * `A` & `B` can safely hold `10^A`.
+/// * `A` & `B` can safely hold `π`.
+pub trait Supported<const A: u8, B> {}
+
+precision_whitelist!(
+    0 1 2 3 4 5 6 7 8 9
+    10 11 12 13 14 15 16 17 18 19
+    20 21 22 23 24 25 26 27 28 29
+    30 31 32 33 34 35 36 37
+);
+
+int_whitelist!(
+    u8 u16 u32 u64 u128 usize
+       i16 i32 i64 i128 isize
+);
 
 whitelist!(
+    0 u8
     1 u8
     2 u8
 
+    0 u16
     1 u16
     2 u16
     3 u16
     4 u16
 
+    0 u32
     1 u32
     2 u32
     3 u32
@@ -30,6 +66,7 @@ whitelist!(
     8 u32
     9 u32
 
+    0 u64
     1 u64
     2 u64
     3 u64
@@ -48,6 +85,7 @@ whitelist!(
     16 u64
     17 u64
     18 u64
+    19 u64
 
     1 u128
     2 u128
@@ -98,7 +136,7 @@ whitelist!(
     8 usize
     9 usize
 
-    1 i8
+    // i8 does not support `180`.
 
     1 i16
     2 i16

@@ -14,12 +14,15 @@
     pub wrapping
 );
 
-pub trait Int 
+pub trait Int
 where
     Self: ::core::marker::Sized,
-    Self: Num,
     Self: ::core::cmp::Eq,
     Self: ::core::cmp::Ord,
+    Self: Num,
+    Self: Bits,
+    Self: Bound,
+    Self: Sign,
     Self: CheckedAdd,
     Self: CheckedDiv,
     Self: CheckedMul,
@@ -43,6 +46,26 @@ where
     Self: WrappingPow,
     Self: WrappingRem,
     Self: WrappingSub,
+    Self: ::core::ops::Shl<Output = Self>,
+    Self: ::core::ops::ShlAssign,
+    Self: ::core::ops::Shr<Output = Self>,
+    Self: ::core::ops::ShrAssign,
+    Self: ::core::ops::BitAnd<Output = Self>,
+    Self: ::core::ops::BitAndAssign,
+    Self: ::core::ops::BitOr<Output = Self>,
+    Self: ::core::ops::BitOrAssign,
+    Self: ::core::ops::BitXor<Output = Self>,
+    Self: ::core::ops::BitXorAssign,
+    Self: for<'a> ::core::ops::Shl<&'a Self, Output = Self>,
+    Self: for<'a> ::core::ops::ShlAssign<&'a Self>,
+    Self: for<'a> ::core::ops::Shr<&'a Self, Output = Self>,
+    Self: for<'a> ::core::ops::ShrAssign<&'a Self>,
+    Self: for<'a> ::core::ops::BitAnd<&'a Self, Output = Self>,
+    Self: for<'a> ::core::ops::BitAndAssign<&'a Self>,
+    Self: for<'a> ::core::ops::BitOr<&'a Self, Output = Self>,
+    Self: for<'a> ::core::ops::BitOrAssign<&'a Self>,
+    Self: for<'a> ::core::ops::BitXor<&'a Self, Output = Self>,
+    Self: for<'a> ::core::ops::BitXorAssign<&'a Self>,
     Self: ::core::convert::TryFrom<i8>,
     Self: ::core::convert::TryFrom<i16>,
     Self: ::core::convert::TryFrom<i32>,
@@ -72,7 +95,6 @@ pub trait Float
 where
     Self: ::core::marker::Sized,
     Self: Num,
-    Self: QuickAccess,
     Self: ArcTan,
     Self: ArcSin,
     Self: ArcCos,
@@ -86,6 +108,7 @@ where
 
 pub trait Num
 where
+    Self: QuickAccess,
     Self: Sqrt,
     Self: ::core::default::Default,
     Self: ::core::clone::Clone,
@@ -119,9 +142,12 @@ where
 impl<T> Int for T
 where
     T: ::core::marker::Sized,
-    T: Num,
     T: ::core::cmp::Eq,
     T: ::core::cmp::Ord,
+    T: Num,
+    T: Bits,
+    T: Bound,
+    T: Sign,
     T: CheckedAdd,
     T: CheckedDiv,
     T: CheckedMul,
@@ -145,6 +171,26 @@ where
     T: WrappingPow,
     T: WrappingRem,
     T: WrappingSub,
+    T: ::core::ops::Shl<Output = Self>,
+    T: ::core::ops::ShlAssign,
+    T: ::core::ops::Shr<Output = Self>,
+    T: ::core::ops::ShrAssign,
+    T: ::core::ops::BitAnd<Output = Self>,
+    T: ::core::ops::BitAndAssign,
+    T: ::core::ops::BitOr<Output = Self>,
+    T: ::core::ops::BitOrAssign,
+    T: ::core::ops::BitXor<Output = Self>,
+    T: ::core::ops::BitXorAssign,
+    T: for<'a> ::core::ops::Shl<&'a Self, Output = Self>,
+    T: for<'a> ::core::ops::ShlAssign<&'a Self>,
+    T: for<'a> ::core::ops::Shr<&'a Self, Output = Self>,
+    T: for<'a> ::core::ops::ShrAssign<&'a Self>,
+    T: for<'a> ::core::ops::BitAnd<&'a Self, Output = Self>,
+    T: for<'a> ::core::ops::BitAndAssign<&'a Self>,
+    T: for<'a> ::core::ops::BitOr<&'a Self, Output = Self>,
+    T: for<'a> ::core::ops::BitOrAssign<&'a Self>,
+    T: for<'a> ::core::ops::BitXor<&'a Self, Output = Self>,
+    T: for<'a> ::core::ops::BitXorAssign<&'a Self>,
     T: ::core::convert::TryFrom<i8>,
     T: ::core::convert::TryFrom<i16>,
     T: ::core::convert::TryFrom<i32>,
@@ -188,6 +234,7 @@ where
 
 impl<T> Num for T
 where
+    T: QuickAccess,
     T: Sqrt,
     T: ::core::default::Default,
     T: ::core::clone::Clone,

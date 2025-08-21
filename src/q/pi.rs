@@ -43,10 +43,13 @@ const LOOK_UP: [u128; 37] = [
 #[inline]
 pub fn pi<const A: u8, B>() -> B
 where
-    B: num::Int,
-    (): Precision<A>,
-    (): N<B>,
-    (): PICompatible<A, B> {
+    B: ops::Int,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    if A == 0 {
+        return B::AS_3
+    }
     unsafe  {
         look_up::<A>().try_into().unwrap_unchecked()
     }
