@@ -1,13 +1,30 @@
 use super::*;
-use ::core::result;
-use ::core::cmp;
-use ::core::mem;
 
 ::modwire::expose!(
     pub iter
 );
 
-pub type Result<T> = result::Result<T, Error>;
+#[macro_export]
+macro_rules! array {
+    ($($data:expr),* $(,)?) => {{
+        let mut arr = Array::<{count!($($data),*)}, _>::default();
+        $(
+            arr.push($data).expect("Exceeded fixed capacity.");
+        )*
+        arr
+    }};
+}
+
+macro_rules! count {
+    () => {
+        0
+    };
+    ($head:expr $(,$tail:expr)*) => {
+        1 + count!($($tail),*)
+    };
+}
+
+pub type Result<T> = ::core::result::Result<T, Error>;
 
 #[repr(u8)]
 #[derive(Debug)]
@@ -22,7 +39,7 @@ pub enum Error {
 pub struct Array<const A: usize, B>
 where
     B: Copy {
-    pub(super) buf: [mem::MaybeUninit<B>; A],
+    pub(super) buf: [::core::mem::MaybeUninit<B>; A],
     pub(super) len: usize
 }
 
@@ -31,8 +48,8 @@ where
     B: Copy {
     #[inline]
     pub fn new(data: [B; A]) -> Self {
-        let mut buf: [mem::MaybeUninit<B>; A] = unsafe {
-            mem::MaybeUninit::uninit().assume_init()
+        let mut buf: [::core::mem::MaybeUninit<B>; A] = unsafe {
+            ::core::mem::MaybeUninit::uninit().assume_init()
         };
         for (k, data) in data.into_iter().enumerate() {
             buf[k].write(data);
@@ -116,6 +133,89 @@ where
         unsafe {
             ::core::slice::from_raw_parts_mut(data, self.len)
         }
+    }
+
+    #[inline]
+    pub const fn swap_insert(&mut self, key: usize, data: B) -> Result<()> {
+        if self.len >= A {
+            return Err(Error::Overflow)
+        }
+        if key > self.len {
+            return Err(Error::KeyOutOfBounds)
+        }
+        self.buf[self.len].write(data);
+        self.len += 1;
+        if key != self.len - 1 {
+            unsafe {
+                let temporary: B = self.buf[key].assume_init_read();
+                self.buf[key] = self.buf[self.len - 1];
+                self.buf[self.len - 1].write(temporary);
+            }
+        }
+        Ok(())
+    }
+
+    #[inline]
+    pub fn insert(&mut self, key: usize, item: B) -> Result<()> {
+        if self.len >= A {
+            return Err(Error::Overflow)
+        }
+        if self.len <= key {
+            return Err(Error::KeyOutOfBounds)
+        }
+        for i in (key..self.len).rev() {
+            self.buf[i + 1] = self.buf[i];
+        }
+        self.buf[key].write(item);
+        self.len += 1;
+        Ok(())
+    }
+
+    #[inline]
+    pub fn remove(&mut self, key: usize) -> Result<B> {
+        if self.len == 0 {
+            return Err(Error::Empty)
+        }
+        if self.len <= key {
+            return Err(Error::KeyOutOfBounds)
+        }
+        let item: B = unsafe {
+            self.buf[key].assume_init_read()
+        };
+        for i in key..self.len - 1 {
+            self.buf[i] = self.buf[i + 1];
+        }
+        self.len -= 1;
+        Ok(item)
+    }
+}
+
+impl<const A: usize, B> Default for Array<A, B>
+where
+    B: Copy {
+    #[inline]
+    fn default() -> Self {
+        Self {
+            buf: unsafe {
+                ::core::mem::MaybeUninit::uninit().assume_init()
+            },
+            len: 0
+        }
+    }
+}
+
+impl<const A: usize, B> Eq for Array<A, B>
+where
+    B: Copy,
+    B: PartialEq {}
+
+impl<const A: usize, B> PartialEq for Array<A, B>
+where
+    B: Copy,
+    B: PartialEq {
+    #[inline]
+    fn eq(&self, other: &Self) -> bool {
+        self.len == other.len && self.as_slice() == other.as_slice()
     }
 }
 

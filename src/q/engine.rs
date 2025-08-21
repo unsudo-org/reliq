@@ -5,6 +5,7 @@ type Rad<T> = T;
 type Deg<T> = T;
 type Ratio<T> = T;
 
+#[repr(transparent)]
 #[derive(Clone)]
 #[derive(Copy)]
 pub struct DefaultEngine; 

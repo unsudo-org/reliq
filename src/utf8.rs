@@ -2,6 +2,7 @@ use super::*;
 
 pub type Result<T> = ::core::result::Result<T, Error>;
 
+#[derive(Debug)]
 pub enum Error {
     Overflow,
     IllegalByteSequence,
@@ -133,5 +134,21 @@ impl<const T: usize> Utf8<T> {
         }
         Err(Error::IllegalByteSequence)
     }
+
+    pub fn as_str(&self) -> &str {
+        let ret = self.buf.as_slice();
+        ::core::str::from_utf8(ret)
+            .ok()
+            .ok_or(Error::IllegalByteSequence)
+            .unwrap()
+    }
 }
 
+impl<const T: usize> map::Key for Utf8<T> {}
+
+impl<const T: usize> ::core::hash::Hash for Utf8<T> {
+    #[inline]
+    fn hash<H: ::core::hash::Hasher>(&self, state: &mut H) {
+        
+    }
+}

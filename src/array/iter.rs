@@ -1,7 +1,5 @@
-use super::*;
-
 pub struct Iter<const A: usize, B> {
-    buf: [mem::MaybeUninit<B>; A],
+    buf: [::core::mem::MaybeUninit<B>; A],
     len: usize,
     key: usize
 }

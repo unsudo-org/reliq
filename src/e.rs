@@ -1,8 +1,8 @@
 #[inline]
-pub fn require<A, B, C, D>(state: &mut A, on_transaction: B) -> ::core::result::Result<C, D>
+pub fn require<A, B, C, D>(state: &mut A, on_transaction: B) -> Result<C, D>
 where
     A: Clone,
-    B: FnOnce(&mut A) -> ::core::result::Result<C, D> {
+    B: FnOnce(&mut A) -> Result<C, D> {
     let snapshot: A = state.clone();
     match on_transaction(state) {
         Ok(ret) => Ok(ret),
@@ -14,9 +14,9 @@ where
 }
 
 #[inline]
-pub fn retry<A, B, C>(attempts: usize, mut on_attempt: A) -> ::core::result::Result<B, C> 
+pub fn retry<A, B, C>(attempts: usize, mut on_attempt: A) -> Result<B, C> 
 where
-    A: FnMut(usize) -> ::core::result::Result<B, C> {
+    A: FnMut(usize) -> Result<B, C> {
     let mut last_failure: Option<C> = None;
     for attempt in 0..=attempts {
         match on_attempt(attempt) {
