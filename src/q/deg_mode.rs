@@ -69,3 +69,30 @@ where
         Ok(ret)
     }
 }
+
+#[cfg(test)]
+#[allow(clippy::zero_prefixed_literal)]
+mod test {
+    use super::*;
+
+    #[::rstest::rstest]
+    #[case(25_00.into(), 0_46.into())]
+    fn tan(#[case] angle: Deg2<u32>, #[case] expected: Q2<u32>) {
+        let ret: Q2<_> = angle.tan().unwrap();
+        assert_eq!(ret, expected);
+    }
+
+    #[::rstest::rstest]
+    #[case(25_00.into(), 0_42.into())]
+    fn sin(#[case] angle: Deg2<u32>, #[case] expected: Q2<u32>) {
+        let ret: Q2<_> = angle.sin().unwrap();
+        assert_eq!(ret, expected);
+    }
+
+    #[::rstest::rstest]
+    #[case(1_00.into(), 1_00.into())]
+    fn cos(#[case] angle: Deg2<u32>, #[case] expected: Q2<u32>) {
+        let ret: Q2<_> = angle.cos().unwrap();
+        assert_eq!(ret, expected);
+    }
+}
