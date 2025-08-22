@@ -2,6 +2,7 @@
     pub bits
     pub bound
     pub checked
+    pub checked2
     pub overflowing
     pub pow
     pub prim
@@ -13,6 +14,17 @@
     pub unsigned
     pub wrapping
 );
+
+pub type Result<T> = ::core::result::Result<T, Error>;
+
+pub enum Error {
+    Overflow,
+    Underflow,
+    DivisionByZero,
+    ModuloByZero,
+    ShiftOverflow,
+    NegationOverflow
+}
 
 pub trait Int
 where

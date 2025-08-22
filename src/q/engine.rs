@@ -91,7 +91,7 @@ where
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
         (): Supported<A, B> {
-        Self::muldiv(angle, pi::<A, _>(), n180::<B>() * scale::<A, B>())
+        Self::muldiv(angle, pi::<A, _>(), as_180::<B>() * scale::<A, B>())
     }
 
     #[inline]
@@ -102,7 +102,20 @@ where
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
         (): Supported<A, B> {
-        Self::muldiv(angle, n180::<B>() * scale::<A, B>(), pi())
+        Self::muldiv(angle, as_180::<B>() * scale::<A, B>(), pi())
+    }
+
+    #[inline]
+    fn lerp<const A: u8, B>(x: F<B>, y: F<B>, t: F<B>) -> Result<F<B>>
+    where
+        B: ops::Int,
+        B: ops::Prim,
+        (): SupportedPrecision<A>,
+        (): SupportedInt<B>,
+        (): Supported<A, B> {
+        let d: F<_> = Self::sub(y, x)?;
+        let s: F<_> = Self::muldiv(d, t, scale())?;
+        Self::add(x, s)
     }
 
     #[inline]
@@ -403,7 +416,7 @@ where
 }
 
 #[inline]
-fn n180<T>() -> T
+fn as_180<T>() -> T
 where
     T: ops::Int,
     (): SupportedInt<T> {
