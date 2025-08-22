@@ -10,12 +10,12 @@ pub enum Error {
 }
 
 #[derive(Clone)]
-pub struct Utf8<const T: usize> {
-    buf: array::Array<T, u8>,
+pub struct Utf8<const A: usize> {
+    buf: array::Array<A, u8>,
     len: usize
 }
 
-impl<const T: usize> Utf8<T> {
+impl<const A: usize> Utf8<A> {
     #[inline]
     pub const fn zero() -> Self {
         Self {
@@ -33,7 +33,7 @@ impl<const T: usize> Utf8<T> {
     pub const fn encode(bytes: &[u8]) -> Self {
         let mut ret: Self = Self::zero();
         let mut key: usize = 0;
-        while key < bytes.len() && ret.buf.len < T {
+        while key < bytes.len() && ret.buf.len < A {
             let byte = bytes[key];
             ret.buf.buf[key].write(byte);
             ret.buf.len += 1;
@@ -62,7 +62,7 @@ impl<const T: usize> Utf8<T> {
     #[inline]
     pub const fn push(&mut self, c: char) -> Result<()> {
         let code: u32 = c as u32;
-        let arr: &mut array::Array<T, u8> = &mut self.buf;
+        let arr: &mut array::Array<A, u8> = &mut self.buf;
         let req: usize = if code <= 0x7f {
             1
         } else if code <= 0x7ff {
@@ -72,7 +72,7 @@ impl<const T: usize> Utf8<T> {
         } else {
             4
         };
-        if arr.len() + req > T {
+        if arr.len() + req > A {
             return Err(Error::Overflow)
         }
         match req {
@@ -135,11 +135,66 @@ impl<const T: usize> Utf8<T> {
         Err(Error::IllegalByteSequence)
     }
 
+    pub fn cast<const B: usize>(self) -> Result<Utf8<B>> {
+        let a: Utf8<A> = self;
+        let a: &str = a.as_str();
+        let mut b: Utf8<B> = Utf8::zero();
+        b.push_str(a)?;
+        Ok(b)
+    }
+
     pub fn as_str(&self) -> &str {
         let ret = self.buf.as_slice();
         ::core::str::from_utf8(ret)
             .ok()
             .ok_or(Error::IllegalByteSequence)
             .unwrap()
+    }
+}
+
+impl<const T: usize> TryFrom<&str> for Utf8<T> {
+    type Error = Error;
+
+    fn try_from(value: &str) -> ::core::result::Result<Self, Self::Error> {
+        let mut s: Self = Self::zero();
+        s.push_str(value)?;
+        Ok(s)
+    }
+}
+
+impl<const T: usize> Eq for Utf8<T> {}
+impl<const T: usize> PartialEq for Utf8<T> {
+    fn eq(&self, other: &Self) -> bool {
+        self.len == other.len && self.buf == other.buf
+    }
+}
+
+impl<const A: usize> ::core::fmt::Debug for Utf8<A> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        f
+            .debug_struct("Utf8")
+            .field("len", &self.len)
+            .field("buf_len", &self.buf.len)
+            .field("as_str", &self.as_str())
+            .finish()
+    }
+}
+
+impl<const T: usize> ::core::fmt::Display for Utf8<T> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        let s: &str = self.as_str();
+        write!(f, "{}", s)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn try_it() {
+        let s: Utf8<64> = "Hello World".try_into().unwrap();
+        let expected: Utf8<64> = "Hello World".try_into().unwrap();
+        assert_eq!(s, expected);
     }
 }
