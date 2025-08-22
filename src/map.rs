@@ -36,16 +36,6 @@ where
     B: Key,
     C: Val,
     D: Hasher {
-    #[inline]
-    pub const fn new() -> Self {
-        Self {
-            keys: [None; A],
-            vals: [None; A],
-            len: 0,
-            hasher: ::core::marker::PhantomData
-        }
-    }
-
     pub const fn len(&self) -> usize {
         self.len
     }
@@ -132,3 +122,19 @@ where
         ) % A
     }
 }
+
+impl<const A: usize, B, C, D> Default for Map<A, B, C, D> 
+where
+    B: Key,
+    C: Val,
+    D: Hasher {
+    #[inline]
+    fn default() -> Self {
+        Self {
+            keys: [None; A],
+            vals: [None; A],
+            len: 0,
+            hasher: ::core::marker::PhantomData
+        }
+    }
+ }

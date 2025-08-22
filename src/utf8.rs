@@ -143,12 +143,3 @@ impl<const T: usize> Utf8<T> {
             .unwrap()
     }
 }
-
-impl<const T: usize> map::Key for Utf8<T> {}
-
-impl<const T: usize> ::core::hash::Hash for Utf8<T> {
-    #[inline]
-    fn hash<H: ::core::hash::Hasher>(&self, state: &mut H) {
-        
-    }
-}
