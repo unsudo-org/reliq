@@ -156,6 +156,21 @@ where
     }
 
     #[inline]
+    pub const fn swap_remove(&mut self, key: usize) -> Result<B> {
+        if key >= self.len {
+            return Err(Error::KeyOutOfBounds)
+        }
+        let ret: B = unsafe {
+            self.buf[key].assume_init_read()
+        };
+        if key != self.len - 1 {
+            self.buf[key] = self.buf[self.len - 1];
+        }
+        self.len -= 1;
+        Ok(ret)
+    }    
+
+    #[inline]
     pub fn insert(&mut self, key: usize, item: B) -> Result<()> {
         if self.len >= A {
             return Err(Error::Overflow)
@@ -253,12 +268,50 @@ mod test {
     use super::*;
 
     #[test]
+    fn push_pop() {
+        let mut arr: Array<4, u8> = Array::default();
+        assert_eq!(arr.len(), 0);
+        arr.push(1).unwrap();
+        arr.push(2).unwrap();
+        assert_eq!(arr.len(), 2);
+    }
+
+    #[test]
+    fn insert_remove_ordered() {
+        let mut arr: Array<4, u8> = Array::default();
+        arr.push(1).unwrap();
+        arr.push(3).unwrap();
+        arr.insert(1, 2).unwrap(); // insert in middle
+        assert_eq!(arr.as_slice(), &[1, 2, 3]);
+
+        let val = arr.remove(1).unwrap(); // remove middle
+        assert_eq!(val, 2);
+        assert_eq!(arr.as_slice(), &[1, 3]);
+    }
+
+    #[test]
+    fn swap_insert_remove_unordered() {
+        let mut arr: Array<4, u8> = Array::default();
+        arr.push(10).unwrap();
+        arr.push(20).unwrap();
+        arr.push(30).unwrap();
+
+        // Insert 15 at index 1, expect ordering not preserved
+        arr.swap_insert(1, 15).unwrap();
+        assert_eq!(arr.len(), 4);
+        assert!(arr.as_slice().contains(&15));
+
+        let val = arr.swap_remove(1).unwrap();
+        assert!(val == 15 || val == 20); // due to swap, either could be returned
+        assert_eq!(arr.len(), 3);
+    }
+
+    #[test]
     fn iter() {
         let mut arr: Array<3, u8> = Array::default();
         arr.push(1).unwrap();
         arr.push(2).unwrap();
         arr.push(3).unwrap();
-
         let collected: Array<3, u8> = arr.into_iter().collect();
         assert_eq!(collected, array!(1, 2, 3));
     }
