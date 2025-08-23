@@ -1,7 +1,9 @@
+use super::*;
+
 pub struct Iter<const A: usize, B> {
-    buf: [::core::mem::MaybeUninit<B>; A],
-    len: usize,
-    key: usize
+    pub(super) buf: [::core::mem::MaybeUninit<B>; A],
+    pub(super) len: usize,
+    pub(super) key: usize
 }
 
 impl<const A: usize, B> Iterator for Iter<A, B> {
@@ -24,4 +26,11 @@ impl<const A: usize, B> Iterator for Iter<A, B> {
         let left: usize = self.len - self.key;
         (left, Some(left))
     }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+
 }

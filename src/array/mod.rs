@@ -219,3 +219,47 @@ where
     }
 }
 
+impl<const A: usize, B> FromIterator<B> for Array<A, B>
+where
+    B: Copy {
+    fn from_iter<T: IntoIterator<Item = B>>(iter: T) -> Self {
+        let mut arr: Self = Self::default();
+        for item in iter {
+            if arr.push(item).is_err() {
+                break
+            }
+        }
+        arr
+    }
+}
+
+impl<const A: usize, B> IntoIterator for Array<A, B>
+where
+    B: Copy {
+    type Item = B;
+    type IntoIter = Iter<A, B>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        Iter {
+            buf: self.buf,
+            len: self.len,
+            key: 0
+        }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn iter() {
+        let mut arr: Array<3, u8> = Array::default();
+        arr.push(1).unwrap();
+        arr.push(2).unwrap();
+        arr.push(3).unwrap();
+
+        let collected: Array<3, u8> = arr.into_iter().collect();
+        assert_eq!(collected, array!(1, 2, 3));
+    }
+}

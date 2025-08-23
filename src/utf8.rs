@@ -169,6 +169,23 @@ impl<const T: usize> PartialEq for Utf8<T> {
     }
 }
 
+impl<const A: usize> Ord for Utf8<A> {
+    fn cmp(&self, other: &Self) -> ::core::cmp::Ordering {
+        let x: &str = self.as_str();
+        let y: &str = other.as_str();
+        x.cmp(y)
+    }
+}
+
+impl<const T: usize> PartialOrd for Utf8<T> {
+    fn partial_cmp(&self, other: &Self) -> Option<::core::cmp::Ordering> {
+        let x: &str = self.as_str();
+        let y: &str = other.as_str();
+        let ret: ::core::cmp::Ordering = x.cmp(y);
+        Some(ret)
+    }
+}
+
 impl<const A: usize> ::core::fmt::Debug for Utf8<A> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         f
