@@ -30,7 +30,7 @@ impl<const A: usize> Utf8<A> {
     }
 
     #[inline]
-    pub const fn encode(bytes: &[u8]) -> Self {
+    pub const fn encode<B>(bytes: &[u8]) -> Self {
         let mut ret: Self = Self::new();
         let mut key: usize = 0;
         while key < bytes.len() && ret.buf.len < A {

@@ -1,8 +1,25 @@
 use super::*;
 
+macro_rules! ty {
+    ($($n:literal)*) => {
+        ::paste::paste!(
+            $(
+                pub type [< Point2D $n >]<A> = Point2D<$n, A>;
+            )*
+        );
+    };
+}
+
+ty!(
+    1 2 3 4 5 6 7 8 9
+    10 11 12 13 14 15 16 17 18 19
+    20 21 22 23 24 25 26 27 28 29
+    30 31 32 33 34 35 36 37
+);
+
 #[derive(Clone)]
 #[derive(Copy)]
-pub struct Point2D<const A: u8, B, C>
+pub struct Point2D<const A: u8, B, C = q::DefaultEngine>
 where
     B: ops::Int,
     B: ops::Prim,

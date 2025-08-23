@@ -1,7 +1,5 @@
 use super::*;
 
-::modwire::expose!(
-    pub point2d
-    pub point3d
-    pub point4d
-);
+pub mod point2d;
+pub mod point3d;
+pub mod point4d;

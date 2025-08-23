@@ -1,23 +1,15 @@
-pub trait Key
-where
-    Self: ::core::fmt::Debug,
-    Self: Default,
-    Self: Clone,
-    Self: Copy,
-    Self: Eq,
-    Self: ::core::hash::Hash {}
+::modwire::expose!(
+    pub hasher
+    pub key
+    pub val
+);
 
-pub trait Val
-where
-    Self: ::core::fmt::Debug,
-    Self: Default,
-    Self: Clone,
-    Self: Copy {}
+pub type Result<T> = ::core::result::Result<T, Error>;
 
-pub trait Hasher
-where
-    Self: Default,
-    Self: ::core::hash::Hasher {}
+#[derive(Debug)]
+pub enum Error {
+    OutOfSpace
+}
 
 #[derive(Clone)]
 pub struct Map<const A: usize, B, C, D = ::core::hash::SipHasher> 
@@ -36,6 +28,15 @@ where
     B: Key,
     C: Val,
     D: Hasher {
+    pub const fn new() -> Self {
+        Self {
+            keys: [None; A],
+            vals: [None; A],
+            len: 0,
+            hasher: ::core::marker::PhantomData
+        }
+    }
+
     pub const fn len(&self) -> usize {
         self.len
     }
@@ -62,9 +63,9 @@ where
     }
 
     #[inline]
-    pub fn insert(&mut self, key: B, data: C) -> Result<(), (B, C)> {
+    pub fn insert(&mut self, key: B, data: C) -> Result<()> {
         if self.len >= A {
-            return Err((key, data))
+            return Err(Error::OutOfSpace)
         }
         let mut position: usize = self.hash_index(&key);
         for _ in 0..A {
@@ -82,7 +83,7 @@ where
                 _ => position = (position + 1) % A
             }
         }
-        Err((key, data))
+        Err(Error::OutOfSpace)
     }
 
     #[inline]
@@ -130,11 +131,6 @@ where
     D: Hasher {
     #[inline]
     fn default() -> Self {
-        Self {
-            keys: [None; A],
-            vals: [None; A],
-            len: 0,
-            hasher: ::core::marker::PhantomData
-        }
+        Self::new()
     }
 }
