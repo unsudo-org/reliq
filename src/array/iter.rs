@@ -27,10 +27,3 @@ impl<const A: usize, B> Iterator for Iter<A, B> {
         (left, Some(left))
     }
 }
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-
-}

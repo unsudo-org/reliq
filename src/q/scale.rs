@@ -42,7 +42,7 @@ const LOOK_UP: [u128; 38] = [
 ];
 
 #[inline]
-pub fn scale<const A: u8, B>() -> B 
+pub(super) fn scale<const A: u8, B>() -> B 
 where 
     B: ops::Int,
     (): SupportedPrecision<A>,

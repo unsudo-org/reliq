@@ -8,9 +8,9 @@ use super::*;
     pub deg_mode
     pub engine
     pub mode
-        pi
+    pub pi
     pub rad_mode
-        scale
+    pub scale
     pub supported
 );
 

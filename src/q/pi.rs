@@ -41,7 +41,7 @@ const LOOK_UP: [u128; 37] = [
 ];
 
 #[inline]
-pub fn pi<const A: u8, B>() -> B
+pub(super) fn pi<const A: u8, B>() -> B
 where
     B: ops::Int,
     (): SupportedPrecision<A>,

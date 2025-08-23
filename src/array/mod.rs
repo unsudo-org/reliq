@@ -281,10 +281,10 @@ mod test {
         let mut arr: Array<4, u8> = Array::default();
         arr.push(1).unwrap();
         arr.push(3).unwrap();
-        arr.insert(1, 2).unwrap(); // insert in middle
+        arr.insert(1, 2).unwrap();
         assert_eq!(arr.as_slice(), &[1, 2, 3]);
 
-        let val = arr.remove(1).unwrap(); // remove middle
+        let val = arr.remove(1).unwrap();
         assert_eq!(val, 2);
         assert_eq!(arr.as_slice(), &[1, 3]);
     }
@@ -295,14 +295,12 @@ mod test {
         arr.push(10).unwrap();
         arr.push(20).unwrap();
         arr.push(30).unwrap();
-
-        // Insert 15 at index 1, expect ordering not preserved
         arr.swap_insert(1, 15).unwrap();
         assert_eq!(arr.len(), 4);
         assert!(arr.as_slice().contains(&15));
 
         let val = arr.swap_remove(1).unwrap();
-        assert!(val == 15 || val == 20); // due to swap, either could be returned
+        assert!(val == 15 || val == 20);
         assert_eq!(arr.len(), 3);
     }
 
