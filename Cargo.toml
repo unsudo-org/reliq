@@ -1,7 +1,10 @@
 [package]
 name = "reliq"
-version = "0.1.0"
+description = "A portable library of primitive-like constructs."
+version = "0.1.1"
 edition = "2024"
+license = "Apache-2.0"
+readme = "readme.md"
 keywords = [
     "arithmetic",
     "math"

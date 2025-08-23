@@ -17,7 +17,7 @@ pub struct Utf8<const A: usize> {
 
 impl<const A: usize> Utf8<A> {
     #[inline]
-    pub const fn zero() -> Self {
+    pub const fn new() -> Self {
         Self {
             buf: array::Array {
                 buf: unsafe {
@@ -31,7 +31,7 @@ impl<const A: usize> Utf8<A> {
 
     #[inline]
     pub const fn encode(bytes: &[u8]) -> Self {
-        let mut ret: Self = Self::zero();
+        let mut ret: Self = Self::new();
         let mut key: usize = 0;
         while key < bytes.len() && ret.buf.len < A {
             let byte = bytes[key];
@@ -138,7 +138,7 @@ impl<const A: usize> Utf8<A> {
     pub fn cast<const B: usize>(self) -> Result<Utf8<B>> {
         let a: Utf8<A> = self;
         let a: &str = a.as_str();
-        let mut b: Utf8<B> = Utf8::zero();
+        let mut b: Utf8<B> = Utf8::new();
         b.push_str(a)?;
         Ok(b)
     }
@@ -152,11 +152,17 @@ impl<const A: usize> Utf8<A> {
     }
 }
 
+impl<const A: usize> Default for Utf8<A> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<const T: usize> TryFrom<&str> for Utf8<T> {
     type Error = Error;
 
     fn try_from(value: &str) -> ::core::result::Result<Self, Self::Error> {
-        let mut s: Self = Self::zero();
+        let mut s: Self = Self::new();
         s.push_str(value)?;
         Ok(s)
     }
