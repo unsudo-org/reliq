@@ -18,6 +18,34 @@ where
     Self: Clone,
     Self: Copy {
     #[inline]
+    fn sqrt<const A: u8, B>(n: F<B>) -> Result<F<B>>
+    where
+        B: ops::Int,
+        B: ops::Prim,
+        B: ops::Signed,
+        (): SupportedPrecision<A>,
+        (): SupportedInt<B>,
+        (): Supported<A, B> {
+        if n < B::AS_0 {
+            return Err(Error::Underflow)
+        }
+        if n == B::AS_0 || n == B::AS_1 {
+            return Ok(n)
+        }
+        let mut ret: B = n.checked_div(B::AS_2).ok_or(Error::DivisionByZero)?;
+        let mut last: B;
+        loop {
+            last = ret;
+            ret = Self::add(ret, Self::div::<A, _>(n, ret)?)?;
+            ret = Self::div::<A, _>(ret, B::AS_2)?;
+            if ret == last || ret == last.checked_add(B::AS_1).unwrap_or(ret) {
+                break
+            }
+        }
+        Ok(ret)
+    }
+
+    #[inline]
     fn tan<const A: u8, B>(angle: Rad<F<B>>) -> Result<Ratio<F<B>>>
     where
         B: ops::Int,

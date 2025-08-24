@@ -1,4 +1,10 @@
-use super::*;
+use super::ops;
+use super::common;
+use super::q;
+
+::modwire::expose!(
+    pub e
+);
 
 macro_rules! ty {
     ($($n:literal)*) => {
@@ -17,9 +23,16 @@ ty!(
     30 31 32 33 34 35 36 37
 );
 
+type QTuple<const A: Precision, B, C> = (
+    Q<A, B, C>,
+    Q<A, B, C>
+);
+type Q<const A: Precision, B, C> = q::Q<A, B, q::DefaultMode, C>;
+type Precision = u8;
+
 #[derive(Clone)]
 #[derive(Copy)]
-pub struct Point2D<const A: u8, B, C = q::DefaultEngine>
+pub struct Point2D<const A: Precision, B, C = q::DefaultEngine>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -27,11 +40,11 @@ where
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
-    pub x: q::Q<A, B, q::DefaultMode, C>,
-    pub y: q::Q<A, B, q::DefaultMode, C>
+    pub x: Q<A, B, C>,
+    pub y: Q<A, B, C>
 }
 
-impl<const A: u8, B, C> From<(B, B)> for Point2D<A, B, C>
+impl<const A: Precision, B, C> From<(B, B)> for Point2D<A, B, C>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -48,7 +61,7 @@ where
     }
 }
 
-impl<const A: u8, B, C> From<(q::Q<A, B, q::DefaultMode, C>, q::Q<A, B, q::DefaultMode, C>)> for Point2D<A, B, C>
+impl<const A: Precision, B, C> From<QTuple<A, B, C>> for Point2D<A, B, C>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -56,10 +69,30 @@ where
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
-    fn from(value: (q::Q<A, B, q::DefaultMode, C>, q::Q<A, B, q::DefaultMode, C>)) -> Self {
+    fn from(value: QTuple<A, B, C>) -> Self {
         Self {
             x: value.0,
             y: value.1
         }
+    }
+}
+
+impl<const A: Precision, B, C> common::SignedPoint<A, B, C, Error> for Point2D<A, B, C>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    B: ops::Signed,
+    C: q::Engine,
+    (): q::SupportedPrecision<A>,
+    (): q::SupportedInt<B>,
+    (): q::Supported<A, B> {
+    fn distance_between(self, rhs: Self) -> ::core::result::Result<Q<A, B, C>, Error> {
+        let dx: Q<A, B, C> = (self.x - rhs.x)?;
+        let dx: Q<A, B, C> = (dx * dx)?;
+        let dy: Q<A, B, C> = (self.y - rhs.y)?;
+        let dy: Q<A, B, C> = (dy * dy)?;
+        let ret: Q<A, B, C> = (dx + dy)?;
+        let ret: Q<A, B, C> = ret.sqrt()?;
+        Ok(ret)
     }
 }

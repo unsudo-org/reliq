@@ -8,6 +8,7 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
+
     #[inline]
     pub fn lerp<E, F>(self, rhs: E, t: F) -> Result<Self> 
     where
@@ -45,6 +46,14 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
+    #[inline]
+    pub fn sqrt(self) -> Result<Self> {
+        let ret: B = self.n;
+        let ret: B = D::sqrt(ret)?;
+        let ret: Self = ret.into();
+        Ok(ret)
+    }
+
     #[inline]
     pub fn to_negative(self) -> Self {
         let ret: B = self.n;
