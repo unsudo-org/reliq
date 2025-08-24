@@ -1,5 +1,3 @@
-use super::*;
-
 pub struct Iter<const A: usize, B> {
     pub(super) buf: [::core::mem::MaybeUninit<B>; A],
     pub(super) len: usize,

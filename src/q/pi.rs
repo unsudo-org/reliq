@@ -55,9 +55,9 @@ where
         | (true, 64, 1..=19)
         | (true, 128, 1..=37)
         | (false, 8, 1..=2)
-        | (false, 16, 1..=5)
-        | (false, 32, 1..=10)
-        | (false, 64, 1..=20)
+        | (false, 16, 1..=4)
+        | (false, 32, 1..=9)
+        | (false, 64, 1..=19)
         | (false, 128, 1..=37) => {
             unsafe {
                 look_up::<A>().try_into().unwrap_unchecked()
