@@ -1,8 +1,10 @@
+### !!! This crate is not stable yet. !!!
+
 # Reliq
 ## A Numeric & Data Structure Toolkit designed for Portability.
 A lightweight, `no_std` compatible library providing fixed-capacity arrays, UTF-8 strings, fixed-precision numeric types, and a generic numeric trait hierarchy. It is designed for portability where heap allocation may be undesirable, and predictablee arithmetic behaviour is required.
 
-### !!! This crate is not stable yet. !!!
+
 
 #### Fixed-Capacity Arrays
 * `Array<const A: usize, B> -- stack-allocated, compile-time sized array.
@@ -24,17 +26,10 @@ assert_eq!(arr.len(), 3);
 * Supports safe `push`/`pop` of `char`, casting between capacities, and encoding/decoding from byte slices.
 * Implements `Display`, `Debug`, `PartialEq`, `Eq`, `Ord`, and `PartialOrd`.
 ```rust
-let mut s: Utf8<16> = Utf8::zero();
+let mut s: Utf8<16> = Utf8::default();
 s.push('H').unwrap();
 s.push('i').unwrap();
 assert_eq!(s.as_str(), "Hi");
-```
-
-#### Fixed-Precision Rational / Decimal Type
-```rust
-fn op() -> q::Result<q::Q2<u32>> {
-    
-}
 ```
 
 #### Numeric Trait Hierarchy

@@ -8,5 +8,4 @@ pub mod e;
 pub mod map;
 pub mod ops;
 pub mod q;
-pub mod timestamp;
 pub mod utf8;
