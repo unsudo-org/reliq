@@ -1,5 +1,3 @@
-use super::*;
-
 ::modwire::expose!(
     pub bits
     pub bound
@@ -20,9 +18,6 @@ use super::*;
 pub type Result<T> = ::core::result::Result<T, Error>;
 
 #[repr(u8)]
-#[cfg_attr(feature = "ink", derive(::scale::Encode))]
-#[cfg_attr(feature = "ink", derive(::scale::Decode))]
-#[cfg_attr(feature = "ink", derive(::scale_info::TypeInfo))]
 #[derive(Debug)]
 #[derive(Clone)]
 #[derive(PartialEq)]
