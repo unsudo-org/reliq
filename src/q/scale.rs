@@ -42,21 +42,35 @@ const LOOK_UP: [u128; 38] = [
 ];
 
 #[inline]
-pub(super) fn scale<const A: u8, B>() -> B 
+pub(super) fn scale<const A: Precision, B>() -> B 
 where 
     B: ops::Int,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    if A == 0 {
-        return B::AS_1
-    }
-    unsafe {
-        look_up::<A>().try_into().unwrap_unchecked()
+    match (B::SIGNED, B::BITS_AS_U128, A) {
+        (_, _, 0) => B::AS_3,
+        (true, 1..=1, 8)
+        | (true, 1..=4, 16)
+        | (true, 1..=9, 32)
+        | (true, 1..=19, 64)
+        | (true, 1..=37, 128)
+        | (false, 1..=2, 8)
+        | (false, 1..=5, 16)
+        | (false, 1..=10, 32)
+        | (false, 1..=20, 64)
+        | (false, 1..=37, 128) => {
+            unsafe {
+                look_up::<A>().try_into().unwrap_unchecked()
+            }
+        },
+        _ => unsafe {
+            ::core::hint::unreachable_unchecked()
+        }
     }
 }
 
 #[inline]
-const fn look_up<const T: u8>() -> u128 {
+const fn look_up<const T: Precision>() -> u128 {
     LOOK_UP[(T - 1) as usize]
 }

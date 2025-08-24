@@ -1,6 +1,6 @@
 use super::*;
 
-impl<const A: u8, B, C, D> Q<A, B, C, D>
+impl<const A: Precision, B, C, D> Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -37,7 +37,7 @@ where
     }
 }
 
-impl<const A: u8, B, C, D> Q<A, B, C, D>
+impl<const A: Precision, B, C, D> Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -71,7 +71,7 @@ where
     }
 }
 
-impl<const A: u8, B, C, D> From<B> for Q<A, B, C, D>
+impl<const A: Precision, B, C, D> From<B> for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -83,13 +83,13 @@ where
     fn from(n: B) -> Self {
         Self {
             n,
-            m_0: ::core::marker::PhantomData,
-            m_1: ::core::marker::PhantomData
+            mode: ::core::marker::PhantomData,
+            engine: ::core::marker::PhantomData
         }
     }
 }
 
-impl<const A: u8, B, C, D> ::core::ops::Add for Q<A, B, C, D>
+impl<const A: Precision, B, C, D> ::core::ops::Add for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -109,7 +109,7 @@ where
     }
 }
 
-impl<const A: u8, B, C, D> ::core::ops::Sub for Q<A, B, C, D>
+impl<const A: Precision, B, C, D> ::core::ops::Sub for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -129,7 +129,7 @@ where
     }
 }
 
-impl<const A: u8, B, C, D> ::core::ops::Mul for Q<A, B, C, D>
+impl<const A: Precision, B, C, D> ::core::ops::Mul for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -149,7 +149,7 @@ where
     }
 }
 
-impl<const A: u8, B, C, D> ::core::ops::Div for Q<A, B, C, D>
+impl<const A: Precision, B, C, D> ::core::ops::Div for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -169,7 +169,7 @@ where
     }
 }
 
-impl<const A: u8, B, C, D> Eq for Q<A, B, C, D>
+impl<const A: Precision, B, C, D> Eq for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -178,7 +178,7 @@ where
     (): SupportedInt<B>,
     (): Supported<A, B> {}
 
-impl<const A: u8, B, C, D> PartialEq for Q<A, B, C, D>
+impl<const A: Precision, B, C, D> PartialEq for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -192,7 +192,7 @@ where
     }
 }
 
-impl<const A: u8, B, C, D> Ord for Q<A, B, C, D>
+impl<const A: Precision, B, C, D> Ord for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -249,7 +249,7 @@ where
     }
 }
 
-impl<const A: u8, B, C, D> PartialOrd for Q<A, B, C, D>
+impl<const A: Precision, B, C, D> PartialOrd for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,

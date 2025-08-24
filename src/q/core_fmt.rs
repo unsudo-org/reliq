@@ -1,6 +1,6 @@
 use super::*;
 
-impl<const A: u8, B, C, D> ::core::fmt::Debug for Q<A, B, C, D>
+impl<const A: Precision, B, C, D> ::core::fmt::Debug for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -13,7 +13,7 @@ where
     }
 }
 
-impl<const A: u8, B, C, D> ::core::fmt::Display for Q<A, B, C, D>
+impl<const A: Precision, B, C, D> ::core::fmt::Display for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,

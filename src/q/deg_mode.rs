@@ -3,7 +3,7 @@ use super::*;
 macro_rules! ty {
     ($($n:literal)*) => {
         ::paste::paste!(
-            pub type Deg<const A: u8, B> = Q<A, B, DegMode>;
+            pub type Deg<const A: Precision, B> = Q<A, B, DegMode>;
             $(
                 pub type [< Deg $n >]<T> = Q<$n, T, DegMode>;
             )*
@@ -23,7 +23,7 @@ ty!(
 #[derive(Copy)]
 pub struct DegMode;
 
-impl<const A: u8, B, C> TryFrom<Q<A, B, RadMode, C>> for Q<A, B, DegMode, C>
+impl<const A: Precision, B, C> TryFrom<Q<A, B, RadMode, C>> for Q<A, B, DegMode, C>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -38,7 +38,7 @@ where
     }
 }
 
-impl<const A: u8, B, C> Q<A, B, DegMode, C> 
+impl<const A: Precision, B, C> Q<A, B, DegMode, C> 
 where
     B: ops::Int,
     B: ops::Prim,

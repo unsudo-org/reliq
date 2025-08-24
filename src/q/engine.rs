@@ -18,7 +18,7 @@ where
     Self: Clone,
     Self: Copy {
     #[inline]
-    fn sqrt<const A: u8, B>(n: F<B>) -> Result<F<B>>
+    fn sqrt<const A: Precision, B>(n: F<B>) -> Result<F<B>>
     where
         B: ops::Int,
         B: ops::Prim,
@@ -46,7 +46,7 @@ where
     }
 
     #[inline]
-    fn tan<const A: u8, B>(angle: Rad<F<B>>) -> Result<Ratio<F<B>>>
+    fn tan<const A: Precision, B>(angle: Rad<F<B>>) -> Result<Ratio<F<B>>>
     where
         B: ops::Int,
         B: ops::Prim,
@@ -57,7 +57,7 @@ where
     }
 
     #[inline]
-    fn sin<const A: u8, B>(angle: Rad<F<B>>) -> Result<Ratio<F<B>>>
+    fn sin<const A: Precision, B>(angle: Rad<F<B>>) -> Result<Ratio<F<B>>>
     where
         B: ops::Int,
         B: ops::Prim,
@@ -68,7 +68,7 @@ where
     }
 
     #[inline]
-    fn cos<const A: u8, B>(angle: Rad<F<B>>) -> Result<Ratio<F<B>>>
+    fn cos<const A: Precision, B>(angle: Rad<F<B>>) -> Result<Ratio<F<B>>>
     where
         B: ops::Int,
         B: ops::Prim,
@@ -112,7 +112,7 @@ where
     }
 
     #[inline]
-    fn to_rad<const A: u8, B>(angle: Deg<F<B>>) -> Result<Rad<F<B>>>
+    fn to_rad<const A: Precision, B>(angle: Deg<F<B>>) -> Result<Rad<F<B>>>
     where
         B: ops::Int,
         B: ops::Prim,
@@ -123,7 +123,7 @@ where
     }
 
     #[inline]
-    fn to_deg<const A: u8, B>(angle: Rad<F<B>>) -> Result<Deg<F<B>>>
+    fn to_deg<const A: Precision, B>(angle: Rad<F<B>>) -> Result<Deg<F<B>>>
     where
         B: ops::Int,
         B: ops::Prim,
@@ -134,7 +134,7 @@ where
     }
 
     #[inline]
-    fn lerp<const A: u8, B>(x: F<B>, y: F<B>, t: F<B>) -> Result<F<B>>
+    fn lerp<const A: Precision, B>(x: F<B>, y: F<B>, t: F<B>) -> Result<F<B>>
     where
         B: ops::Int,
         B: ops::Prim,
@@ -147,7 +147,7 @@ where
     }
 
     #[inline]
-    fn cast<const A: u8, const B: u8, C>(n: F<C>) -> Result<F<C>>
+    fn cast<const A: Precision, const B: u8, C>(n: F<C>) -> Result<F<C>>
     where
         C: ops::Int,
         C: ops::Prim,
@@ -208,7 +208,7 @@ where
     }
 
     #[inline]
-    fn mul<const A: u8, B>(x: F<B>, y: F<B>) -> Result<F<B>>
+    fn mul<const A: Precision, B>(x: F<B>, y: F<B>) -> Result<F<B>>
     where
         B: ops::Int,
         B: ops::Prim,
@@ -222,7 +222,7 @@ where
     }
 
     #[inline]
-    fn div<const A: u8, B>(x: F<B>, y: F<B>) -> Result<F<B>>
+    fn div<const A: Precision, B>(x: F<B>, y: F<B>) -> Result<F<B>>
     where
         B: ops::Int,
         B: ops::Prim,
@@ -456,7 +456,7 @@ where
 }
 
 #[inline]
-pub fn deg90<const A: u8, B>() -> Result<Deg<B>>
+pub fn deg90<const A: Precision, B>() -> Result<Deg<B>>
 where
     B: ops::Int,
     (): SupportedPrecision<A>,

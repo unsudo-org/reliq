@@ -1,6 +1,5 @@
 use super::q;
 use super::ops;
-use super::common;
 
 ::modwire::expose!(
     pub e
@@ -41,7 +40,7 @@ where
     pub z: Q<A, B, C>
 }
 
-impl<const A: Precision, B, C> common::SignedPoint<A, B, C, Error> for Point3D<A, B, C>
+impl<const A: Precision, B, C> Point3D<A, B, C>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -50,7 +49,7 @@ where
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
-    fn distance_between(self, rhs: Self) -> ::core::result::Result<Q<A, B, C>, Error> {
+    pub fn distance_between(self, rhs: Self) -> ::core::result::Result<Q<A, B, C>, Error> {
         let dx: Q<A, B, C> = (self.x - rhs.x)?;
         let dx: Q<A, B, C> = (dx * dx)?;
         let dy: Q<A, B, C> = (self.y - rhs.y)?;

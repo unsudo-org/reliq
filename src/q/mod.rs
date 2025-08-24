@@ -15,6 +15,7 @@ use super::*;
 );
 
 type Ratio<T> = T;
+type Precision = u8;
 
 pub type Result<T> = ::core::result::Result<T, Error>;
 
@@ -32,7 +33,7 @@ pub enum Error {
 #[repr(transparent)]
 #[derive(Clone)]
 #[derive(Copy)]
-pub struct Q<const A: u8, B = usize, C = DefaultMode, D = DefaultEngine>
+pub struct Q<const A: Precision, B = usize, C = DefaultMode, D = DefaultEngine>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -41,6 +42,6 @@ where
     (): SupportedInt<B>,
     (): Supported<A, B> {
     n: B,
-    m_0: ::core::marker::PhantomData<C>,
-    m_1: ::core::marker::PhantomData<D>
+    mode: ::core::marker::PhantomData<C>,
+    engine: ::core::marker::PhantomData<D>
 }
