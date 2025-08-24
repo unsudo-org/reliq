@@ -163,7 +163,7 @@ where
     fn div(self, rhs: Self) -> Self::Output {
         let x: B = self.n;
         let y: B = rhs.n;
-        let ret: B = D::div(x, y)?;
+        let ret: B = D::div::<A, _>(x, y)?;
         let ret: Self = ret.into();
         Ok(ret)
     }

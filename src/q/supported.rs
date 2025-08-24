@@ -47,17 +47,14 @@ int_whitelist!(
 );
 
 whitelist!(
-    0 u8
     1 u8
     2 u8
 
-    0 u16
     1 u16
     2 u16
     3 u16
     4 u16
 
-    0 u32
     1 u32
     2 u32
     3 u32
@@ -68,7 +65,6 @@ whitelist!(
     8 u32
     9 u32
 
-    0 u64
     1 u64
     2 u64
     3 u64

@@ -49,22 +49,24 @@ where
     (): Supported<A, B> {
     match (B::SIGNED, B::BITS_AS_U128, A) {
         (_, _, 0) => B::AS_3,
-        (true, 1..=1, 8)
-        | (true, 1..=4, 16)
-        | (true, 1..=9, 32)
-        | (true, 1..=19, 64)
-        | (true, 1..=37, 128)
-        | (false, 1..=2, 8)
-        | (false, 1..=5, 16)
-        | (false, 1..=10, 32)
-        | (false, 1..=20, 64)
-        | (false, 1..=37, 128) => {
+        (true, 8, 1..=1)
+        | (true, 16, 1..=4)
+        | (true, 32, 1..=9)
+        | (true, 64, 1..=19)
+        | (true, 128, 1..=37)
+        | (false, 8, 1..=2)
+        | (false, 16, 1..=5)
+        | (false, 32, 1..=10)
+        | (false, 64, 1..=20)
+        | (false, 128, 1..=37) => {
             unsafe {
                 look_up::<A>().try_into().unwrap_unchecked()
             }
         },
-        _ => unsafe {
-            ::core::hint::unreachable_unchecked()
+        _ => {
+            unsafe {
+                ::core::hint::unreachable_unchecked()
+            }
         }
     }
 }
