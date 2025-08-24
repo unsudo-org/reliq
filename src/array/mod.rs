@@ -1,5 +1,4 @@
 ::modwire::expose!(
-    pub ink
     pub iter
 );
 
@@ -26,9 +25,6 @@ macro_rules! count {
 pub type Result<T> = ::core::result::Result<T, Error>;
 
 #[repr(u8)]
-#[cfg_attr(feature = "ink", derive(::scale::Encode))]
-#[cfg_attr(feature = "ink", derive(::scale::Decode))]
-#[cfg_attr(feature = "ink", derive(::scale_info::TypeInfo))]
 #[derive(Debug)]
 pub enum Error {
     Overflow,
@@ -41,8 +37,6 @@ pub enum Error {
 pub struct Array<const A: usize, B>
 where
     B: Copy {
-    #[cfg_attr(feature = "ink", codec(skip))]
-    #[cfg_attr(feature = "ink", scale_info(skip_type_param))]
     pub(super) buf: [::core::mem::MaybeUninit<B>; A],
     pub(super) len: usize
 }

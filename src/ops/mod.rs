@@ -130,7 +130,6 @@ where
 
 pub trait Num
 where
-    Self: ink::Ink,
     Self: QuickAccess,
     Self: Sqrt,
     Self: ::core::default::Default,
@@ -257,7 +256,6 @@ where
 
 impl<T> Num for T
 where
-    T: ink::Ink,
     T: QuickAccess,
     T: Sqrt,
     T: ::core::default::Default,

@@ -5,7 +5,6 @@ pub mod color;
 pub mod common;
 pub mod coordinate;
 pub mod e;
-pub mod ink;
 pub mod map;
 pub mod ops;
 pub mod q;
