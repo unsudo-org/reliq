@@ -1,13 +1,17 @@
+use super::*;
+
 pub trait Val
 where
+    Self: ink::Ink,
     Self: ::core::fmt::Debug,
     Self: Default,
     Self: Clone,
     Self: Copy {}
 
-impl<A> Val for A
+impl<T> Val for T
 where
-    A: ::core::fmt::Debug,
-    A: Default,
-    A: Clone,
-    A: Copy {}
+    T: ink::Ink,
+    T: ::core::fmt::Debug,
+    T: Default,
+    T: Clone,
+    T: Copy {}

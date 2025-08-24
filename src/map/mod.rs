@@ -1,3 +1,5 @@
+use super::*;
+
 ::modwire::expose!(
     pub hasher
     pub key
@@ -6,11 +8,18 @@
 
 pub type Result<T> = ::core::result::Result<T, Error>;
 
+#[repr(u8)]
+#[cfg_attr(feature = "ink", derive(::scale::Encode))]
+#[cfg_attr(feature = "ink", derive(::scale::Decode))]
+#[cfg_attr(feature = "ink", derive(::scale_info::TypeInfo))]
 #[derive(Debug)]
 pub enum Error {
     OutOfSpace
 }
 
+#[cfg_attr(feature = "ink", derive(::scale::Encode))]
+#[cfg_attr(feature = "ink", derive(::scale::Decode))]
+#[cfg_attr(feature = "ink", derive(::scale_info::TypeInfo))]
 #[derive(Clone)]
 pub struct Map<const A: usize, B, C, D = ::core::hash::SipHasher> 
 where
@@ -20,6 +29,8 @@ where
     keys: [Option<B>; A],
     vals: [Option<C>; A],
     len: usize,
+    #[cfg_attr(feature = "ink", codec(skip))]
+    #[cfg_attr(feature = "ink", scale_info(skip_type_param))]
     hasher: ::core::marker::PhantomData<D>
 }
 

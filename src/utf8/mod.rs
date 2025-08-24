@@ -2,6 +2,10 @@ use super::*;
 
 pub type Result<T> = ::core::result::Result<T, Error>;
 
+#[repr(u8)]
+#[cfg_attr(feature = "ink", derive(::scale::Encode))]
+#[cfg_attr(feature = "ink", derive(::scale::Decode))]
+#[cfg_attr(feature = "ink", derive(::scale_info::TypeInfo))]
 #[derive(Debug)]
 pub enum Error {
     Overflow,
@@ -10,6 +14,9 @@ pub enum Error {
 }
 
 #[derive(Clone)]
+#[cfg_attr(feature = "ink", derive(::scale::Encode))]
+#[cfg_attr(feature = "ink", derive(::scale::Decode))]
+#[cfg_attr(feature = "ink", derive(::scale_info::TypeInfo))]
 pub struct Utf8<const A: usize> {
     buf: array::Array<A, u8>,
     len: usize

@@ -1,3 +1,5 @@
+use super::*;
+
 ::modwire::expose!(
     pub bits
     pub bound
@@ -17,6 +19,14 @@
 
 pub type Result<T> = ::core::result::Result<T, Error>;
 
+#[repr(u8)]
+#[cfg_attr(feature = "ink", derive(::scale::Encode))]
+#[cfg_attr(feature = "ink", derive(::scale::Decode))]
+#[cfg_attr(feature = "ink", derive(::scale_info::TypeInfo))]
+#[derive(Debug)]
+#[derive(Clone)]
+#[derive(PartialEq)]
+#[derive(Eq)]
 pub enum Error {
     Overflow,
     Underflow,
@@ -120,6 +130,7 @@ where
 
 pub trait Num
 where
+    Self: ink::Ink,
     Self: QuickAccess,
     Self: Sqrt,
     Self: ::core::default::Default,
@@ -246,6 +257,7 @@ where
 
 impl<T> Num for T
 where
+    T: ink::Ink,
     T: QuickAccess,
     T: Sqrt,
     T: ::core::default::Default,

@@ -32,11 +32,7 @@ s.push('i').unwrap();
 assert_eq!(s.as_str(), "Hi");
 ```
 
-#### Numeric Trait Hierarchy
-
 #### Example
-
-
 
 ```rust
 let mut value = 0;
