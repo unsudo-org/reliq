@@ -1,8 +1,7 @@
-use super::ops;
-use super::q;
+use super::*;
 
 ::modwire::expose!(
-    pub e
+    pub error
 );
 
 #[repr(u8)]
