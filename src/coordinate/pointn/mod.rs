@@ -15,7 +15,7 @@ where
     n: array::Array<B, Q<A, C, D>>
 }
 
-impl<const A: q::Precision, const B: Count, C, D> PointN<A, B, C, D>
+impl<const A: u8, const B: usize, C, D> PointN<A, B, C, D>
 where
     C: ops::Int,
     C: ops::Prim,
@@ -23,7 +23,7 @@ where
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<C>,
     (): q::Supported<A, C> {
-    pub fn dimension(&self) -> Option<Q<A, C, D>> {
-
+    pub fn dimension(&self, k: usize) -> Option<&Q<A, C, D>> {
+        self.n.get(k).ok()
     }
 }
