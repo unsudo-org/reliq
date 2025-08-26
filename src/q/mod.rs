@@ -15,7 +15,7 @@ use super::*;
 );
 
 type Ratio<T> = T;
-type Precision = u8;
+pub type Precision = u8;
 
 pub type Result<T> = ::core::result::Result<T, Error>;
 

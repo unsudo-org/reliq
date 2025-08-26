@@ -96,8 +96,6 @@ where
                     let old_val = self.vals[pos].take();
                     self.keys[pos] = None;
                     self.len -= 1;
-
-                    // Reinsert subsequent cluster keys to avoid lookup holes
                     let mut next = (pos + 1) % A;
                     while let Some(k) = self.keys[next] {
                         let val = self.vals[next].take().unwrap();
