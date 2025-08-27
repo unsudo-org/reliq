@@ -78,3 +78,20 @@ where
         Self::Rgba(r, g, b, a)
     }
 }
+
+impl<const A: u8, B, C> ::core::fmt::Display for Color<A, B>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Into<q::Q<A, B>>,
+    (): q::SupportedPrecision<A>,
+    (): q::SupportedInt<B>,
+    (): q::Supported<A, B> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::Hex(code) => {
+                
+            }
+        }
+    }
+}
