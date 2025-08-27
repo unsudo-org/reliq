@@ -1,9 +1,6 @@
-use super::q;
-use super::ops;
-
-::modwire::expose!(
-    pub e
-);
+use super::*;
+pub use super::Result;
+pub use super::Error;
 
 macro_rules! ty {
     ($($n:literal)*) => {

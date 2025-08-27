@@ -1,4 +1,6 @@
 use super::*;
+pub use super::Result;
+pub use super::Error;
 
 type Precision = u8;
 
