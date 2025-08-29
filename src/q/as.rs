@@ -4,7 +4,7 @@ macro_rules! r#as {
     ($($n:literal)*) => {
         ::paste::paste!(
             $(
-                pub fn [< as _ $n >]<const A: Precision, B, C>() -> Q<A, B, DefaultMode, C>
+                pub fn [< as _ $n >]<const A: u8, B, C>() -> Q<A, B, DefaultMode, C>
                 where
                     B: ops::Int,
                     B: ops::Prim,

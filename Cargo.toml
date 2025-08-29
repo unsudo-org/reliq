@@ -1,27 +1,20 @@
-[package]
-name = "reliq"
-description = "A portable library of primitive-like constructs."
-version = "0.2.7"
-edition = "2024"
-license = "Apache-2.0"
-readme = "readme.md"
-publish = true
-keywords = [
+package.name = "reliq"
+package.description = "A portable library of primitive-like constructs."
+package.version = "0.2.8"
+package.edition = "2024"
+package.license = "Apache-2.0"
+package.readme = "readme.md"
+package.publish = true
+package.keywords = [
     "arithmetic",
     "math",
     "portable"
 ]
-
-[dependencies]
-modwire = { version = ">=0.1.0,<1.0.0" }
-paste = { version = ">=1.0.15,<2.0.0" }
-
-[dev-dependencies]
-criterion = { version = ">=0.7.0,<1.0.0" }
-rstest = { version = ">=0.26.1,<1.0.0" }
-
-[features]
-default = []
+dependencies.modwire.version = ">=0.1.0,<1.0.0"
+dependencies.paste.version = ">=1.0.15,<2.0.0"
+dev-dependencies.criterion.version = ">=0.7.0,<1.0.0"
+dev-dependencies.rstest.version = ">=0.26.1,<1.0.0"
+features.default = []
 
 [[bench]]
 name = "q"

@@ -36,6 +36,7 @@ pub enum Error {
 #[derive(Clone)]
 pub struct Array<const A: usize, B>
 where
+    B: Clone,
     B: Copy {
     pub(super) buf: [::core::mem::MaybeUninit<B>; A],
     pub(super) len: usize
@@ -96,11 +97,11 @@ where
     }
 
     #[inline]
-    pub const fn push(&mut self, data: B) -> Result<()> {
+    pub const fn push(&mut self, item: B) -> Result<()> {
         if self.len >= A {
             return Err(Error::Overflow)
         }
-        self.buf[self.len].write(data);
+        self.buf[self.len].write(item);
         self.len += 1;
         Ok(())
     }
@@ -268,10 +269,24 @@ mod test {
     #[test]
     fn push_pop() {
         let mut arr: Array<4, u8> = Array::default();
-        assert_eq!(arr.len(), 0);
-        arr.push(1).unwrap();
-        arr.push(2).unwrap();
-        assert_eq!(arr.len(), 2);
+        let len: usize  = arr.len();
+        assert_eq!(len, 0);
+        let item_0: u8 = 2;
+        let item_1: u8 = 4;
+        arr.push(item_0).unwrap();
+        arr.push(item_1).unwrap();
+        let len: usize = arr.len();
+        assert_eq!(len, 2);
+        let arr_item_0: &u8 = arr.get(0).unwrap();
+        let arr_item_1: &u8 = arr.get(1).unwrap();
+        assert_eq!(arr_item_0, &item_0);
+        assert_eq!(arr_item_1, &item_1);
+        let arr_item_1: u8 = arr.pop().unwrap();
+        let arr_item_0: u8 = arr.pop().unwrap();
+        assert_eq!(arr_item_0, item_0);
+        assert_eq!(arr_item_1, item_1);
+        let len: usize = arr.len();
+        assert_eq!(len, 0);
     }
 
     #[test]
@@ -281,7 +296,6 @@ mod test {
         arr.push(3).unwrap();
         arr.insert(1, 2).unwrap();
         assert_eq!(arr.as_slice(), &[1, 2, 3]);
-
         let val = arr.remove(1).unwrap();
         assert_eq!(val, 2);
         assert_eq!(arr.as_slice(), &[1, 3]);

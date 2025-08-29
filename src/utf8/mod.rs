@@ -6,7 +6,7 @@ pub type Result<T> = ::core::result::Result<T, Error>;
 #[derive(Debug)]
 pub enum Error {
     Overflow,
-    IllegalByteSequence,
+    InvalidSequence,
     Empty
 }
 
@@ -133,7 +133,7 @@ impl<const A: usize> Utf8<A> {
             }
             back += 1;
         }
-        Err(Error::IllegalByteSequence)
+        Err(Error::InvalidSequence)
     }
 
     pub fn cast<const B: usize>(self) -> Result<Utf8<B>> {
@@ -148,7 +148,7 @@ impl<const A: usize> Utf8<A> {
         let ret = self.buf.as_slice();
         ::core::str::from_utf8(ret)
             .ok()
-            .ok_or(Error::IllegalByteSequence)
+            .ok_or(Error::InvalidSequence)
             .unwrap()
     }
 }

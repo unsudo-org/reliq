@@ -1,11 +1,14 @@
 use super::*;
+
 pub use super::Result;
 pub use super::Error;
 
-type Precision = u8;
+type IntTupleWithTimetamp<T> = (::core::time::Duration, T, T, T);
+type IntTuple<T> = (T, T, T);
+type Q<const A: u8, B, C> = q::Q<A, B, q::DefaultMode, C>;
 
 #[derive(Clone)]
-pub struct Point4D<const A: Precision, B, C = q::DefaultEngine>
+pub struct Point4D<const A: u8, B, C = q::DefaultEngine>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -14,12 +17,12 @@ where
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
     pub timestamp: ::core::time::Duration,
-    pub x: q::Q<A, B, q::DefaultMode, C>,
-    pub y: q::Q<A, B, q::DefaultMode, C>,
-    pub z: q::Q<A, B, q::DefaultMode, C>
+    pub x: Q<A, B, C>,
+    pub y: Q<A, B, C>,
+    pub z: Q<A, B, C>
 }
 
-impl<const A: Precision, B, C> Default for Point4D<A, B, C>
+impl<const A: u8, B, C> Default for Point4D<A, B, C>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -37,7 +40,7 @@ where
     }
 }
 
-impl<const A: Precision, B, C> From<(::core::time::Duration, B, B, B)> for Point4D<A, B, C>
+impl<const A: u8, B, C> From<IntTupleWithTimetamp<B>> for Point4D<A, B, C>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -45,14 +48,14 @@ where
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
-    fn from(value: (::core::time::Duration, B, B, B)) -> Self {
+    fn from(value: IntTupleWithTimetamp<B>) -> Self {
         let timestamp: ::core::time::Duration = value.0;
         let x: B = value.1;
-        let x: q::Q<A, B, q::DefaultMode, C> = x.into();
+        let x: Q<A, B, C> = x.into();
         let y: B = value.2;
-        let y: q::Q<A, B, q::DefaultMode, C> = y.into();
+        let y: Q<A, B, C> = y.into();
         let z: B = value.3;
-        let z: q::Q<A, B, q::DefaultMode, C> = z.into();
+        let z: Q<A, B, C> = z.into();
         Self {
             timestamp,
             x,
@@ -62,7 +65,7 @@ where
     }
 }
 
-impl<const A: Precision, B, C> From<(B, B, B)> for Point4D<A, B, C>
+impl<const A: u8, B, C> From<IntTuple<B>> for Point4D<A, B, C>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -70,13 +73,13 @@ where
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
-    fn from(value: (B, B, B)) -> Self {
+    fn from(value: IntTuple<B>) -> Self {
         let x: B = value.0;
-        let x: q::Q<A, B, q::DefaultMode, C> = x.into();
+        let x: Q<A, B, C> = x.into();
         let y: B = value.1;
-        let y: q::Q<A, B, q::DefaultMode, C> = y.into();
+        let y: Q<A, B, C> = y.into();
         let z: B = value.2;
-        let z: q::Q<A, B, q::DefaultMode, C> = z.into();
+        let z: Q<A, B, C> = z.into();
         Self {
             timestamp: ::core::time::Duration::default(),
             x,

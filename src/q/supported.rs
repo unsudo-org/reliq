@@ -25,14 +25,14 @@ macro_rules! whitelist {
 }
 
 /// `A` is a valid precision.
-pub trait SupportedPrecision<const T: Precision> {}
+pub trait SupportedPrecision<const T: u8> {}
 
 /// `T` must be able to support `180`.
 pub trait SupportedInt<T> {}
 
 /// * `A` & `B` can safely hold `10^A`.
 /// * `A` & `B` can safely hold `π`.
-pub trait Supported<const A: Precision, B> {}
+pub trait Supported<const A: u8, B> {}
 
 precision_whitelist!(
     0 1 2 3 4 5 6 7 8 9

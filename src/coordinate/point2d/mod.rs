@@ -19,16 +19,15 @@ ty!(
     30 31 32 33 34 35 36 37
 );
 
-type QTuple<const A: Precision, B, C> = (
+type QTuple<const A: u8, B, C> = (
     Q<A, B, C>,
     Q<A, B, C>
 );
-type Q<const A: Precision, B, C> = q::Q<A, B, q::DefaultMode, C>;
-type Precision = u8;
+type Q<const A: u8, B, C> = q::Q<A, B, q::DefaultMode, C>;
 
 #[derive(Clone)]
 #[derive(Copy)]
-pub struct Point2D<const A: Precision, B, C = q::DefaultEngine>
+pub struct Point2D<const A: u8, B, C = q::DefaultEngine>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -40,7 +39,7 @@ where
     pub y: Q<A, B, C>
 }
 
-impl<const A: Precision, B, C> From<(B, B)> for Point2D<A, B, C>
+impl<const A: u8, B, C> From<(B, B)> for Point2D<A, B, C>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -57,7 +56,7 @@ where
     }
 }
 
-impl<const A: Precision, B, C> From<QTuple<A, B, C>> for Point2D<A, B, C>
+impl<const A: u8, B, C> From<QTuple<A, B, C>> for Point2D<A, B, C>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -73,7 +72,7 @@ where
     }
 }
 
-impl<const A: Precision, B, C> Point2D<A, B, C>
+impl<const A: u8, B, C> Point<A, B, C> for Point2D<A, B, C>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -82,7 +81,15 @@ where
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
-    pub fn distance_between(self, rhs: Self) -> ::core::result::Result<Q<A, B, C>, Error> {
+    fn distance_between(self, rhs: Self) -> Result<Q<A, B, C>>
+    where
+        B: ops::Int,
+        B: ops::Prim,
+        B: ops::Signed,
+        C: q::Engine,
+        (): q::SupportedPrecision<A>,
+        (): q::SupportedInt<B>,
+        (): q::Supported<A, B> {
         let dx: Q<A, B, C> = (self.x - rhs.x)?;
         let dx: Q<A, B, C> = (dx * dx)?;
         let dy: Q<A, B, C> = (self.y - rhs.y)?;
