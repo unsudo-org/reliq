@@ -1,3 +1,5 @@
+use super::*;
+
 ::modwire::expose!(
     pub iter
 );
@@ -13,6 +15,7 @@ macro_rules! array {
     }};
 }
 
+#[allow(unused_macros)]
 macro_rules! count {
     () => {
         0
@@ -229,6 +232,49 @@ where
             item.into()
         });
         Self::new(value)
+    }
+}
+
+impl<const A: u8, const B: usize, C, D> From<point::Set<A, B, C, D>> for Array<B, point::Point<A, B, C, D>>
+where
+    C: ops::Int,
+    C: ops::Prim,
+    D: q::Engine,
+    (): q::SupportedPrecision<A>,
+    (): q::SupportedInt<C>,
+    (): q::Supported<A, C> {
+    fn from(value: point::Set<A, B, C, D>) -> Self {
+        value.points
+    }
+}
+
+impl<const A: u8, const B: usize, C, D> From<point::Point<A, B, C, D>> for Array<B, q::Q<A, C, q::DefaultMode, D>>
+where
+    C: ops::Int,
+    C: ops::Prim,
+    D: q::Engine,
+    (): q::SupportedPrecision<A>,
+    (): q::SupportedInt<C>,
+    (): q::Supported<A, C> {
+    fn from(value: point::Point<A, B, C, D>) -> Self {
+        value.dimensions
+    }
+}
+
+#[cfg(feature = "std")]
+impl<const A: usize, B, C> TryFrom<Vec<C>> for Array<A, B>
+where
+    B: Copy,
+    C: Into<B> {
+    type Error = Error;
+
+    fn try_from(value: Vec<C>) -> ::core::result::Result<Self, Self::Error> {
+        let mut ret: Self = Self::default();
+        for item in value {
+            let item: B = item.into();
+            ret.push(item)?;
+        }
+        Ok(ret)
     }
 }
 

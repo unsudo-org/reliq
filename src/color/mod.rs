@@ -69,11 +69,8 @@ where
     (): q::Supported<A, B> {
     fn from(value: u16) -> Self {
         let value: u32 = value.into();
-        if value > 0xffffff {
-            Self::Hex(0xffffff)
-        } else {
-            Self::Hex(value)
-        }
+        let value: Self = value.into();
+        value
     }
 }
 
@@ -86,11 +83,8 @@ where
     (): q::Supported<A, B> {
     fn from(value: u8) -> Self {
         let value: u32 = value.into();
-        if value > 0xffffff {
-            Self::Hex(0xffffff)
-        } else {
-            Self::Hex(value)
-        }
+        let value: Self = value.into();
+        value
     }
 }
 

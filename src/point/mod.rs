@@ -22,7 +22,7 @@ where
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<C>,
     (): q::Supported<A, C> {
-    dimensions: array::Array<B, Q<A, C, D>>
+    pub(crate) dimensions: array::Array<B, Q<A, C, D>>
 }
 
 impl<const A: u8, const B: usize, C, D> Point<A, B, C, D>

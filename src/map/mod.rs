@@ -12,6 +12,7 @@ pub enum Error {
     OutOfSpace
 }
 
+#[allow(deprecated)]
 #[derive(Clone)]
 pub struct Map<const A: usize, B, C, D = ::core::hash::SipHasher> 
 where

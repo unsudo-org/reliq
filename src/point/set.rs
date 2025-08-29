@@ -10,7 +10,7 @@ where
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<C>,
     (): q::Supported<A, C> {
-    pub(super) points: array::Array<B, Point<A, B, C, D>>
+    pub(crate) points: array::Array<B, Point<A, B, C, D>>
 }
 
 impl<const A: u8, const B: usize, C, D> Set<A, B, C, D>

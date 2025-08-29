@@ -184,6 +184,7 @@ impl<const T: usize> Ord for Utf8<T> {
     }
 }
 
+#[allow(clippy::non_canonical_partial_ord_impl)]
 impl<const T: usize> PartialOrd for Utf8<T> {
     fn partial_cmp(&self, other: &Self) -> Option<::core::cmp::Ordering> {
         let x: &str = self.as_str();
