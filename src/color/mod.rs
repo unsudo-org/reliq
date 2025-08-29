@@ -60,6 +60,40 @@ where
     }
 }
 
+impl<const A: u8, B> From<u16> for Color<A, B>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    (): q::SupportedPrecision<A>,
+    (): q::SupportedInt<B>,
+    (): q::Supported<A, B> {
+    fn from(value: u16) -> Self {
+        let value: u32 = value.into();
+        if value > 0xffffff {
+            Self::Hex(0xffffff)
+        } else {
+            Self::Hex(value)
+        }
+    }
+}
+
+impl<const A: u8, B> From<u8> for Color<A, B>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    (): q::SupportedPrecision<A>,
+    (): q::SupportedInt<B>,
+    (): q::Supported<A, B> {
+    fn from(value: u8) -> Self {
+        let value: u32 = value.into();
+        if value > 0xffffff {
+            Self::Hex(0xffffff)
+        } else {
+            Self::Hex(value)
+        }
+    }
+}
+
 impl<const A: u8, B, C> From<(u8, u8, u8, C)> for Color<A, B>
 where
     B: ops::Int,
