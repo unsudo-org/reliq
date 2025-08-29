@@ -21,8 +21,32 @@ where
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<C>,
     (): q::Supported<A, C> {
+    pub fn next_weighted(&self) -> Result<Point<A, B, C, D>> {
+        let len: usize = self.children.len();
+        if len < 3 {
+            return self.next_linear()
+        }
+        let mut dimensions: array::Array<B, Q<A, C, D>> = array::Array::default();
+        let l: &Point<A, B, C, D> = self.children.get(len - 1)?;
+        let m: &Point<A, B, C, D> = self.children.get(len - 2)?;
+        let p: &Point<A, B, C, D> = self.children.get(len - 3)?;
+        for i in 0..B {
+            let p: Q<A, C, D> = *p.dimension(i).unwrap();
+            let m: Q<A, C, D> = *m.dimension(i).unwrap();
+            let l: Q<A, C, D> = *l.dimension(i).unwrap();
+            let a: Q<A, C, D> = (m - p)?;
+            let b: Q<A, C, D> = (l - m)?;
+            let c: Q<A, C, D> = C::AS_2.into();
+            let d: Q<A, C, D> = C::AS_3.into();
+            let next: Q<A, C, D> = ((l + ((a + (b * c)?)?))? / d)?;
+            dimensions.push(next).ok();
+        }
+        let ret: Point<A, B, C, D> = dimensions.into();
+        Ok(ret)
+    }
+
     #[inline]
-    pub fn predict_next_via_k_step(&self) -> Result<Point<A, B, C, D>> {
+    pub fn next_k_step(&self) -> Result<Point<A, B, C, D>> {
         let len: usize = self.children.len();
         let mut arr: array::Array<B, Q<A, C, D>> = array::Array::default();
         for dimension in 0..B {
@@ -52,14 +76,13 @@ where
             arr.push((last + magnitude_average)?).ok();
         }
         let ret: Point<A, B, C, D> = Point {
-            children: arr
+            dimensions: arr
         };
         Ok(ret)
     }
 
-    /// Predict the next N-D point using linear extrapolation.
     #[inline]
-    pub fn predict_next_via_linear(&self) -> Result<Point<A, B, C, D>> {
+    pub fn next_linear(&self) -> Result<Point<A, B, C, D>> {
         let len: usize = self.children.len();
         if len < 2 {
             return Err(Error::InsufficientSetSize)
@@ -92,4 +115,24 @@ where
             children: value
         }
     }
+}
+
+#[test]
+fn test_next_linear() {
+    let set: Set<2, 2, u128, q::DefaultEngine> = array::Array::new([
+        array::Array::new([
+            0_00.into(),
+            0_00.into()
+        ]).into(),
+        array::Array::new([
+            0_00.into(),
+            0_00.into()
+        ]).into()
+    ]).into();
+    let predicted_point: Point<2, 2, u128> = set.next_linear().unwrap();
+    let expected_predicted_point: Point<2, 2, u128> = array::Array::new([
+        0_00.into(),
+        0_00.into()
+    ]).into();
+    assert_eq!(predicted_point, expected_predicted_point);
 }

@@ -26,6 +26,7 @@ pub type Result<T> = ::core::result::Result<T, Error>;
 
 #[repr(u8)]
 #[derive(Debug)]
+#[derive(Clone)]
 pub enum Error {
     Overflow,
     KeyOutOfBounds,

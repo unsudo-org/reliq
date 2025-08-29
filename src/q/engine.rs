@@ -6,8 +6,11 @@ pub type Deg<T> = T;
 pub type Ratio<T> = T;
 
 #[repr(transparent)]
+#[derive(Debug)]
 #[derive(Clone)]
 #[derive(Copy)]
+#[derive(PartialEq)]
+#[derive(Eq)]
 pub struct DefaultEngine; 
 
 impl Engine for DefaultEngine {}

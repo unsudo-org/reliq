@@ -22,7 +22,7 @@ where
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<C>,
     (): q::Supported<A, C> {
-    children: array::Array<B, Q<A, C, D>>
+    dimensions: array::Array<B, Q<A, C, D>>
 }
 
 impl<const A: u8, const B: usize, C, D> Point<A, B, C, D>
@@ -38,11 +38,11 @@ where
     }
 
     pub const fn is_empty(&self) -> bool {
-        self.children.len() == 0
+        self.dimensions.len() == 0
     }
 
     pub fn dimension(&self, k: usize) -> Option<&Q<A, C, D>> {
-        self.children.get(k).ok()
+        self.dimensions.get(k).ok()
     }
 }
 
@@ -57,8 +57,8 @@ where
     (): q::Supported<A, C> {
     pub fn distance_between(self, rhs: Self) -> Result<Q<A, C, D>> {
         let mut sum: Q<A, C, D> = C::AS_0.into();
-        let rhs_iter: array::Iter<_, _> = rhs.children.into_iter();
-        for (x_0, x_1) in self.children.into_iter().zip(rhs_iter) {
+        let rhs_iter: array::Iter<_, _> = rhs.dimensions.into_iter();
+        for (x_0, x_1) in self.dimensions.into_iter().zip(rhs_iter) {
             let dn: Q<A, C, D> = (x_0 - x_1)?;
             let dn: Q<A, C, D> = (dn * dn)?;
             sum = (sum + dn)?;
@@ -89,6 +89,26 @@ where
     }
 }
 
+impl<const A: u8, const B: usize, C, D> Default for Point<A, B, C, D>
+where
+    C: ops::Int,
+    C: ops::Prim,
+    D: q::Engine,
+    (): q::SupportedPrecision<A>,
+    (): q::SupportedInt<C>,
+    (): q::Supported<A, C> {
+    fn default() -> Self {
+        let mut dimensions: array::Array<B, Q<A, C, D>> = array::Array::default();
+        for _ in 0..B {
+            let zero: Q<A, C, D> = C::AS_0.into();
+            dimensions.push(zero).unwrap();
+        }
+        Self {
+            dimensions: array::Array::default()
+        }
+    }
+}
+
 impl<const A: u8, const B: usize, C, D> From<array::Array<B, Q<A, C, D>>> for Point<A, B, C, D>
 where
     C: ops::Int,
@@ -99,7 +119,17 @@ where
     (): q::Supported<A, C> {
     fn from(children: array::Array<B, Q<A, C, D>>) -> Self {
         Self {
-            children
+            dimensions: children
         }
     }
+}
+
+#[test]
+fn test_default() {
+    let point: Point<2, 2, u128> = Point::default();
+    let expected_point: Point<2, 2, u128> = array::Array::new([
+        0_00.into(),
+        0_00.into()
+    ]).into();
+    assert_eq!(point, expected_point);
 }

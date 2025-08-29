@@ -2,6 +2,8 @@ use super::*;
 
 pub type Result<T> = ::core::result::Result<T, Error>;
 
+#[derive(Debug)]
+#[derive(Clone)]
 pub enum Error {
     QError(q::Error),
     ArrayError(array::Error),
