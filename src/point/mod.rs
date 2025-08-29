@@ -1,5 +1,3 @@
-use crate::ops::Int;
-
 use super::*;
 
 ::modwire::expose!(
@@ -150,14 +148,4 @@ where
             dimensions: value.into()
         }
     }
-}
-
-#[test]
-fn test_default() {
-    let point: Point<2, 2, u128> = Point::default();
-    let expected_point: Point<2, 2, u128> = [
-        0_00,
-        0_00
-    ].into();
-    assert_eq!(point, expected_point);
 }

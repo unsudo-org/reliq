@@ -67,5 +67,16 @@ fn bench(c: &mut c::Criterion) {
     });
 }
 
-c::criterion_group!(benches, bench);
+fn point(c: &mut c::Criterion) {
+    c.bench_function("create `Point<2, 2, u32>`", |b| {
+        b.iter(|| {
+            let point: ::reliq::point::Point<2, 2, u32> = bbox([
+                25_00,
+                30_00
+            ]).into();
+        });
+    });
+}
+
+c::criterion_group!(benches, bench, point);
 c::criterion_main!(benches);

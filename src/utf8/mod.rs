@@ -153,7 +153,7 @@ impl<const A: usize> Utf8<A> {
     }
 }
 
-impl<const A: usize> Default for Utf8<A> {
+impl<const T: usize> Default for Utf8<T> {
     fn default() -> Self {
         Self::new()
     }
@@ -176,7 +176,7 @@ impl<const T: usize> PartialEq for Utf8<T> {
     }
 }
 
-impl<const A: usize> Ord for Utf8<A> {
+impl<const T: usize> Ord for Utf8<T> {
     fn cmp(&self, other: &Self) -> ::core::cmp::Ordering {
         let x: &str = self.as_str();
         let y: &str = other.as_str();
@@ -193,7 +193,7 @@ impl<const T: usize> PartialOrd for Utf8<T> {
     }
 }
 
-impl<const A: usize> ::core::fmt::Debug for Utf8<A> {
+impl<const T: usize> ::core::fmt::Debug for Utf8<T> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         f
             .debug_struct("Utf8")
@@ -211,14 +211,9 @@ impl<const T: usize> ::core::fmt::Display for Utf8<T> {
     }
 }
 
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn try_it() {
-        let s: Utf8<64> = "Hello World".try_into().unwrap();
-        let expected: Utf8<64> = "Hello World".try_into().unwrap();
-        assert_eq!(s, expected);
-    }
+#[test]
+fn test() {
+    let s: Utf8<32> = "Hello World".try_into().unwrap();
+    let s_ok: Utf8<32> = "Hello World".try_into().unwrap();
+    assert_eq!(s, s_ok);
 }
