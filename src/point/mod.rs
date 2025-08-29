@@ -44,8 +44,6 @@ where
     pub fn dimension(&self, k: usize) -> Option<&Q<A, C, D>> {
         self.children.get(k).ok()
     }
-
-
 }
 
 impl<const A: u8, const B: usize, C, D> Point<A, B, C, D>
@@ -69,9 +67,11 @@ where
         Ok(ret)
     }
 
-    pub fn nearest(self, set: Set<A, B, C, D>) -> Result<Option<(Q<A, C, D>, Self)>> {
+    pub fn nearest<E>(self, set: E) -> Result<Option<(Q<A, C, D>, Self)>> 
+    where
+        E: Into<Set<A, B, C, D>> {
+        let set: Set<A, B, C, D> = set.into();
         let mut best: Option<(Q<A, C, D>, Self)> = None;
-
         for candidate in set.children.into_iter() {
             let distance = self.distance_between(candidate)?;
             match &mut best {
