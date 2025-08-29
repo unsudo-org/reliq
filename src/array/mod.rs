@@ -34,6 +34,7 @@ pub enum Error {
 
 #[derive(Debug)]
 #[derive(Clone)]
+#[derive(Copy)]
 pub struct Array<const A: usize, B>
 where
     B: Clone,

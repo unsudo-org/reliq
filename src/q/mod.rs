@@ -78,6 +78,11 @@ where
         let ret: Q<E, B, C, D> = ret.into();
         Ok(ret)
     }
+
+    #[inline]
+    pub fn sqrt(self) -> Result<Self> {
+        self.n.sqrt().into()
+    }
 }
 
 impl<const A: u8, B, C, D> Q<A, B, C, D>
