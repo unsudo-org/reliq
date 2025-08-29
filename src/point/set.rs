@@ -10,7 +10,6 @@ where
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<C>,
     (): q::Supported<A, C> {
-
     pub(super) children: array::Array<B, Point<A, B, C, D>>
 }
 
@@ -22,51 +21,61 @@ where
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<C>,
     (): q::Supported<A, C> {
-
-    pub fn preview_k_step(&self, k: usize) -> Result<Point<A, B, C, D>> {
+    #[inline]
+    pub fn predict_next_via_k_step(&self) -> Result<Point<A, B, C, D>> {
         let len: usize = self.children.len();
-        let mut set: array::Array<_, _> = array::Array::<B, Q<A, C, D>>::default();
+        let mut arr: array::Array<B, Q<A, C, D>> = array::Array::default();
         for dimension in 0..B {
-            let mut vel_sum: Q<A, C, D> = C::AS_0.into();
+            let mut magnitude_sum: Q<A, C, D> = C::AS_0.into();
             for i in (len - B)..len {
-                let prev = *self.children[i - 1].dimension(dimension);
-                let curr = *self.children[i].dimension(dimension);
-                vel_sum = (vel_sum + (curr - prev)?)?;
+                let prev: Point<A, B, C, D> = *self.children.get(i - 1)?;
+                let prev: Q<A, C, D> = *prev.dimension(dimension).expect("Point dimension is not out of bounds.");
+                let curr: Point<A, B, C, D> = *self.children.get(i)?;
+                let curr: Q<A, C, D> = *curr.dimension(dimension).expect("Point dimension is not out of bounds.");
+                magnitude_sum = (magnitude_sum + (curr - prev)?)?;
             }
-            let avg_mag = (vel_sum / B.into())?;
-            let last = *self.children[len - 1].dimension(dimension);
-            set.push((last + avg_mag)?).ok();
+            let len: usize = B;
+            let len: C = len
+                .try_into()
+                .ok()
+                .expect("???");
+            let len: Q<A, C, D> = len.into();
+            let magnitude_average: Q<A, C, D> = (magnitude_sum / len)?;
+            let k: C = len.to_int();
+            let k: C = k - C::AS_1;
+            let k: usize = k
+                .try_into()
+                .ok()
+                .expect("???");
+            let last: Point<A, B, C, D> = *self.children.get(k).unwrap();
+            let last: Q<A, C, D> = *last.dimension(dimension).unwrap();
+            arr.push((last + magnitude_average)?).ok();
         }
-        let ret = Point {
-            children: set
+        let ret: Point<A, B, C, D> = Point {
+            children: arr
         };
         Ok(ret)
     }
 
-    
     /// Predict the next N-D point using linear extrapolation.
-    pub fn estimate_next(&self) -> Result<Point<A, B, C, D>> {
-        let len = self.children.len();
-        assert!(len >= 2, "estimate_next requires at least 2 points");
-        let p_prev = &self.children[len - 2];
-        let p_last = &self.children[len - 1];
-
-        let mut coords = array::Array::<B, Q<A, C, D>>::default();
-
-        for i in 0..B {
-            let x_prev = *p_prev
-                .dimension(i)
-                .expect("Point dimension out of bounds");
-            let x_last = *p_last
-                .dimension(i)
-                .expect("Point dimension out of bounds");
-
-            let vel = (x_last - x_prev)?;
-            let x_next = (x_last + vel)?;
-            coords.push(x_next).ok();
+    #[inline]
+    pub fn predict_next_via_linear(&self) -> Result<Point<A, B, C, D>> {
+        let len: usize = self.children.len();
+        if len < 2 {
+            return Err(Error::InsufficientSetSize)
         }
-
-        Ok(Point { children: coords })
+        let prev: &Point<A, B, C, D> = self.children.get(len - 2)?;
+        let last: &Point<A, B, C, D> = self.children.get(len - 1)?;
+        let mut arr: array::Array<B, Q<A, C, D>> = array::Array::default();
+        for i in 0..B {
+            let prev_x: Q<A, C, D> = *prev.dimension(i).expect("Point dimension is not out of bounds.");
+            let last_x: Q<A, C, D> = *last.dimension(i).expect("Point dimension is not out of bounds.");
+            let magnitude: Q<A, C, D> = (last_x - prev_x)?;
+            let next_x: Q<A, C, D> = (last_x + magnitude)?;
+            arr.push(next_x).ok();
+        }
+        let ret: Point<A, B, C, D> = arr.into();
+        Ok(ret)
     }
 }
 

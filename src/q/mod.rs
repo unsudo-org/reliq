@@ -80,8 +80,8 @@ where
     }
 
     #[inline]
-    pub fn sqrt(self) -> Result<Self> {
-        self.n.sqrt().into()
+    pub fn to_int(self) -> B {
+        self.n
     }
 }
 

@@ -45,6 +45,18 @@ where
         self.children.get(k).ok()
     }
 
+
+}
+
+impl<const A: u8, const B: usize, C, D> Point<A, B, C, D>
+where
+    C: ops::Int,
+    C: ops::Prim,
+    C: ops::Signed,
+    D: q::Engine,
+    (): q::SupportedPrecision<A>,
+    (): q::SupportedInt<C>,
+    (): q::Supported<A, C> {
     pub fn distance_between(self, rhs: Self) -> Result<Q<A, C, D>> {
         let mut sum: Q<A, C, D> = C::AS_0.into();
         let rhs_iter: array::Iter<_, _> = rhs.children.into_iter();
@@ -74,5 +86,20 @@ where
         }
 
         Ok(best)
+    }
+}
+
+impl<const A: u8, const B: usize, C, D> From<array::Array<B, Q<A, C, D>>> for Point<A, B, C, D>
+where
+    C: ops::Int,
+    C: ops::Prim,
+    D: q::Engine,
+    (): q::SupportedPrecision<A>,
+    (): q::SupportedInt<C>,
+    (): q::Supported<A, C> {
+    fn from(children: array::Array<B, Q<A, C, D>>) -> Self {
+        Self {
+            children
+        }
     }
 }
