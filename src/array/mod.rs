@@ -220,6 +220,18 @@ where
     }
 }
 
+impl<const A: usize, B, C> From<[C; A]> for Array<A, B>
+where
+    B: Copy,
+    C: Into<B> {
+    fn from(value: [C; A]) -> Self {
+        let value: [B; A] = value.map(|item| {
+            item.into()
+        });
+        Self::new(value)
+    }
+}
+
 impl<const A: usize, B> Eq for Array<A, B>
 where
     B: Copy,

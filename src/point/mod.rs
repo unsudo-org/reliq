@@ -1,3 +1,5 @@
+use crate::ops::Int;
+
 use super::*;
 
 ::modwire::expose!(
@@ -72,7 +74,7 @@ where
         E: Into<Set<A, B, C, D>> {
         let set: Set<A, B, C, D> = set.into();
         let mut best: Option<(Q<A, C, D>, Self)> = None;
-        for candidate in set.children.into_iter() {
+        for candidate in set.points.into_iter() {
             let distance = self.distance_between(candidate)?;
             match &mut best {
                 None => best = Some((distance, candidate)),
@@ -109,17 +111,43 @@ where
     }
 }
 
-impl<const A: u8, const B: usize, C, D> From<array::Array<B, Q<A, C, D>>> for Point<A, B, C, D>
+impl<const A: u8, const B: usize, C, D, E> From<array::Array<B, E>> for Point<A, B, C, D>
 where
     C: ops::Int,
     C: ops::Prim,
     D: q::Engine,
+    E: Into<Q<A, C, D>>,
+    E: Copy,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<C>,
     (): q::Supported<A, C> {
-    fn from(children: array::Array<B, Q<A, C, D>>) -> Self {
+    fn from(value: array::Array<B, E>) -> Self {
+        let mut dimensions: array::Array<B, Q<A, C, D>> = array::Array::default();
+        for item in value {
+            let item: Q<A, C, D> = item.into();
+            dimensions.push(item).ok();
+        }
         Self {
-            dimensions: children
+            dimensions
+        }
+    }
+}
+
+impl<const A: u8, const B: usize, C, D, E> From<[E; B]> for Point<A, B, C, D>
+where
+    C: ops::Int,
+    C: ops::Prim,
+    D: q::Engine,
+    E: Into<Q<A, C, D>>,
+    (): q::SupportedPrecision<A>,
+    (): q::SupportedInt<C>,
+    (): q::Supported<A, C> {
+    fn from(value: [E; B]) -> Self {
+        let value: [Q<A, C, D>; B] = value.map(|item| {
+            item.into()
+        });
+        Self {
+            dimensions: value.into()
         }
     }
 }
@@ -127,9 +155,9 @@ where
 #[test]
 fn test_default() {
     let point: Point<2, 2, u128> = Point::default();
-    let expected_point: Point<2, 2, u128> = array::Array::new([
-        0_00.into(),
-        0_00.into()
-    ]).into();
+    let expected_point: Point<2, 2, u128> = [
+        0_00,
+        0_00
+    ].into();
     assert_eq!(point, expected_point);
 }
