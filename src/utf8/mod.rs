@@ -169,6 +169,18 @@ impl<const T: usize> TryFrom<&str> for Utf8<T> {
     }
 }
 
+#[cfg(feature = "std")]
+impl<const T: usize> TryFrom<String> for Utf8<T> {
+    type Error = Error;
+
+    fn try_from(value: String) -> ::core::result::Result<Self, Self::Error> {
+        let value: &str = &value;
+        let mut s: Self = Self::new();
+        s.push_str(value)?;
+        Ok(s)
+    }
+}
+
 impl<const T: usize> Eq for Utf8<T> {}
 impl<const T: usize> PartialEq for Utf8<T> {
     fn eq(&self, other: &Self) -> bool {

@@ -79,18 +79,18 @@ where
     }
 }
 
-#[test]
-fn test_sin() {
-    let angle: Deg2<i32> = 16_00.into();
-    let angle: Q2<i32> = angle.sin().unwrap();
-    let angle_ok: Q2<i32> = 1_00.into();
-    assert_eq!(angle, angle_ok);
+#[cfg(test)]
+#[::rstest::rstest]
+#[case(1_00.into(), 0_84.into())]
+fn test_sin(#[case] angle: Rad2<i32>, #[case] ok: Q2<i32>) {
+    let ret: Q2<i32> = angle.sin().unwrap();
+    assert_eq!(ret, ok);
 }
 
-#[test]
-fn test_cos() {
-    let angle: Deg2<i32> = 2_00.into();
-    let angle: Q2<i32> = angle.cos().unwrap();
-    let angle_ok: Q2<i32> = 1_00.into();
-    assert_eq!(angle, angle_ok);
+#[cfg(test)]
+#[::rstest::rstest]
+#[case(1_00.into(), 0_54.into())]
+fn test_cos(#[case] angle: Rad2<i32>, #[case] ok: Q2<i32>) {
+    let ret: Q2<i32> = angle.cos().unwrap();
+    assert_eq!(ret, ok);
 }

@@ -361,9 +361,23 @@ where
     }
 }
 
-#[test]
-fn test_interpolation() {
-    let color: Color<2, u32> = (25, 25, 25).into();
-    let new_color: Color<2, u32> = color.interpolate((25, 25, 25), 0_25).unwrap();
-    assert_eq!(color, new_color);
+#[cfg(test)]
+#[::rstest::rstest]
+#[case((25, 25, 25), (50, 50, 50), (25, 25, 25))]
+#[case((0, 0, 0), (255, 255, 255), (127, 127, 127))]
+#[case((100, 150, 200), (50, 75, 100), (75, 112, 150))]
+#[case((10, 20, 30), (240, 220, 200), (125, 120, 115))]
+#[case((255, 0, 0), (0, 255, 0), (128, 128, 0))]
+#[case((255, 255, 255), (0, 0, 0), (128, 128, 128))]
+#[case((10, 50, 100), (100, 150, 200), (55, 100, 150))]
+fn test_interpolation<A, B, C>(#[case] x: A, #[case] y: B, #[case] ok: C) 
+where
+    A: Into<Color<2, i128>>,
+    B: Into<Color<2, i128>>,
+    C: Into<Color<2, i128>> {
+    let x: Color<2, i128> = x.into();
+    let y: Color<2, i128> = y.into();
+    let ok: Color<2, i128> = ok.into();
+    let ret: Color<2, i128> = x.interpolate(y, 0_50).unwrap();
+    assert_eq!(ret, ok);
 }
