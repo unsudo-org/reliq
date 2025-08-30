@@ -1,6 +1,6 @@
 use super::*;
 
-pub type Result<T, Error> = ::core::result::Result<T, Error>;
+pub type Result<T> = ::core::result::Result<T, Error>;
 
 #[derive(Debug)]
 #[derive(Clone)]
@@ -8,6 +8,7 @@ pub type Result<T, Error> = ::core::result::Result<T, Error>;
 #[derive(Eq)]
 pub enum Error {
     OpsError(ops::Error),
+    QError(q::Error),
     IllegalHex,
     AlphaOverflow,
     AlphaUnderflow
@@ -16,5 +17,11 @@ pub enum Error {
 impl From<ops::Error> for Error {
     fn from(value: ops::Error) -> Self {
         Self::OpsError(value)
+    }
+}
+
+impl From<q::Error> for Error {
+    fn from(value: q::Error) -> Self {
+        Self::QError(value)
     }
 }

@@ -18,11 +18,13 @@ pub type Result<T> = ::core::result::Result<T, Error>;
 #[derive(Debug)]
 #[derive(Clone)]
 #[derive(PartialEq)]
+#[derive(Eq)]
 pub enum Error {
     Overflow,
     Underflow,
     DivisionByZero,
-    ModuloByZero
+    ModuloByZero,
+    UnsupportedOperation
 }
 
 /// # Where
@@ -51,7 +53,6 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-
     #[inline]
     pub fn lerp<E, F>(self, rhs: E, t: F) -> Result<Self> 
     where
@@ -80,7 +81,7 @@ where
     }
 
     #[inline]
-    pub fn to_int(self) -> B {
+    pub fn as_int(self) -> B {
         self.n
     }
 }

@@ -65,7 +65,7 @@ where
                 .expect("???");
             let len: Q<A, C, D> = len.into();
             let magnitude_average: Q<A, C, D> = (magnitude_sum / len)?;
-            let k: C = len.to_int();
+            let k: C = len.as_int();
             let k: C = k - C::AS_1;
             let k: usize = k
                 .try_into()

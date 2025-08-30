@@ -7,32 +7,122 @@ use super::*;
 #[repr(u8)]
 #[derive(Clone)]
 #[derive(Copy)]
-pub enum Color<const A: u8, B> 
+pub enum Color<const A: u8, B, C> 
 where
     B: ops::Int,
     B: ops::Prim,
+    C: q::Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
     Hex(u32),
     Rgb(u8, u8, u8),
-    Rgba(u8, u8, u8, q::Q<A, B>)
+    Rgba(u8, u8, u8, q::Q<A, B, q::DefaultMode, C>)
 }
 
-impl<const A: u8, B> Color<A, B>
+impl<const A: u8, B, C> Color<A, B, C>
 where
     B: ops::Int,
     B: ops::Prim,
+    C: q::Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
-    (): q::Supported<A, B> {
-    
+    (): q::Supported<A, B>,
+    (): q::Supported<1, B> {
+    pub fn interpolate<D, E>(self, rhs: D, t: E) -> Result<Self>
+    where
+        D: Into<Self>,
+        E: Into<q::Q<A, B, q::DefaultMode, C>> {
+        let rhs: Self = rhs.into();
+        let t: q::Q<A, B, q::DefaultMode, C> = t.into();
+        match (self, rhs) {
+            (Self::Rgb(r_0, g_0, b_0), Self::Rgb(r_1, g_1, b_1)) => {
+                let lerp: _ = |a: u8, b: u8| -> q::Result<u8> {
+                    let a: B = a
+                        .try_into()
+                        .ok()
+                        .ok_or(q::Error::UnsupportedOperation)?;
+                    let a: q::Q<A, B, q::DefaultMode, C> = a.into();
+                    let b: B = b
+                        .try_into()
+                        .ok()
+                        .ok_or(q::Error::UnsupportedOperation)?;
+                    let b: q::Q<A, B, q::DefaultMode, C> = b.into();
+                    let ret: q::Q<A, B, q::DefaultMode, C> = ((a + (b - a)?)? * t)?;
+                    let ret: B = ret.as_int();
+                    let ret: u8 = ret
+                        .try_into()
+                        .ok()
+                        .ok_or(q::Error::UnsupportedOperation)?;
+                    Ok(ret)
+                };
+                let r: u8 = lerp(r_0, r_1)?;
+                let g: u8 = lerp(g_0, g_1)?;
+                let b: u8 = lerp(b_0, b_1)?;
+                Ok(Self::Rgb(r, g, b))
+            },
+            (Self::Rgba(r_0, g_0, b_0, a_0), Self::Rgba(r_1, g_1, b_1, a_1)) => {
+                let lerp: _ = |a: u8, b: u8| -> q::Result<u8> {
+                    let a: B = a
+                        .try_into()
+                        .ok()
+                        .ok_or(q::Error::UnsupportedOperation)?;
+                    let a: q::Q::<A, B, q::DefaultMode, C> = a.into();
+                    let b: B = b
+                        .try_into()
+                        .ok()
+                        .ok_or(q::Error::UnsupportedOperation)?;
+                    let b: q::Q::<A, B, q::DefaultMode, C> = b.into();
+                    let ret: q::Q<A, B, q::DefaultMode, C> = ((a + (b - a)?)? * t)?;
+                    let ret: B = ret.as_int();
+                    let ret: u8 = ret
+                        .try_into()
+                        .ok()
+                        .ok_or(q::Error::UnsupportedOperation)?;
+                    Ok(ret)
+                };
+                let a: q::Q<A, B, q::DefaultMode, C> = {
+                    let ret: q::Q<A, B, q::DefaultMode, C> = ((a_0 + (a_1 - a_0)?)? * t)?;
+                    let ret: q::Q<A, B, q::DefaultMode, C> = ret.clamp(q::as_0(), q::as_1());
+                    ret
+                };
+                let r: u8 = lerp(r_0, r_1)?;
+                let g: u8 = lerp(g_0, g_1)?;
+                let b: u8 = lerp(b_0, b_1)?;
+                Ok(Self::Rgba(r, g, b, a))
+            },
+            (Self::Hex(hex_0), Self::Hex(hex_1)) => {
+                let r_0: u8 = (hex_0 >> 16) as u8;
+                let g_0: u8 = (hex_0 >> 8) as u8;
+                let b_0: u8 = (hex_0 >> 0xff) as u8;
+                let r_1: u8 = (hex_1 >> 16) as u8;
+                let g_1: u8 = (hex_1 >> 8) as u8;
+                let b_1: u8 = (hex_1 >> 0xff) as u8;
+                let rgb: Self = (r_0, g_0, b_0).into();
+                let ret: Self = rgb.interpolate((r_1, g_1, b_1), t)?;
+                Ok(ret)
+            },
+            (lhs, rhs) => {
+                let lhs: Self = match lhs {
+                    Self::Rgb(r, g, b) => Self::Rgba(r, g, b, q::as_1()),
+                    o => o
+                };
+                let rhs: Self = match rhs {
+                    Self::Rgb(r, g, b) => Self::Rgba(r, g, b, q::as_1()),
+                    o => o
+                };
+                let ret: Self = lhs.interpolate(rhs, t)?;
+                Ok(ret)
+            }
+        }
+    }
 }
 
-impl<const A: u8, B> From<(u8, u8, u8)> for Color<A, B>
+impl<const A: u8, B, C> From<(u8, u8, u8)> for Color<A, B, C>
 where
     B: ops::Int,
     B: ops::Prim,
+    C: q::Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
@@ -44,10 +134,11 @@ where
     }
 }
 
-impl<const A: u8, B> From<u32> for Color<A, B>
+impl<const A: u8, B, C> From<u32> for Color<A, B, C>
 where
     B: ops::Int,
     B: ops::Prim,
+    C: q::Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
@@ -60,10 +151,11 @@ where
     }
 }
 
-impl<const A: u8, B> From<u16> for Color<A, B>
+impl<const A: u8, B, C> From<u16> for Color<A, B, C>
 where
     B: ops::Int,
     B: ops::Prim,
+    C: q::Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
@@ -74,10 +166,11 @@ where
     }
 }
 
-impl<const A: u8, B> From<u8> for Color<A, B>
+impl<const A: u8, B, C> From<u8> for Color<A, B, C>
 where
     B: ops::Int,
     B: ops::Prim,
+    C: q::Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
@@ -88,33 +181,35 @@ where
     }
 }
 
-impl<const A: u8, B, C> From<(u8, u8, u8, C)> for Color<A, B>
+impl<const A: u8, B, C, D> From<(u8, u8, u8, D)> for Color<A, B, C>
 where
     B: ops::Int,
     B: ops::Prim,
-    C: Into<q::Q<A, B>>,
+    C: q::Engine,
+    D: Into<q::Q<A, B, q::DefaultMode, C>>,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B>,
     (): q::Supported<1, B> {
-    fn from(value: (u8, u8, u8, C)) -> Self {
+    fn from(value: (u8, u8, u8, D)) -> Self {
         let r: u8 = value.0;
         let g: u8 = value.1;
         let b: u8 = value.2;
-        let a: q::Q<A, B> = value.3.into();
-        let a: q::Q<A, B> = a.clamp(q::as_0(), q::as_1());
+        let a: q::Q<A, B, q::DefaultMode, C> = value.3.into();
+        let a: q::Q<A, B, q::DefaultMode, C> = a.clamp(q::as_0(), q::as_1());
         Self::Rgba(r, g, b, a)
     }
 }
 
-impl<const A: u8, B> ::core::fmt::Display for Color<A, B>
+impl<const A: u8, B, C> ::core::fmt::Display for Color<A, B, C>
 where
     B: ops::Int,
     B: ops::Prim,
+    C: q::Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         match self {
             Self::Hex(code) => write!(f, "#{:06X}", code),
             Self::Rgb(r, g, b) => write!(f, "rgb({}, {}, {})", r, g, b),

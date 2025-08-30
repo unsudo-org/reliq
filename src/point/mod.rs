@@ -144,8 +144,9 @@ where
         let value: [Q<A, C, D>; B] = value.map(|item| {
             item.into()
         });
+        let dimensions: array::Array<B, Q<A, C, D>> = value.into();
         Self {
-            dimensions: value.into()
+            dimensions
         }
     }
 }
