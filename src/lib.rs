@@ -1,3 +1,4 @@
+#![allow(clippy::zero_prefixed_literal)]
 #![cfg_attr(not(feature = "std"), no_std)]
 
 pub mod array;

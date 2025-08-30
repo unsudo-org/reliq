@@ -1,5 +1,3 @@
-use super::*;
-
 macro_rules! precision_whitelist {
     ($($n:literal)*) => {
         $(

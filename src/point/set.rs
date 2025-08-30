@@ -145,15 +145,49 @@ where
     }
 }
 
+impl<const A: u8, const B: usize, C, D> ::core::ops::Deref for Set<A, B, C, D> 
+where
+    C: ops::Int,
+    C: ops::Prim,
+    D: q::Engine,
+    (): q::SupportedPrecision<A>,
+    (): q::SupportedInt<C>,
+    (): q::Supported<A, C> {
+    type Target = array::Array<B, Point<A, B, C, D>>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.points
+    }
+}
+
+impl<const A: u8, const B: usize, C, D> ::core::ops::DerefMut for Set<A, B, C, D> 
+where
+    C: ops::Int,
+    C: ops::Prim,
+    D: q::Engine,
+    (): q::SupportedPrecision<A>,
+    (): q::SupportedInt<C>,
+    (): q::Supported<A, C> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.points
+    }
+}
+
 #[test]
 fn test_next_linear() {
-    let set: Set<2, 2, u128, q::DefaultEngine> = [[
+    let mut set: Set<2, 2, u128, q::DefaultEngine> = [[
         0_00, 
         0_00
     ], [
         0_00, 
         0_00
     ]].into();
+    set.push(
+        [
+            1_00,
+            2_00
+        ].into()
+    ).ok();
     let predicted_point: Point<2, 2, u128> = set.next_linear().unwrap();
     let expected_predicted_point: Point<2, 2, u128> = [
         0_00,

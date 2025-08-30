@@ -297,6 +297,7 @@ where
     }
 }
 
+#[allow(clippy::non_canonical_partial_ord_impl)]
 impl<const A: u8, B, C, D> PartialOrd for Q<A, B, C, D>
 where
     B: ops::Int,
