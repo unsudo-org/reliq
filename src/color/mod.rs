@@ -32,17 +32,20 @@ where
     (): q::Supported<1, B> {
     #[inline]
     pub fn is_hex(self) -> bool {
-        matches!(self, Self::Hex(_))
+        let ret: Self = self.normalize();
+        matches!(ret, Self::Hex(_))
     }
 
     #[inline]
     pub fn is_rgb(self) -> bool {
-        matches!(self, Self::Rgb(_, _, _))
+        let ret: Self = self.normalize();
+        matches!(ret, Self::Rgb(_, _, _))
     }
 
     #[inline]
     pub fn is_rgba(self) -> bool {
-        matches!(self, Self::Rgba(_, _, _, _))
+        let ret: Self = self.normalize();
+        matches!(ret, Self::Rgba(_, _, _, _))
     }
 
     #[inline]
@@ -50,9 +53,12 @@ where
     where
         D: Into<Self>,
         E: Into<q::Q<A, B, q::DefaultMode, C>> {
-        let rhs: Self = rhs.into();
+        let x: Color<A, B, C> = self.normalize();
+        let y: Self = rhs.into();
+        let y: Color<A, B, C> = y.normalize();
         let t: q::Q<A, B, q::DefaultMode, C> = t.into();
-        match (self, rhs) {
+        let t: q::Q<A, B, q::DefaultMode, C> = t.clamp(q::as_0(), q::as_1());
+        match (x, y) {
             (Self::Rgb(r_0, g_0, b_0), Self::Rgb(r_1, g_1, b_1)) => {
                 let lerp: _ = |a: u8, b: u8| -> q::Result<u8> {
                     let a: B = a
@@ -136,8 +142,9 @@ where
 
     #[inline]
     pub fn as_hex(self) -> Self {
-        match self {
+        match self.normalize() {
             Self::Rgb(r, g, b) => {
+                
                 let ret: u32 = ((r as u32) << 16) | ((g as u32) << 8) | (b as u32);
                 let ret: Self = Self::Hex(ret);
                 ret
@@ -153,7 +160,7 @@ where
 
     #[inline]
     pub fn as_rgb(self) -> Self {
-        match self {
+        match self.normalize() {
             Self::Hex(hex) => {
                 let (r, g, b) = (
                     ((hex >> 16) & 0xff) as u8,
@@ -169,7 +176,7 @@ where
 
     #[inline]
     pub fn as_rgba(self) -> Self {
-        match self {
+        match self.normalize() {
             Self::Hex(hex) => {
                 let (r, g, b) = (
                     ((hex >> 16) & 0xff) as u8,
@@ -182,6 +189,23 @@ where
             Self::Rgba(_, _, _, _) => self
         }
     }
+
+    #[inline]
+    fn normalize(self) -> Self {
+        match self {
+            Self::Hex(code) => {
+                let ret: u32 = code.clamp(0x000000, 0xFFFFFF);
+                let ret: Self = Self::Hex(ret);
+                ret
+            },
+            Self::Rgb(_, _, _) => self,
+            Self::Rgba(r, g, b, a) => {
+                let ret: q::Q<A, B, q::DefaultMode, C> = a.clamp(q::as_0(), q::as_1());
+                let ret: Self = Self::Rgba(r, g, b, ret);
+                ret
+            }
+        }
+    }
 }
 
 impl<const A: u8, B, C> From<(u8, u8, u8)> for Color<A, B, C>
@@ -191,13 +215,14 @@ where
     C: q::Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
-    (): q::Supported<A, B> {
+    (): q::Supported<A, B>,
+    (): q::Supported<1, B> {
     #[inline]
     fn from(value: (u8, u8, u8)) -> Self {
         let r: u8 = value.0;
         let g: u8 = value.1;
         let b: u8 = value.2;
-        Self::Rgb(r, g, b)
+        Self::Rgb(r, g, b).normalize()
     }
 }
 
@@ -208,14 +233,11 @@ where
     C: q::Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
-    (): q::Supported<A, B> {
+    (): q::Supported<A, B>,
+    (): q::Supported<1, B> {
     #[inline]
     fn from(value: u32) -> Self {
-        if value > 0xffffff {
-            Self::Hex(0xffffff)
-        } else {
-            Self::Hex(value)
-        }
+        Self::Hex(value).normalize()
     }
 }
 
@@ -226,7 +248,8 @@ where
     C: q::Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
-    (): q::Supported<A, B> {
+    (): q::Supported<A, B>,
+    (): q::Supported<1, B> {
     #[inline]
     fn from(value: u16) -> Self {
         let value: u32 = value.into();
@@ -242,7 +265,8 @@ where
     C: q::Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
-    (): q::Supported<A, B> {
+    (): q::Supported<A, B>,
+    (): q::Supported<1, B> {
     #[inline]
     fn from(value: u8) -> Self {
         let value: u32 = value.into();
@@ -267,8 +291,7 @@ where
         let g: u8 = value.1;
         let b: u8 = value.2;
         let a: q::Q<A, B, q::DefaultMode, C> = value.3.into();
-        let a: q::Q<A, B, q::DefaultMode, C> = a.clamp(q::as_0(), q::as_1());
-        Self::Rgba(r, g, b, a)
+        Self::Rgba(r, g, b, a).normalize()
     }
 }
 
@@ -279,10 +302,11 @@ where
     C: q::Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
-    (): q::Supported<A, B> {
+    (): q::Supported<A, B>,
+    (): q::Supported<1, B> {
     #[inline]
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-        match self {
+        match self.normalize() {
             Self::Hex(code) => write!(f, "#{:06X}", code),
             Self::Rgb(r, g, b) => write!(f, "rgb({}, {}, {})", r, g, b),
             Self::Rgba(r, g, b, a) => write!(f, "rgba({}, {}, {}, {:.3})", r, g, b, a)
@@ -311,7 +335,9 @@ where
     (): q::Supported<1, B> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
-        match (self, other) {
+        let x: Color<A, B, C> = self.normalize();
+        let y: Color<A, B, C> = other.normalize();
+        match (x, y) {
             (Self::Hex(hex_0), Self::Hex(hex_1)) => {
                 hex_0 == hex_1
             },
@@ -323,7 +349,7 @@ where
             (Self::Rgba(r_0, g_0, b_0, a_0), Self::Rgba(r_1, g_1, b_1, a_1)) => {
                 r_0 == r_1 
                 && g_0 == g_1 
-                && b_0 == b_1 
+                && b_0 == b_1
                 && a_0 == a_1
             },
             (o_0, o_1) => {
