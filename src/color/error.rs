@@ -2,6 +2,7 @@ use super::*;
 
 pub type Result<T> = ::core::result::Result<T, Error>;
 
+#[repr(u8)]
 #[derive(Debug)]
 #[derive(Clone)]
 #[derive(PartialEq)]
