@@ -5,9 +5,10 @@ use super::*;
 );
 
 #[repr(u8)]
+#[derive(Debug)]
 #[derive(Clone)]
 #[derive(Copy)]
-pub enum Color<const A: u8, B, C> 
+pub enum Color<const A: u8, B, C = q::DefaultEngine> 
 where
     B: ops::Int,
     B: ops::Prim,
@@ -29,6 +30,22 @@ where
     (): q::SupportedInt<B>,
     (): q::Supported<A, B>,
     (): q::Supported<1, B> {
+    #[inline]
+    pub fn is_hex(self) -> bool {
+        matches!(self, Self::Hex(_))
+    }
+
+    #[inline]
+    pub fn is_rgb(self) -> bool {
+        matches!(self, Self::Rgb(_, _, _))
+    }
+
+    #[inline]
+    pub fn is_rgba(self) -> bool {
+        matches!(self, Self::Rgba(_, _, _, _))
+    }
+
+    #[inline]
     pub fn interpolate<D, E>(self, rhs: D, t: E) -> Result<Self>
     where
         D: Into<Self>,
@@ -92,12 +109,12 @@ where
                 Ok(Self::Rgba(r, g, b, a))
             },
             (Self::Hex(hex_0), Self::Hex(hex_1)) => {
-                let r_0: u8 = (hex_0 >> 16) as u8;
-                let g_0: u8 = (hex_0 >> 8) as u8;
-                let b_0: u8 = (hex_0 >> 0xff) as u8;
-                let r_1: u8 = (hex_1 >> 16) as u8;
-                let g_1: u8 = (hex_1 >> 8) as u8;
-                let b_1: u8 = (hex_1 >> 0xff) as u8;
+                let r_0: u8 = ((hex_0 >> 16) & 0xff) as u8;
+                let g_0: u8 = ((hex_0 >> 8) & 0xff) as u8;
+                let b_0: u8 = (hex_0 & 0xff) as u8;
+                let r_1: u8 = ((hex_1 >> 16) & 0xff) as u8;
+                let g_1: u8 = ((hex_1 >> 8) & 0xff) as u8;
+                let b_1: u8 = (hex_1 & 0xff) as u8;
                 let rgb: Self = (r_0, g_0, b_0).into();
                 let ret: Self = rgb.interpolate((r_1, g_1, b_1), t)?;
                 Ok(ret)
@@ -116,6 +133,55 @@ where
             }
         }
     }
+
+    #[inline]
+    pub fn as_hex(self) -> Self {
+        match self {
+            Self::Rgb(r, g, b) => {
+                let ret: u32 = ((r as u32) << 16) | ((g as u32) << 8) | (b as u32);
+                let ret: Self = Self::Hex(ret);
+                ret
+            },
+            Self::Rgba(r, g, b, _) => {
+                let ret: u32 = ((r as u32) << 16) | ((g as u32) << 8) | (b as u32);
+                let ret: Self = Self::Hex(ret);
+                ret
+            },
+            Self::Hex(_) => self
+        }
+    }
+
+    #[inline]
+    pub fn as_rgb(self) -> Self {
+        match self {
+            Self::Hex(hex) => {
+                let (r, g, b) = (
+                    ((hex >> 16) & 0xff) as u8,
+                    ((hex >> 8) & 0xff) as u8,
+                    (hex & 0xff) as u8
+                );
+                Self::Rgb(r, g, b)
+            },
+            Self::Rgba(r, g, b, _) => Self::Rgb(r, g, b),
+            Self::Rgb(_, _, _) => self
+        }
+    }
+
+    #[inline]
+    pub fn as_rgba(self) -> Self {
+        match self {
+            Self::Hex(hex) => {
+                let (r, g, b) = (
+                    ((hex >> 16) & 0xff) as u8,
+                    ((hex >> 8) & 0xff) as u8,
+                    (hex & 0xff) as u8
+                );
+                Self::Rgba(r, g, b, q::as_1())
+            },
+            Self::Rgb(r, g, b) => Self::Rgba(r, g, b, q::as_1()),
+            Self::Rgba(_, _, _, _) => self
+        }
+    }
 }
 
 impl<const A: u8, B, C> From<(u8, u8, u8)> for Color<A, B, C>
@@ -126,6 +192,7 @@ where
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
+    #[inline]
     fn from(value: (u8, u8, u8)) -> Self {
         let r: u8 = value.0;
         let g: u8 = value.1;
@@ -142,6 +209,7 @@ where
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
+    #[inline]
     fn from(value: u32) -> Self {
         if value > 0xffffff {
             Self::Hex(0xffffff)
@@ -159,6 +227,7 @@ where
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
+    #[inline]
     fn from(value: u16) -> Self {
         let value: u32 = value.into();
         let value: Self = value.into();
@@ -174,6 +243,7 @@ where
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
+    #[inline]
     fn from(value: u8) -> Self {
         let value: u32 = value.into();
         let value: Self = value.into();
@@ -191,6 +261,7 @@ where
     (): q::SupportedInt<B>,
     (): q::Supported<A, B>,
     (): q::Supported<1, B> {
+    #[inline]
     fn from(value: (u8, u8, u8, D)) -> Self {
         let r: u8 = value.0;
         let g: u8 = value.1;
@@ -209,6 +280,7 @@ where
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
+    #[inline]
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         match self {
             Self::Hex(code) => write!(f, "#{:06X}", code),
@@ -216,4 +288,56 @@ where
             Self::Rgba(r, g, b, a) => write!(f, "rgba({}, {}, {}, {:.3})", r, g, b, a)
         }
     }
+}
+
+impl<const A: u8, B, C> Eq for Color<A, B, C>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: q::Engine,
+    (): q::SupportedPrecision<A>,
+    (): q::SupportedInt<B>,
+    (): q::Supported<A, B>,
+    (): q::Supported<1, B> {}
+
+impl<const A: u8, B, C> PartialEq for Color<A, B, C>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: q::Engine,
+    (): q::SupportedPrecision<A>,
+    (): q::SupportedInt<B>,
+    (): q::Supported<A, B>,
+    (): q::Supported<1, B> {
+    #[inline]
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::Hex(hex_0), Self::Hex(hex_1)) => {
+                hex_0 == hex_1
+            },
+            (Self::Rgb(r_0, g_0, b_0), Self::Rgb(r_1, g_1, b_1)) => {
+                r_0 == r_1 
+                && g_0 == g_1 
+                && b_0 == b_1
+            },
+            (Self::Rgba(r_0, g_0, b_0, a_0), Self::Rgba(r_1, g_1, b_1, a_1)) => {
+                r_0 == r_1 
+                && g_0 == g_1 
+                && b_0 == b_1 
+                && a_0 == a_1
+            },
+            (o_0, o_1) => {
+                let o_0: Self = o_0.as_rgba();
+                let o_1: Self = o_1.as_rgba();
+                o_0 == o_1
+            }
+        }
+    }
+}
+
+#[test]
+fn test_interpolation() {
+    let color: Color<2, u32> = (25, 25, 25).into();
+    let new_color: Color<2, u32> = color.interpolate((25, 25, 25), 0_25).unwrap();
+    assert_eq!(color, new_color);
 }
