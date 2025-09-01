@@ -84,6 +84,37 @@ where
     pub fn as_int(self) -> B {
         self.n
     }
+
+    #[inline]
+    pub fn to_int<E>(&self) -> Result<E>
+    where
+        E: ops::Int,
+        E: TryFrom<B> {
+        let ret: B = scale::<A, B>();
+        let ret: B = self.n / ret;
+        let ret: E = ret
+            .try_into()
+            .ok()
+            .ok_or(Error::UnsupportedOperation)?;
+        Ok(ret)
+    }
+
+    #[inline]
+    pub fn to_float<E>(&self) -> Result<E>
+    where
+        E: ops::Float,
+        E: TryFrom<B> {
+        let num: E = self.n
+            .try_into()
+            .ok()
+            .ok_or(Error::UnsupportedOperation)?;
+        let den: E = scale::<A, B>()
+            .try_into()
+            .ok()
+            .ok_or(Error::UnsupportedOperation)?;
+        let ret: E = num / den;
+        Ok(ret)
+    }
 }
 
 impl<const A: u8, B, C, D> Q<A, B, C, D>
