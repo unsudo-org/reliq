@@ -1,7 +1,5 @@
 pub trait Key
 where
-    Self: ::core::fmt::Debug,
-    Self: Default,
     Self: Clone,
     Self: Copy,
     Self: Eq,
@@ -9,8 +7,6 @@ where
 
 impl<T> Key for T
 where
-    T: ::core::fmt::Debug,
-    T: Default,
     T: Clone,
     T: Copy,
     T: Eq,
