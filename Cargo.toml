@@ -1,6 +1,6 @@
 package.name = "reliq"
 package.description = "A portable library of primitive-like constructs."
-package.version = "0.3.4"
+package.version = "0.3.5"
 package.edition = "2024"
 package.license = "Apache-2.0"
 package.readme = "readme.md"
@@ -12,10 +12,16 @@ package.keywords = [
 ]
 dependencies.modwire.version = ">=0.1.0,<1.0.0"
 dependencies.paste.version = ">=1.0.15,<2.0.0"
+dependencies.serde.version = "*"
+dependencies.thiserror.version = "*"
+dependencies.thiserror.optional = true
+dependencies.strum.version = "*"
+dependencies.strum.default-features = false
+dependencies.strum_macros.version = "*"
 dev-dependencies.criterion.version = ">=0.7.0,<1.0.0"
 dev-dependencies.rstest.version = ">=0.26.1,<1.0.0"
-features.default = []
-features.std = []
+features.default = ["std"]
+features.std = ["dep:thiserror"]
 
 [[bench]]
 name = "q"

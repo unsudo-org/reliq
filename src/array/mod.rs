@@ -30,9 +30,15 @@ pub type Result<T> = ::core::result::Result<T, Error>;
 #[repr(u8)]
 #[derive(Debug)]
 #[derive(Clone)]
+#[cfg_attr(feature = "std", derive(::serde::Serialize))]
+#[cfg_attr(feature = "std", derive(::serde::Deserialize))]
+#[cfg_attr(feature = "std", derive(::thiserror::Error))]
 pub enum Error {
+    #[cfg_attr(feature = "std", error("Overflow"))]
     Overflow,
+    #[cfg_attr(feature = "std", error("Key out of bounds"))]
     KeyOutOfBounds,
+    #[cfg_attr(feature = "std", error("Empty"))]
     Empty
 }
 
@@ -319,6 +325,41 @@ where
             len: self.len,
             key: 0
         }
+    }
+}
+
+#[cfg(feature = "std")]
+impl<const A: usize, B> ::serde::Serialize for Array<A, B>
+where
+    B: Copy,
+    B: ::serde::Serialize {
+    fn serialize<S>(&self, serializer: S) -> ::core::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer {
+        self.as_slice().serialize(serializer)
+    }
+}
+
+#[cfg(feature = "std")]
+impl<'de, const A: usize, B> ::serde::Deserialize<'de> for Array<A, B>
+where
+    B: Copy,
+    B: ::serde::Deserialize<'de> {
+    fn deserialize<D>(deserializer: D) -> ::core::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de> {
+        let vec: Vec<B> = Vec::deserialize(deserializer)?;
+        if vec.len() > A {
+            return Err(::serde::de::Error::custom("Array overflow during deserialization"));
+        }
+        let mut ret = Array::<A, B>::default();
+        for item in vec {
+            ret
+                .push(item)
+                .ok()
+                .ok_or(::serde::de::Error::custom("Array overflow during deserialization"))?;
+        }
+        Ok(ret)
     }
 }
 

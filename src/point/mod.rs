@@ -14,6 +14,8 @@ type Q<const A: u8, B, C> = q::Q<A, B, q::DefaultMode, C>;
 #[derive(Copy)]
 #[derive(PartialEq)]
 #[derive(Eq)]
+#[cfg_attr(feature = "std", derive(::serde::Serialize))]
+#[cfg_attr(feature = "std", derive(::serde::Deserialize))]
 pub struct Point<const A: u8, const B: usize, C, D = q::DefaultEngine>
 where
     C: ops::Int,

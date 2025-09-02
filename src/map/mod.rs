@@ -134,3 +134,50 @@ where
         Self::new()
     }
 }
+
+#[cfg(feature = "std")]
+impl<const A: usize, B, C, D> ::serde::Serialize for Map<A, B, C, D>
+where
+    B: Key,
+    B: ::serde::Serialize,
+    C: Val,
+    C: ::serde::Serialize,
+    D: Hasher {
+    fn serialize<S>(&self, serializer: S) -> ::core::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer {
+        let mut ret: Vec<(&B, &C)> = Vec::with_capacity(self.len);
+        for i in 0..A {
+            if let (Some(k), Some(v)) = (&self.keys[i], &self.vals[i]) {
+                ret.push((k, v));
+            }
+        }
+        ret.serialize(serializer)
+    }
+}
+
+#[cfg(feature = "std")]
+impl<'de, const A: usize, B, C, D> ::serde::Deserialize<'de> for Map<A, B, C, D>
+where
+    B: Key,
+    B: ::serde::Deserialize<'de>,
+    C: Val,
+    C: ::serde::Deserialize<'de>,
+    D: Hasher {
+    fn deserialize<De>(deserializer: De) -> ::core::result::Result<Self, De::Error>
+    where
+        De: serde::Deserializer<'de> {
+        let entries: Vec<(B, C)> = ::serde::Deserialize::deserialize(deserializer)?;
+        if entries.len() > A {
+            return Err(serde::de::Error::custom("Array overflow during deserialization"));
+        }
+        let mut map = Map::<A, B, C, D>::new();
+        for (k, v) in entries {
+            map
+                .insert(k, v)
+                .ok()
+                .ok_or(::serde::de::Error::custom("out of space"))?;
+        }
+        Ok(map)
+    }
+}

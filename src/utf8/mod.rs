@@ -4,13 +4,19 @@ pub type Result<T> = ::core::result::Result<T, Error>;
 
 #[repr(u8)]
 #[derive(Debug)]
+#[cfg_attr(feature = "std", derive(::thiserror::Error))]
 pub enum Error {
+    #[cfg_attr(feature = "std", error("Overflow"))]
     Overflow,
+    #[cfg_attr(feature = "std", error("Invalid sequence"))]
     InvalidSequence,
+    #[cfg_attr(feature = "std", error("Empty"))]
     Empty
 }
 
 #[derive(Clone)]
+#[cfg_attr(feature = "std", derive(::serde::Serialize))]
+#[cfg_attr(feature = "std", derive(::serde::Deserialize))]
 pub struct Utf8<const A: usize> {
     buf: array::Array<A, u8>,
     len: usize

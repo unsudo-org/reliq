@@ -8,6 +8,9 @@ use super::*;
 #[derive(Debug)]
 #[derive(Clone)]
 #[derive(Copy)]
+#[derive(::strum_macros::EnumCount)]
+#[cfg_attr(feature = "std", derive(::serde::Serialize))]
+#[cfg_attr(feature = "std", derive(::serde::Deserialize))]
 pub enum Color<const A: u8, B, C = q::DefaultEngine> 
 where
     B: ops::Int,
