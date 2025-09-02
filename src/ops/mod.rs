@@ -23,23 +23,28 @@ pub type Result<T> = ::core::result::Result<T, Error>;
 #[derive(Clone)]
 #[derive(PartialEq)]
 #[derive(Eq)]
-#[cfg_attr(feature = "std", derive(::serde::Serialize))]
-#[cfg_attr(feature = "std", derive(::serde::Deserialize))]
-#[cfg_attr(feature = "std", derive(::thiserror::Error))]
+#[derive(PartialOrd)]
+#[derive(Ord)]
+#[derive(Hash)]
+#[derive(::strum_macros::EnumCount)]
+#[derive(::strum_macros::EnumIs)]
+#[derive(::thiserror::Error)]
+#[derive(::serde::Serialize)]
+#[derive(::serde::Deserialize)]
 pub enum Error {
-    #[cfg_attr(feature = "std", error("Overflow"))]
+    #[error("")]
     Overflow,
-    #[cfg_attr(feature = "std", error(""))]
+    #[error("")]
     Underflow,
-    #[cfg_attr(feature = "std", error(""))]
+    #[error("")]
     DivisionByZero,
-    #[cfg_attr(feature = "std", error(""))]
+    #[error("")]
     ModuloByZero,
-    #[cfg_attr(feature = "std", error(""))]
+    #[error("")]
     ShiftOverflow,
-    #[cfg_attr(feature = "std", error(""))]
+    #[error("")]
     NegationOverflow,
-    #[cfg_attr(feature = "std", error(""))]
+    #[error("")]
     UnsupportedConversion
 }
 

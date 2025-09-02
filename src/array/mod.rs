@@ -30,15 +30,21 @@ pub type Result<T> = ::core::result::Result<T, Error>;
 #[repr(u8)]
 #[derive(Debug)]
 #[derive(Clone)]
-#[cfg_attr(feature = "std", derive(::serde::Serialize))]
-#[cfg_attr(feature = "std", derive(::serde::Deserialize))]
-#[cfg_attr(feature = "std", derive(::thiserror::Error))]
+#[derive(PartialEq)]
+#[derive(Eq)]
+#[derive(PartialOrd)]
+#[derive(Ord)]
+#[derive(::strum_macros::EnumCount)]
+#[derive(::strum_macros::EnumIs)]
+#[derive(::thiserror::Error)]
+#[derive(::serde::Serialize)]
+#[derive(::serde::Deserialize)]
 pub enum Error {
-    #[cfg_attr(feature = "std", error("Overflow"))]
+    #[error("Overflow")]
     Overflow,
-    #[cfg_attr(feature = "std", error("Key out of bounds"))]
+    #[error("Key out of bounds")]
     KeyOutOfBounds,
-    #[cfg_attr(feature = "std", error("Empty"))]
+    #[error("Empty")]
     Empty
 }
 
@@ -328,7 +334,17 @@ where
     }
 }
 
-#[cfg(feature = "std")]
+impl<const A: usize, B> ::core::hash::Hash for Array<A, B> 
+where
+    B: Copy,
+    B: ::core::hash::Hash {
+    fn hash<H: ::core::hash::Hasher>(&self, state: &mut H) {
+        for byte in self.as_slice() {
+            byte.hash(state);
+        }
+    }
+}
+
 impl<const A: usize, B> ::serde::Serialize for Array<A, B>
 where
     B: Copy,
@@ -340,7 +356,6 @@ where
     }
 }
 
-#[cfg(feature = "std")]
 impl<'de, const A: usize, B> ::serde::Deserialize<'de> for Array<A, B>
 where
     B: Copy,
@@ -348,18 +363,36 @@ where
     fn deserialize<D>(deserializer: D) -> ::core::result::Result<Self, D::Error>
     where
         D: serde::Deserializer<'de> {
-        let vec: Vec<B> = Vec::deserialize(deserializer)?;
-        if vec.len() > A {
-            return Err(::serde::de::Error::custom("Array overflow during deserialization"));
+        use serde::de::{self, Deserializer, SeqAccess, Visitor};
+        use core::fmt;
+
+        struct ArrayVisitor<const N: usize, B> {
+            marker: core::marker::PhantomData<B>,
         }
-        let mut ret = Array::<A, B>::default();
-        for item in vec {
-            ret
-                .push(item)
-                .ok()
-                .ok_or(::serde::de::Error::custom("Array overflow during deserialization"))?;
+
+        impl<'de, const N: usize, B> Visitor<'de> for ArrayVisitor<N, B>
+        where
+            B: Copy + serde::Deserialize<'de> {
+            type Value = Array<N, B>;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                write!(formatter, "an array of at most {} elements", N)
+            }
+
+            fn visit_seq<A>(self, mut seq: A) -> ::core::result::Result<Self::Value, A::Error>
+            where
+                A: SeqAccess<'de>,
+            {
+                let mut arr = Array::<N, B>::default();
+                while let Some(value) = seq.next_element()? {
+                    arr.push(value)
+                        .map_err(|_| de::Error::custom("array overflow"))?;
+                }
+                Ok(arr)
+            }
         }
-        Ok(ret)
+
+        deserializer.deserialize_seq(ArrayVisitor::<A, B> { marker: core::marker::PhantomData })
     }
 }
 
