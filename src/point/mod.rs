@@ -14,8 +14,8 @@ type Q<const A: u8, B, C> = q::Q<A, B, q::DefaultMode, C>;
 #[derive(Copy)]
 #[derive(PartialEq)]
 #[derive(Eq)]
-#[cfg_attr(feature = "std", derive(::serde::Serialize))]
-#[cfg_attr(feature = "std", derive(::serde::Deserialize))]
+#[derive(::serde::Serialize)]
+#[derive(::serde::Deserialize)]
 pub struct Point<const A: u8, const B: usize, C, D = q::DefaultEngine>
 where
     C: ops::Int,
@@ -35,12 +35,8 @@ where
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<C>,
     (): q::Supported<A, C> {
-    pub const fn dimensions(&self) -> usize {
+    pub const fn len(&self) -> usize {
         B
-    }
-
-    pub const fn is_empty(&self) -> bool {
-        self.dimensions.len() == 0
     }
 
     pub fn dimension(&self, k: usize) -> Option<&Q<A, C, D>> {

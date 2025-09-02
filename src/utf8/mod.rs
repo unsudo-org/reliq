@@ -16,11 +16,11 @@ pub type Result<T> = ::core::result::Result<T, Error>;
 #[derive(::serde::Serialize)]
 #[derive(::serde::Deserialize)]
 pub enum Error {
-    #[error("")]
+    #[error("Overflow.")]
     Overflow,
-    #[error("")]
+    #[error("Invalid sequence.")]
     InvalidSequence,
-    #[error("")]
+    #[error("Empty.")]
     Empty
 }
 

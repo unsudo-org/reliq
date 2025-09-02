@@ -9,22 +9,21 @@ pub type Result<T> = ::core::result::Result<T, Error>;
 #[derive(Eq)]
 #[derive(PartialOrd)]
 #[derive(Ord)]
-#[derive(Hash)]
 #[derive(::strum_macros::EnumCount)]
 #[derive(::strum_macros::EnumIs)]
 #[derive(::thiserror::Error)]
 #[derive(::serde::Serialize)]
 #[derive(::serde::Deserialize)]
 pub enum Error {
-    #[error("")]
+    #[error("{0}")]
     OpsError(#[from] ops::Error),
-    #[error("")]
+    #[error("{0}")]
     QError(#[from] q::Error),
-    #[error("")]
+    #[error("Illegal hex.")]
     IllegalHex,
-    #[error("")]
+    #[error("Alpha overflow.")]
     AlphaOverflow,
-    #[error("")]
+    #[error("Alpha underflow.")]
     AlphaUnderflow
 }
 
@@ -91,19 +90,19 @@ where
                     let a: B = a
                         .try_into()
                         .ok()
-                        .ok_or(q::Error::UnsupportedOperation)?;
+                        .ok_or(q::Error::UnsupportedConversion)?;
                     let a: q::Q<A, B, q::DefaultMode, C> = a.into();
                     let b: B = b
                         .try_into()
                         .ok()
-                        .ok_or(q::Error::UnsupportedOperation)?;
+                        .ok_or(q::Error::UnsupportedConversion)?;
                     let b: q::Q<A, B, q::DefaultMode, C> = b.into();
                     let ret: q::Q<A, B, q::DefaultMode, C> = ((a + (b - a)?)? * t)?;
                     let ret: B = ret.as_int();
                     let ret: u8 = ret
                         .try_into()
                         .ok()
-                        .ok_or(q::Error::UnsupportedOperation)?;
+                        .ok_or(q::Error::UnsupportedConversion)?;
                     Ok(ret)
                 };
                 let r: u8 = lerp(r_0, r_1)?;
@@ -116,19 +115,19 @@ where
                     let a: B = a
                         .try_into()
                         .ok()
-                        .ok_or(q::Error::UnsupportedOperation)?;
+                        .ok_or(q::Error::UnsupportedConversion)?;
                     let a: q::Q::<A, B, q::DefaultMode, C> = a.into();
                     let b: B = b
                         .try_into()
                         .ok()
-                        .ok_or(q::Error::UnsupportedOperation)?;
+                        .ok_or(q::Error::UnsupportedConversion)?;
                     let b: q::Q::<A, B, q::DefaultMode, C> = b.into();
                     let ret: q::Q<A, B, q::DefaultMode, C> = ((a + (b - a)?)? * t)?;
                     let ret: B = ret.as_int();
                     let ret: u8 = ret
                         .try_into()
                         .ok()
-                        .ok_or(q::Error::UnsupportedOperation)?;
+                        .ok_or(q::Error::UnsupportedConversion)?;
                     Ok(ret)
                 };
                 let a: q::Q<A, B, q::DefaultMode, C> = {

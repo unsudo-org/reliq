@@ -32,19 +32,19 @@ pub type Result<T> = ::core::result::Result<T, Error>;
 #[derive(::serde::Serialize)]
 #[derive(::serde::Deserialize)]
 pub enum Error {
-    #[error("")]
+    #[error("Overflow.")]
     Overflow,
-    #[error("")]
+    #[error("Underflow.")]
     Underflow,
-    #[error("")]
+    #[error("Division by zero.")]
     DivisionByZero,
-    #[error("")]
+    #[error("Modulo by zero.")]
     ModuloByZero,
-    #[error("")]
+    #[error("Shift overflow.")]
     ShiftOverflow,
-    #[error("")]
+    #[error("Negation overflow.")]
     NegationOverflow,
-    #[error("")]
+    #[error("Unsupported conversion.")]
     UnsupportedConversion
 }
 

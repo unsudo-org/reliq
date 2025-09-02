@@ -19,8 +19,8 @@ pub type Result<T> = ::core::result::Result<T, Error>;
 #[derive(::serde::Serialize)]
 #[derive(::serde::Deserialize)]
 pub enum Error {
-    #[error("")]
-    OutOfSpace
+    #[error("Overflow.")]
+    Overflow
 }
 
 #[allow(deprecated)]
@@ -78,7 +78,7 @@ where
     #[inline]
     pub fn insert(&mut self, key: B, data: C) -> Result<()> {
         if self.len >= A {
-            return Err(Error::OutOfSpace)
+            return Err(Error::Overflow)
         }
         let mut position: usize = self.hash_index(&key);
         for _ in 0..A {
@@ -96,7 +96,7 @@ where
                 _ => position = (position + 1) % A
             }
         }
-        Err(Error::OutOfSpace)
+        Err(Error::Overflow)
     }
 
     #[inline]
