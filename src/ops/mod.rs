@@ -10,6 +10,7 @@
     pub root
     pub sign
     pub signed
+    pub to_prim
     pub trig
     pub unsigned
     pub wrapping
@@ -28,7 +29,8 @@ pub enum Error {
     DivisionByZero,
     ModuloByZero,
     ShiftOverflow,
-    NegationOverflow
+    NegationOverflow,
+    UnsupportedConversion
 }
 
 pub trait Int
@@ -127,6 +129,7 @@ pub trait Num
 where
     Self: QuickAccess,
     Self: Sqrt,
+    Self: ToPrim,
     Self: ::core::default::Default,
     Self: ::core::clone::Clone,
     Self: ::core::marker::Sized,
@@ -253,6 +256,7 @@ impl<T> Num for T
 where
     T: QuickAccess,
     T: Sqrt,
+    T: ToPrim,
     T: ::core::default::Default,
     T: ::core::clone::Clone,
     T: ::core::marker::Sized,
