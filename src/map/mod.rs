@@ -24,6 +24,7 @@ pub enum Error {
 }
 
 #[allow(deprecated)]
+#[derive(Debug)]
 #[derive(Clone)]
 pub struct Map<const A: usize, B, C, D = ::core::hash::SipHasher> 
 where
