@@ -46,6 +46,7 @@ where
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
     Hex(u32),
+    Hsl(u16, q::Q<A, B, q::DefaultMode, C>, q::Q<A, B, q::DefaultMode, C>, q::Q<A, B, q::DefaultMode, C>),
     Rgb(u8, u8, u8),
     Rgba(u8, u8, u8, q::Q<A, B, q::DefaultMode, C>)
 }
@@ -95,7 +96,7 @@ where
 
     #[inline]
     pub fn saturate(self, multiplier: q::Q<A, B, C>) -> Result<Self> {
-        
+
     }
 
     #[inline]
@@ -282,6 +283,8 @@ where
             }
         }
     }
+
+
 }
 
 impl<const A: u8, B, C> From<(u8, u8, u8)> for Color<A, B, C>
