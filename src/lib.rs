@@ -9,4 +9,5 @@ pub mod map;
 pub mod ops;
 pub mod point;
 pub mod q;
+pub mod set;
 pub mod utf8;

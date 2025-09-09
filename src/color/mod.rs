@@ -1,5 +1,8 @@
 use super::*;
 
+// provide common colors as constants.
+
+
 pub type Result<T> = ::core::result::Result<T, Error>;
 
 #[repr(u8)]
@@ -72,6 +75,49 @@ where
     pub fn is_rgba(self) -> bool {
         let ret: Self = self.normalize();
         matches!(ret, Self::Rgba(_, _, _, _))
+    }
+
+    // where multiplier is like 0.0 to 1.0 and more
+    #[inline]
+    pub fn lighten(self, multiplier: q::Q<A, B, C>) -> Result<Self> {
+
+    }
+
+    // where multiplier is like 0.0 to 1.0 and more
+    #[inline]
+    pub fn darken(self, multiplier: q::Q<A, B, C>) -> Result<Self> {
+
+    }
+
+    #[inline]
+    pub fn saturate(self, multiplier: q::Q<A, B, C>) -> Result<Self> {
+
+    }
+
+    #[inline]
+    pub fn desaturate(self, multiplier: q::Q<A, B, C>) -> Result<Self> {
+
+    }
+
+    #[inline]
+    pub fn complement(self) -> Result<Self> {
+
+    }
+
+    pub fn triadic(self) {
+
+    }
+
+    pub fn tetradic(self) {
+
+    }
+
+    pub fn analogous(self) {
+
+    }
+
+    pub fn monochromatic(self) {
+
     }
 
     #[inline]
