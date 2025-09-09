@@ -77,21 +77,25 @@ where
         matches!(ret, Self::Rgba(_, _, _, _))
     }
 
-    // where multiplier is like 0.0 to 1.0 and more
     #[inline]
-    pub fn lighten(self, multiplier: q::Q<A, B, C>) -> Result<Self> {
-
+    pub fn lighten<D>(self, multiplier: D) -> Result<Self> 
+    where
+        D: Into<q::Q<A, B, q::DefaultMode, C>> {
+        let multiplier: q::Q<A, B, q::DefaultMode, C> = multiplier.into();
+        self.interpolate::<_, q::Q<A, B, q::DefaultMode, C>>((255, 255, 255), multiplier)
     }
 
-    // where multiplier is like 0.0 to 1.0 and more
     #[inline]
-    pub fn darken(self, multiplier: q::Q<A, B, C>) -> Result<Self> {
-
+    pub fn darken<D>(self, multiplier: D) -> Result<Self> 
+    where
+        D: Into<q::Q<A, B, q::DefaultMode, C>> {
+        let multiplier: q::Q<A, B, q::DefaultMode, C> = multiplier.into();
+        self.interpolate::<_, q::Q<A, B, q::DefaultMode, C>>((0, 0, 0), multiplier)
     }
 
     #[inline]
     pub fn saturate(self, multiplier: q::Q<A, B, C>) -> Result<Self> {
-
+        
     }
 
     #[inline]
