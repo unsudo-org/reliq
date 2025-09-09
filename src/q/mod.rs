@@ -85,14 +85,14 @@ where
     }
 
     #[inline]
-    pub fn cast<const E: u8>(self) -> Result<Q<E, B, C, D>> 
+    pub fn cast<const E: u8>(self) -> Result<lossy::Lossy<Q<E, B, C, D>>> 
     where
         (): SupportedPrecision<E>,
         (): Supported<E, B> {
         let ret: B = self.n;
         let ret: B = D::cast::<A, E, _>(ret)?;
         let ret: Q<E, B, C, D> = ret.into();
-        Ok(ret)
+        Ok(lossy::Lossy::new(ret))
     }
 
     #[inline]

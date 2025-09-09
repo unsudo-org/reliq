@@ -46,9 +46,10 @@ where
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
     Hex(u32),
-    Hsl(u16, q::Q<A, B, q::DefaultMode, C>, q::Q<A, B, q::DefaultMode, C>, q::Q<A, B, q::DefaultMode, C>),
+    Hsl(u16, q::Q<A, B, q::DefaultMode, C>, q::Q<A, B, q::DefaultMode, C>),
     Rgb(u8, u8, u8),
-    Rgba(u8, u8, u8, q::Q<A, B, q::DefaultMode, C>)
+    Rgba(u8, u8, u8, q::Q<A, B, q::DefaultMode, C>),
+    Hsla(u16, q::Q<A, B, q::DefaultMode, C>, q::Q<A, B, q::DefaultMode, C>, q::Q<A, B, q::DefaultMode, C>)
 }
 
 impl<const A: u8, B, C> Color<A, B, C>
@@ -95,12 +96,16 @@ where
     }
 
     #[inline]
-    pub fn saturate(self, multiplier: q::Q<A, B, C>) -> Result<Self> {
+    pub fn saturate<D>(self, multiplier: q::Q<A, B, C>) -> Result<Self> 
+    where
+        D: Into<q::Q<A, B, q::DefaultMode, C>> {
 
     }
 
     #[inline]
-    pub fn desaturate(self, multiplier: q::Q<A, B, C>) -> Result<Self> {
+    pub fn desaturate<D>(self, multiplier: q::Q<A, B, C>) -> Result<Self> 
+    where
+        D: Into<q::Q<A, B, q::DefaultMode, C>> {
 
     }
 
@@ -121,7 +126,7 @@ where
 
     }
 
-    pub fn monochromatic(self) {
+    pub fn monochromatic<const D: usize>(self) -> array::Array<D, Self> {
 
     }
 
@@ -268,7 +273,25 @@ where
     }
 
     #[inline]
-    fn normalize(self) -> Self {
+    pub fn as_hsl(self) -> lossy::Lossy<Self> {
+        match self.normalize() {
+            Self::Hex(code) => {
+                let (r, g, b) = (
+                    ((code >> 16) & 0xFF) as u8,
+                    ((code >> 8) & 0xFF) as u8,
+                    (code & 0xFF) as u8
+                );
+                let (h, s, l) = Self::rgb_to_hsl(r, g, b);
+                Self::Hsl(h, s, l)
+            },
+            Self::Rgb(r, g, b) | Self::Rgba(r, g, b, _) => {
+                
+            }
+        }
+    }
+
+    #[inline]
+    fn normalize(self) -> lossy::Lossy<Self> {
         match self {
             Self::Hex(code) => {
                 let ret: u32 = code.clamp(0x000000, 0xFFFFFF);
@@ -301,7 +324,7 @@ where
         let r: u8 = value.0;
         let g: u8 = value.1;
         let b: u8 = value.2;
-        Self::Rgb(r, g, b).normalize()
+        Self::Rgb(r, g, b).normalize().allow_lossy()
     }
 }
 

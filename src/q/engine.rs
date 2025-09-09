@@ -21,7 +21,7 @@ where
     Self: Clone,
     Self: Copy {
     #[inline]
-    fn sqrt<const A: u8, B>(n: F<B>) -> Result<F<B>>
+    fn sqrt<const A: u8, B>(n: F<B>) -> Result<lossy::Lossy<F<B>>>
     where
         B: ops::Int,
         B: ops::Prim,
@@ -33,7 +33,7 @@ where
             return Err(Error::Underflow)
         }
         if n == B::AS_0 || n == B::AS_1 {
-            return Ok(n)
+            return Ok(lossy::Lossy::new(n))
         }
         let mut ret: B = n.checked_div(B::AS_2).ok_or(Error::DivisionByZero)?;
         let mut last: B;
@@ -49,7 +49,7 @@ where
     }
 
     #[inline]
-    fn tan<const A: u8, B>(angle: Rad<F<B>>) -> Result<Ratio<F<B>>>
+    fn tan<const A: u8, B>(angle: Rad<F<B>>) -> Result<lossy::Lossy<Ratio<F<B>>>>
     where
         B: ops::Int,
         B: ops::Prim,
@@ -60,7 +60,7 @@ where
     }
 
     #[inline]
-    fn sin<const A: u8, B>(angle: Rad<F<B>>) -> Result<Ratio<F<B>>>
+    fn sin<const A: u8, B>(angle: Rad<F<B>>) -> Result<lossy::Lossy<Ratio<F<B>>>>
     where
         B: ops::Int,
         B: ops::Prim,
@@ -71,7 +71,7 @@ where
     }
 
     #[inline]
-    fn cos<const A: u8, B>(angle: Rad<F<B>>) -> Result<Ratio<F<B>>>
+    fn cos<const A: u8, B>(angle: Rad<F<B>>) -> Result<lossy::Lossy<Ratio<F<B>>>>
     where
         B: ops::Int,
         B: ops::Prim,
@@ -150,7 +150,7 @@ where
     }
 
     #[inline]
-    fn cast<const A: u8, const B: u8, C>(n: F<C>) -> Result<F<C>>
+    fn cast<const A: u8, const B: u8, C>(n: F<C>) -> Result<lossy::Lossy<F<C>>>
     where
         C: ops::Int,
         C: ops::Prim,
@@ -161,7 +161,7 @@ where
         (): Supported<B, C> {
         let old_scale: C = scale::<A, _>();
         let new_scale: C = scale::<B, _>();
-        Self::muldiv(n, new_scale, old_scale)
+        Ok(lossy::Lossy::new(Self::muldiv(n, new_scale, old_scale)?))
     }
 
     #[inline]
