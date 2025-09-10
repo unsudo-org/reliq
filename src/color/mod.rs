@@ -135,9 +135,9 @@ where
     where
         D: Into<Self>,
         E: Into<q::Q<A, B, q::DefaultMode, C>> {
-        let x: Color<A, B, C> = self.normalize();
+        let x: Color<A, B, C> = self.normalize().anyhow();
         let y: Self = rhs.into();
-        let y: Color<A, B, C> = y.normalize();
+        let y: Color<A, B, C> = y.normalize().anyhow();
         let t: q::Q<A, B, q::DefaultMode, C> = t.into();
         let t: q::Q<A, B, q::DefaultMode, C> = t.clamp(q::as_0(), q::as_1());
         match (x, y) {
@@ -223,7 +223,7 @@ where
     }
 
     #[inline]
-    pub fn as_hex(self) -> Self {
+    pub fn to_hex(self) -> Self {
         match self.normalize() {
             Self::Rgb(r, g, b) => {
                 
@@ -241,23 +241,25 @@ where
     }
 
     #[inline]
-    pub fn as_rgb(self) -> Self {
-        match self.normalize() {
+    pub fn to_rgb(self) -> Lossy<Self> {
+        match self.normalize().anyhow() {
             Self::Hex(hex) => {
                 let (r, g, b) = (
-                    ((hex >> 16) & 0xff) as u8,
-                    ((hex >> 8) & 0xff) as u8,
+                    ((hex >> 16) & 0xFF) as u8,
+                    ((hex >> 8) & 0xFF) as u8,
                     (hex & 0xff) as u8
                 );
                 Self::Rgb(r, g, b)
             },
-            Self::Rgba(r, g, b, _) => Self::Rgb(r, g, b),
-            Self::Rgb(_, _, _) => self
+            Self::Hsl(, , ) => ,
+            Self::Rgb(_, _, _) => Exact(self),
+            Self::Rgba(r, g, b, _) => Trunc(Self::Rgb(r, g, b)),
+            Self::Hsla(, , , )
         }
     }
 
     #[inline]
-    pub fn as_rgba(self) -> Self {
+    pub fn to_rgba(self) -> Self {
         match self.normalize() {
             Self::Hex(hex) => {
                 let (r, g, b) = (
@@ -273,8 +275,8 @@ where
     }
 
     #[inline]
-    pub fn as_hsl(self) -> lossy::Lossy<Self> {
-        match self.normalize() {
+    pub fn to_hsl(self) -> Lossy<Self> {
+        match self.normalize().anyhow() {
             Self::Hex(code) => {
                 let (r, g, b) = (
                     ((code >> 16) & 0xFF) as u8,
@@ -290,8 +292,12 @@ where
         }
     }
 
+    pub fn to_hsla(self) -> Self {
+
+    }
+
     #[inline]
-    fn normalize(self) -> lossy::Lossy<Self> {
+    fn normalize(self) -> Lossy<Self> {
         match self {
             Self::Hex(code) => {
                 let ret: u32 = code.clamp(0x000000, 0xFFFFFF);
@@ -324,7 +330,7 @@ where
         let r: u8 = value.0;
         let g: u8 = value.1;
         let b: u8 = value.2;
-        Self::Rgb(r, g, b).normalize().allow_lossy()
+        Self::Rgb(r, g, b).normalize().anyhow()
     }
 }
 
@@ -339,7 +345,7 @@ where
     (): q::Supported<1, B> {
     #[inline]
     fn from(value: u32) -> Self {
-        Self::Hex(value).normalize()
+        Self::Hex(value).normalize().anyhow()
     }
 }
 
@@ -455,8 +461,8 @@ where
                 && a_0 == a_1
             },
             (o_0, o_1) => {
-                let o_0: Self = o_0.as_rgba();
-                let o_1: Self = o_1.as_rgba();
+                let o_0: Self = o_0.to_rgba();
+                let o_1: Self = o_1.to_rgba();
                 o_0 == o_1
             }
         }

@@ -90,9 +90,10 @@ where
         (): SupportedPrecision<E>,
         (): Supported<E, B> {
         let ret: B = self.n;
-        let ret: B = D::cast::<A, E, _>(ret)?;
+        let ret: B = D::cast::<A, E, _>(ret)?.anyhow();
         let ret: Q<E, B, C, D> = ret.into();
-        Ok(lossy::Lossy::new(ret))
+        let ret: lossy::Lossy<_> = ret.into();
+        Ok(ret)
     }
 
     #[inline]
@@ -111,10 +112,11 @@ where
     (): SupportedInt<B>,
     (): Supported<A, B> {
     #[inline]
-    pub fn sqrt(self) -> Result<Self> {
+    pub fn sqrt(self) -> Result<approximate::Approximate<Self>> {
         let ret: B = self.n;
-        let ret: B = D::sqrt(ret)?;
+        let ret: B = D::sqrt(ret)?.allow_approximation();
         let ret: Self = ret.into();
+        let ret: approximate::Approximate<_> = ret.into();
         Ok(ret)
     }
 

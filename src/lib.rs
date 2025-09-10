@@ -2,6 +2,10 @@
 #![allow(clippy::let_with_type_underscore)]
 #![cfg_attr(not(feature = "std"), no_std)]
 
+use lossy::Lossy;
+use lossy::Lossy::Exact;
+use lossy::Lossy::Trunc;
+
 pub mod array;
 pub mod color;
 pub mod fail_safe;

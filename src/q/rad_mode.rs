@@ -47,11 +47,11 @@ where
     (): SupportedInt<B>,
     (): Supported<A, B> {
     #[inline]
-    pub fn tan(self) -> Result<Ratio<Q<A, B, DefaultMode, C>>> {
+    pub fn tan(self) -> Result<approximate::Approximate<Ratio<Q<A, B, DefaultMode, C>>>> {
         let ret: B = self.n;
-        let ret: B = C::tan(ret)?;
+        let ret: B = C::tan(ret)?.allow_approximation();
         let ret: Q<A, B, DefaultMode, C> = ret.into();
-        Ok(ret)
+        Ok(lossy::Lossy::new(ret))
     }
 
     #[inline]
