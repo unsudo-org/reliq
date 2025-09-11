@@ -15,7 +15,7 @@ macro_rules! r#as {
                     (): Supported<1, B> {
                     let ret: B = B::[< AS _ $n >];
                     let ret: B = unsafe {
-                        C::cast::<1, A, _>(ret).unwrap_unchecked()
+                        C::cast::<1, A, _>(ret).unwrap_unchecked().anyhow()
                     };
                     let ret: Q<A, B, DefaultMode, C> = ret.into();
                     ret

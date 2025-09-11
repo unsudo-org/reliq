@@ -28,6 +28,8 @@ pub type Result<T> = ::core::result::Result<T, Error>;
 #[derive(::serde::Serialize)]
 #[derive(::serde::Deserialize)]
 pub enum Error {
+    #[error("{0}")]
+    OpsError(#[from] ops::Error),
     #[error("Overflow.")]
     Overflow,
     #[error("Underflow.")]
@@ -37,7 +39,9 @@ pub enum Error {
     #[error("Modulo by zero.")]
     ModuloByZero,
     #[error("Unsupported conversion.")]
-    UnsupportedConversion
+    UnsupportedConversion,
+    #[error("")]
+    OutOfBounds
 }
 
 /// # Where
@@ -89,11 +93,17 @@ where
     where
         (): SupportedPrecision<E>,
         (): Supported<E, B> {
-        let ret: B = self.n;
-        let ret: B = D::cast::<A, E, _>(ret)?.anyhow();
-        let ret: Q<E, B, C, D> = ret.into();
-        let ret: lossy::Lossy<_> = ret.into();
-        Ok(ret)
+        let n: B = self.n;
+        match D::cast::<A, E, _>(n)? {
+            lossy::Lossy::Exact(n) => {
+                let n: Q<E, B, C, D> = n.into();
+                Ok(lossy::Lossy::Exact(n))
+            },
+            lossy::Lossy::Trunc(n) => {
+                let n: Q<E, B, C, D> = n.into();
+                Ok(lossy::Lossy::Trunc(n))
+            }
+        }
     }
 
     #[inline]
@@ -112,11 +122,10 @@ where
     (): SupportedInt<B>,
     (): Supported<A, B> {
     #[inline]
-    pub fn sqrt(self) -> Result<approximate::Approximate<Self>> {
+    pub fn sqrt(self) -> Result<Self> {
         let ret: B = self.n;
-        let ret: B = D::sqrt(ret)?.allow_approximation();
+        let ret: B = D::sqrt(ret)?;
         let ret: Self = ret.into();
-        let ret: approximate::Approximate<_> = ret.into();
         Ok(ret)
     }
 

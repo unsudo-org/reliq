@@ -47,15 +47,15 @@ where
     (): SupportedInt<B>,
     (): Supported<A, B> {
     #[inline]
-    pub fn tan(self) -> Result<approximate::Approximate<Ratio<Q<A, B, DefaultMode, C>>>> {
+    pub fn tan(self) -> Result<Q<A, B, DefaultMode, C>> {
         let ret: B = self.n;
-        let ret: B = C::tan(ret)?.allow_approximation();
+        let ret: B = C::tan(ret)?;
         let ret: Q<A, B, DefaultMode, C> = ret.into();
-        Ok(lossy::Lossy::new(ret))
+        Ok(ret)
     }
 
     #[inline]
-    pub fn sin(self) -> Result<Ratio<Q<A, B, DefaultMode, C>>> {
+    pub fn sin(self) -> Result<Q<A, B, DefaultMode, C>> {
         let ret: B = self.n;
         let ret: B = C::sin(ret)?;
         let ret: Q<A, B, DefaultMode, C> = ret.into();
@@ -63,7 +63,7 @@ where
     }
 
     #[inline]
-    pub fn cos(self) -> Result<Ratio<Q<A, B, DefaultMode, C>>> {
+    pub fn cos(self) -> Result<Q<A, B, DefaultMode, C>> {
         let ret: B = self.n;
         let ret: B = C::cos(ret)?;
         let ret: Q<A, B, DefaultMode, C> = ret.into();

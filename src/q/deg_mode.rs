@@ -47,17 +47,17 @@ where
     (): SupportedInt<B>,
     (): Supported<A, B> {
     #[inline]
-    pub fn tan(self) -> Result<Ratio<Q<A, B, DefaultMode, C>>> {
+    pub fn tan(self) -> Result<Q<A, B, DefaultMode, C>> {
         self.to_rad()?.tan()
     }
 
     #[inline]
-    pub fn sin(self) -> Result<Ratio<Q<A, B, DefaultMode, C>>> {
+    pub fn sin(self) -> Result<Q<A, B, DefaultMode, C>> {
         self.to_rad()?.sin()
     }
 
     #[inline]
-    pub fn cos(self) -> Result<Ratio<Q<A, B, DefaultMode, C>>> {
+    pub fn cos(self) -> Result<Q<A, B, DefaultMode, C>> {
         self.to_rad()?.cos()
     }
 

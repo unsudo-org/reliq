@@ -1,10 +1,5 @@
 use super::*;
 
-pub type F<T> = T;
-pub type Rad<T> = T;
-pub type Deg<T> = T;
-pub type Ratio<T> = T;
-
 #[repr(transparent)]
 #[derive(Debug)]
 #[derive(Clone)]
@@ -21,7 +16,7 @@ where
     Self: Clone,
     Self: Copy {
     #[inline]
-    fn sqrt<const A: u8, B>(n: F<B>) -> Result<<F<B>>>
+    fn sqrt<const A: u8, B>(n: B) -> Result<B>
     where
         B: ops::Int,
         B: ops::Prim,
@@ -49,31 +44,31 @@ where
     }
 
     #[inline]
-    fn tan<const A: u8, B>(angle: Rad<F<B>>) -> Result<<Ratio<F<B>>>
+    fn tan<const A: u8, B>(rad_angle: B) -> Result<B>
     where
         B: ops::Int,
         B: ops::Prim,
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
         (): Supported<A, B> {
-        let x: B = Self::sin(angle)?;
-        let y: B = Self::cos(angle)?;
+        let x: B = Self::sin(rad_angle)?;
+        let y: B = Self::cos(rad_angle)?;
         Ok(Self::div(x, y)?.into())
     }
 
     #[inline]
-    fn sin<const A: u8, B>(angle: Rad<F<B>>) -> Result<<F<B>>>
+    fn sin<const A: u8, B>(rad_angle: B) -> Result<B>
     where
         B: ops::Int,
         B: ops::Prim,
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
         (): Supported<A, B> {
-        Self::cos(Self::sub(Self::to_rad::<A, B>(deg90()?)?, angle)?)
+        Self::cos(Self::sub(Self::to_rad::<A, B>(deg90()?)?, rad_angle)?)
     }
 
     #[inline]
-    fn cos<const A: u8, B>(angle: Rad<F<B>>) -> Result<Ratio<F<B>>>
+    fn cos<const A: u8, B>(rad_angle: B) -> Result<B>
     where
         B: ops::Int,
         B: ops::Prim,
@@ -86,7 +81,7 @@ where
             let pi_2: B = pi.checked_mul(B::AS_2).ok_or(Error::Overflow)?;
             (scale, pi, pi_2)
         };
-        let mut n: B = angle % pi_2;
+        let mut n: B = rad_angle % pi_2;
         if n < B::AS_0 {
             n = n.checked_add(pi_2).ok_or(Error::Overflow)?;
         }
@@ -117,42 +112,42 @@ where
     }
 
     #[inline]
-    fn to_rad<const A: u8, B>(angle: Deg<F<B>>) -> Result<Rad<F<B>>>
+    fn to_rad<const A: u8, B>(deg_angle: B) -> Result<B>
     where
         B: ops::Int,
         B: ops::Prim,
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
         (): Supported<A, B> {
-        Self::muldiv(angle, pi::<A, _>(), as_180::<B>() * scale::<A, B>())
+        Self::muldiv(deg_angle, pi::<A, _>(), as_180::<B>() * scale::<A, B>())
     }
 
     #[inline]
-    fn to_deg<const A: u8, B>(angle: Rad<F<B>>) -> Result<Deg<F<B>>>
+    fn to_deg<const A: u8, B>(rad_angle: B) -> Result<B>
     where
         B: ops::Int,
         B: ops::Prim,
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
         (): Supported<A, B> {
-        Self::muldiv(angle, as_180::<B>() * scale::<A, B>(), pi())
+        Self::muldiv(rad_angle, as_180::<B>() * scale::<A, B>(), pi())
     }
 
     #[inline]
-    fn lerp<const A: u8, B>(x: F<B>, y: F<B>, t: F<B>) -> Result<F<B>>
+    fn lerp<const A: u8, B>(x: B, y: B, t: B) -> Result<B>
     where
         B: ops::Int,
         B: ops::Prim,
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
         (): Supported<A, B> {
-        let d: F<_> = Self::sub(y, x)?;
-        let s: F<_> = Self::muldiv(d, t, scale())?;
+        let d: B = Self::sub(y, x)?;
+        let s: B = Self::muldiv(d, t, scale())?;
         Self::add(x, s)
     }
 
     #[inline]
-    fn cast<const A: u8, const B: u8, C>(n: F<C>) -> Result<Lossy<F<C>>>
+    fn cast<const A: u8, const B: u8, C>(n: C) -> Result<lossy::Lossy<C>>
     where
         C: ops::Int,
         C: ops::Prim,
@@ -165,14 +160,14 @@ where
         let new_scale: C = scale::<B, _>();
         let ret: C = Self::muldiv(n, new_scale, old_scale)?;
         if B < A {
-            Ok(Trunc(ret))
+            Ok(lossy::Lossy::Trunc(ret))
         } else {
-            Ok(Exact(ret))
+            Ok(lossy::Lossy::Exact(ret))
         }
     }
 
     #[inline]
-    fn to_negative<T>(n: F<T>) -> F<T>
+    fn to_negative<T>(n: T) -> T
     where
         T: ops::Int,
         T: ops::Prim,
@@ -186,7 +181,7 @@ where
     }
 
     #[inline]
-    fn to_positive<T>(n: F<T>) -> F<T>
+    fn to_positive<T>(n: T) -> T
     where
         T: ops::Int,
         T: ops::Prim,
@@ -200,7 +195,7 @@ where
     }
     
     #[inline]
-    fn add<T>(x: F<T>, y: F<T>) -> Result<F<T>>
+    fn add<T>(x: T, y: T) -> Result<T>
     where
         T: ops::Int,
         T: ops::Prim,
@@ -209,7 +204,7 @@ where
     }
 
     #[inline]
-    fn sub<T>(x: F<T>, y: F<T>) -> Result<F<T>>
+    fn sub<T>(x: T, y: T) -> Result<T>
     where
         T: ops::Int,
         T: ops::Prim,
@@ -218,7 +213,7 @@ where
     }
 
     #[inline]
-    fn mul<const A: u8, B>(x: F<B>, y: F<B>) -> Result<F<B>>
+    fn mul<const A: u8, B>(x: B, y: B) -> Result<B>
     where
         B: ops::Int,
         B: ops::Prim,
@@ -232,7 +227,7 @@ where
     }
 
     #[inline]
-    fn div<const A: u8, B>(x: F<B>, y: F<B>) -> Result<F<B>>
+    fn div<const A: u8, B>(x: B, y: B) -> Result<B>
     where
         B: ops::Int,
         B: ops::Prim,
@@ -466,7 +461,7 @@ where
 }
 
 #[inline]
-pub fn deg90<const A: u8, B>() -> Result<Deg<B>>
+fn deg90<const A: u8, B>() -> Result<B>
 where
     B: ops::Int,
     (): SupportedPrecision<A>,
