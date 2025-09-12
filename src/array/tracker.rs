@@ -5,6 +5,8 @@ static mut NEXT_HANDLE: usize = 0;
 #[derive(Debug)]
 #[derive(Clone)]
 #[derive(Copy)]
+#[derive(::serde::Serialize)]
+#[derive(::serde::Deserialize)]
 pub struct Tracker<T>(usize, T);
 
 impl<const A: usize, B> Array<A, Tracker<B>> 

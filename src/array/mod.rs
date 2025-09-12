@@ -45,9 +45,7 @@ pub enum Error {
     #[error("Overflow")]
     Overflow,
     #[error("Key out of bounds")]
-    KeyOutOfBounds,
-    #[error("")]
-    HandleNotAvailable
+    KeyOutOfBounds
 }
 
 #[derive(Debug)]
@@ -93,7 +91,10 @@ where
     }
 
     #[inline]
-    pub const fn get_mut(&mut self, key: usize) -> Option<&mut B> {
+    pub fn get_mut<C>(&mut self, key: C) -> Option<&mut B> 
+    where
+        C: Into<usize> {
+        let key: usize = key.into();
         if key >= self.len {
             return None
         }
@@ -160,7 +161,12 @@ where
     }
 
     #[inline]
-    pub const fn swap_insert(&mut self, key: usize, data: B) -> Option<Result<()>> {
+    pub fn swap_insert<C, D>(&mut self, key: C, item: D) -> Option<Result<()>> 
+    where
+        C: Into<usize>,
+        D: Into<B> {
+        let key: usize = key.into();
+        let data: B = item.into();
         if key > self.len {
             return None
         }
@@ -180,7 +186,7 @@ where
     }
 
     #[inline]
-    pub const fn swap_remove(&mut self, key: usize) -> Option<B> {
+    pub fn swap_remove(&mut self, key: usize) -> Option<B> {
         if key >= self.len {
             return None
         }
@@ -195,7 +201,12 @@ where
     }    
 
     #[inline]
-    pub fn insert(&mut self, key: usize, item: B) -> Option<Result<()>> {
+    pub fn insert<C, D>(&mut self, key: C, item: D) -> Option<Result<()>> 
+    where
+        C: Into<usize>,
+        D: Into<B> {
+        let key: usize = key.into();
+        let item: B = item.into();
         if self.len <= key {
             return None
         }
@@ -211,7 +222,10 @@ where
     }
 
     #[inline]
-    pub fn remove(&mut self, key: usize) -> Option<B> {
+    pub fn remove<C>(&mut self, key: C) -> Option<B> 
+    where
+        C: Into<usize> {
+        let key: usize = key.try_into().ok()?;
         if self.len == 0 || self.len <= key {
             return None
         }
@@ -389,7 +403,7 @@ where
                 A: SeqAccess<'de>,
             {
                 let mut arr = Array::<N, B>::default();
-                while let Some(value) = seq.next_element()? {
+                while let Some(value) = seq.next_element::<B>()? {
                     arr.push(value)
                         .map_err(|_| de::Error::custom("array overflow"))?;
                 }
@@ -429,9 +443,9 @@ fn test_insert_remove_ordered() {
     let mut arr: Array<4, u8> = Array::default();
     arr.push(1).unwrap();
     arr.push(3).unwrap();
-    arr.insert(1, 2).unwrap();
+    arr.insert(1_usize, 2).unwrap();
     assert_eq!(arr.as_slice(), &[1, 2, 3]);
-    let val = arr.remove(1).unwrap();
+    let val = arr.remove(48_usize).unwrap();
     assert_eq!(val, 2);
     assert_eq!(arr.as_slice(), &[1, 3]);
 }
@@ -442,7 +456,7 @@ fn test_swap_insert_remove_unordered() {
     arr.push(10).unwrap();
     arr.push(20).unwrap();
     arr.push(30).unwrap();
-    arr.swap_insert(1, 15).unwrap();
+    arr.swap_insert(1usize, 15).unwrap();
     assert_eq!(arr.len(), 4);
     assert!(arr.as_slice().contains(&15));
 
