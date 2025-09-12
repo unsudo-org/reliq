@@ -1,7 +1,9 @@
 use super::*;
 
 ::modwire::expose!(
+    pub handle
     pub iter
+    pub tracker
 );
 
 #[macro_export]
@@ -44,8 +46,8 @@ pub enum Error {
     Overflow,
     #[error("Key out of bounds")]
     KeyOutOfBounds,
-    #[error("Empty")]
-    Empty
+    #[error("")]
+    HandleNotAvailable
 }
 
 #[derive(Debug)]
@@ -77,24 +79,27 @@ where
     }
 
     #[inline]
-    pub const fn get(&self, key: usize) -> Result<&B> {
+    pub fn get<C>(&self, key: C) -> Option<&B> 
+    where
+        C: Into<usize> {
+        let key: usize = key.into();
         if key >= self.len {
-            return Err(Error::KeyOutOfBounds)
+            return None
         }
         unsafe {
             let ret: &B = &*self.buf[key].as_ptr();
-            Ok(ret)
+            Some(ret)
         }
     }
 
     #[inline]
-    pub const fn get_mut(&mut self, key: usize) -> Result<&mut B> {
+    pub const fn get_mut(&mut self, key: usize) -> Option<&mut B> {
         if key >= self.len {
-            return Err(Error::KeyOutOfBounds)
+            return None
         }
         unsafe {
             let ret: &mut B = &mut *self.buf[key].as_mut_ptr();
-            Ok(ret)
+            Some(ret)
         }
     }
 
@@ -114,7 +119,10 @@ where
     }
 
     #[inline]
-    pub const fn push(&mut self, item: B) -> Result<()> {
+    pub fn push<C>(&mut self, item: C) -> Result<()> 
+    where
+        C: Into<B> {
+        let item: B = item.into();
         if self.len >= A {
             return Err(Error::Overflow)
         }
@@ -124,14 +132,14 @@ where
     }
 
     #[inline]
-    pub const fn pop(&mut self) -> Result<B> {
+    pub const fn pop(&mut self) -> Option<B> {
         if self.len == 0 {
-            return Err(Error::Empty)
+            return None
         }
         self.len -= 1;
         unsafe {
             let ret: B = self.buf[self.len].assume_init_read();
-            Ok(ret)
+            Some(ret)
         }
     }
 
@@ -152,12 +160,12 @@ where
     }
 
     #[inline]
-    pub const fn swap_insert(&mut self, key: usize, data: B) -> Result<()> {
-        if self.len >= A {
-            return Err(Error::Overflow)
-        }
+    pub const fn swap_insert(&mut self, key: usize, data: B) -> Option<Result<()>> {
         if key > self.len {
-            return Err(Error::KeyOutOfBounds)
+            return None
+        }
+        if self.len >= A {
+            return Some(Err(Error::Overflow))
         }
         self.buf[self.len].write(data);
         self.len += 1;
@@ -168,13 +176,13 @@ where
                 self.buf[self.len - 1].write(temporary);
             }
         }
-        Ok(())
+        Some(Ok(()))
     }
 
     #[inline]
-    pub const fn swap_remove(&mut self, key: usize) -> Result<B> {
+    pub const fn swap_remove(&mut self, key: usize) -> Option<B> {
         if key >= self.len {
-            return Err(Error::KeyOutOfBounds)
+            return None
         }
         let ret: B = unsafe {
             self.buf[key].assume_init_read()
@@ -183,32 +191,29 @@ where
             self.buf[key] = self.buf[self.len - 1];
         }
         self.len -= 1;
-        Ok(ret)
+        Some(ret)
     }    
 
     #[inline]
-    pub fn insert(&mut self, key: usize, item: B) -> Result<()> {
-        if self.len >= A {
-            return Err(Error::Overflow)
-        }
+    pub fn insert(&mut self, key: usize, item: B) -> Option<Result<()>> {
         if self.len <= key {
-            return Err(Error::KeyOutOfBounds)
+            return None
+        }
+        if self.len >= A {
+            return Some(Err(Error::Overflow))
         }
         for i in (key..self.len).rev() {
             self.buf[i + 1] = self.buf[i];
         }
         self.buf[key].write(item);
         self.len += 1;
-        Ok(())
+        Some(Ok(()))
     }
 
     #[inline]
-    pub fn remove(&mut self, key: usize) -> Result<B> {
-        if self.len == 0 {
-            return Err(Error::Empty)
-        }
-        if self.len <= key {
-            return Err(Error::KeyOutOfBounds)
+    pub fn remove(&mut self, key: usize) -> Option<B> {
+        if self.len == 0 || self.len <= key {
+            return None
         }
         let item: B = unsafe {
             self.buf[key].assume_init_read()
@@ -217,7 +222,7 @@ where
             self.buf[i] = self.buf[i + 1];
         }
         self.len -= 1;
-        Ok(item)
+        Some(item)
     }
 }
 
@@ -407,8 +412,8 @@ fn test_push_pop() {
     arr.push(item_1).unwrap();
     let len: usize = arr.len();
     assert_eq!(len, 2);
-    let arr_item_0: &u8 = arr.get(0).unwrap();
-    let arr_item_1: &u8 = arr.get(1).unwrap();
+    let arr_item_0: &u8 = arr.get(0_usize).unwrap();
+    let arr_item_1: &u8 = arr.get(1_usize).unwrap();
     assert_eq!(arr_item_0, &item_0);
     assert_eq!(arr_item_1, &item_1);
     let arr_item_1: u8 = arr.pop().unwrap();
