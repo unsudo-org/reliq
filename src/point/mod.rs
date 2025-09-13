@@ -39,8 +39,8 @@ where
         B
     }
 
-    pub fn dimension(&self, k: usize) -> Option<&Q<A, C, D>> {
-        self.dimensions.get(k).ok()
+    pub fn dimension(&self, key: usize) -> Option<&Q<A, C, D>> {
+        self.dimensions.get(key)
     }
 }
 

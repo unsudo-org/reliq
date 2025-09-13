@@ -7,6 +7,7 @@ pub mod color;
 pub mod fail_safe;
 pub mod lossy;
 pub mod map;
+pub mod math;
 pub mod ops;
 pub mod point;
 pub mod q;

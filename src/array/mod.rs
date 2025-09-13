@@ -1,6 +1,8 @@
 use super::*;
 
 ::modwire::expose!(
+    pub builder
+    pub const_builder
     pub handle
     pub iter
     pub tracker
@@ -43,9 +45,7 @@ pub type Result<T> = ::core::result::Result<T, Error>;
 #[derive(::serde::Deserialize)]
 pub enum Error {
     #[error("Overflow")]
-    Overflow,
-    #[error("Key out of bounds")]
-    KeyOutOfBounds
+    Overflow
 }
 
 #[derive(Debug)]
@@ -62,8 +62,12 @@ where
 impl<const A: usize, B> Array<A, B> 
 where
     B: Copy {
+    pub fn new() -> Builder<A, B> {
+        Builder::new()
+    }
+
     #[inline]
-    pub fn new(data: [B; A]) -> Self {
+    pub fn from_slice(data: [B; A]) -> Self {
         let mut buf: [::core::mem::MaybeUninit<B>; A] = unsafe {
             ::core::mem::MaybeUninit::uninit().assume_init()
         };
@@ -102,6 +106,26 @@ where
             let ret: &mut B = &mut *self.buf[key].as_mut_ptr();
             Some(ret)
         }
+    }
+
+    pub fn with<C, D, E>(&self, key: C, on_found: D) -> Option<E> 
+    where
+        C: Into<usize>,
+        D: FnOnce(&B) -> E {
+        if let Some(item) = self.get(key) {
+            return Some(on_found(item))
+        }
+        None
+    }
+
+    pub fn with_mut<C, D, E>(&mut self, key: C, on_found: D) -> Option<E>
+    where
+        C: Into<usize>,
+        D: FnOnce(&mut B) -> E {
+        if let Some(item) = self.get_mut(key) {
+            return Some(on_found(item))
+        }
+        None
     }
 
     #[inline]
@@ -161,7 +185,7 @@ where
     }
 
     #[inline]
-    pub fn swap_insert<C, D>(&mut self, key: C, item: D) -> Option<Result<()>> 
+    pub fn insert_unsorted<C, D>(&mut self, key: C, item: D) -> Option<Result<()>> 
     where
         C: Into<usize>,
         D: Into<B> {
@@ -185,8 +209,9 @@ where
         Some(Ok(()))
     }
 
+    /// Swap the the item with
     #[inline]
-    pub fn swap_remove(&mut self, key: usize) -> Option<B> {
+    pub fn remove_unsorted(&mut self, key: usize) -> Option<B> {
         if key >= self.len {
             return None
         }
@@ -198,7 +223,7 @@ where
         }
         self.len -= 1;
         Some(ret)
-    }    
+    }
 
     #[inline]
     pub fn insert<C, D>(&mut self, key: C, item: D) -> Option<Result<()>> 
@@ -225,7 +250,7 @@ where
     pub fn remove<C>(&mut self, key: C) -> Option<B> 
     where
         C: Into<usize> {
-        let key: usize = key.try_into().ok()?;
+        let key: usize = key.into();
         if self.len == 0 || self.len <= key {
             return None
         }
@@ -262,7 +287,7 @@ where
         let value: [B; A] = value.map(|item| {
             item.into()
         });
-        Self::new(value)
+        Self::from_slice(value)
     }
 }
 
@@ -440,6 +465,14 @@ fn test_push_pop() {
 
 #[test]
 fn test_insert_remove_ordered() {
+    let _: Array<100, &'static str> = Array::new()
+        .with_item("Hello")
+        .with_item("Hi")
+        .with_item("")
+        .build()
+        .unwrap();
+
+
     let mut arr: Array<4, u8> = Array::default();
     arr.push(1).unwrap();
     arr.push(3).unwrap();
@@ -456,11 +489,11 @@ fn test_swap_insert_remove_unordered() {
     arr.push(10).unwrap();
     arr.push(20).unwrap();
     arr.push(30).unwrap();
-    arr.swap_insert(1usize, 15).unwrap();
+    arr.insert_unsorted(1usize, 15).unwrap();
     assert_eq!(arr.len(), 4);
     assert!(arr.as_slice().contains(&15));
 
-    let val = arr.swap_remove(1).unwrap();
+    let val = arr.remove_unsorted(1).unwrap();
     assert!(val == 15 || val == 20);
     assert_eq!(arr.len(), 3);
 }
