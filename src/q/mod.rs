@@ -2,15 +2,22 @@ use super::*;
 
 ::modwire::expose!(
     pub r#as
-    pub default_mode
-    pub deg_mode
+    pub chance
+    pub deg
     pub engine
+    pub factor
     pub mode
+    pub percentage
     pub pi
-    pub rad_mode
+    pub rad
+    pub rate
+    pub ratio
     pub scale
     pub supported
+    pub unit
 );
+
+pub type Precision = u8;
 
 pub type Result<T> = ::core::result::Result<T, Error>;
 
@@ -44,30 +51,34 @@ pub enum Error {
     OutOfBounds
 }
 
-/// # Where
-/// - `A`: Precision
 #[repr(transparent)]
 #[derive(Clone)]
 #[derive(Copy)]
 #[derive(::serde::Serialize)]
 #[derive(::serde::Deserialize)]
-pub struct Q<const A: u8, B = usize, C = DefaultMode, D = DefaultEngine>
+pub struct Q<
+    const A: Precision = 2, 
+          B = usize, 
+          C = UnitMode, 
+          D = DefaultEngine>
 where
     B: ops::Int,
     B: ops::Prim,
+    C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
     n: B,
-    mode: ::core::marker::PhantomData<C>,
-    engine: ::core::marker::PhantomData<D>
+    engine: ::core::marker::PhantomData<D>,
+    mode: ::core::marker::PhantomData<C>
 }
 
-impl<const A: u8, B, C, D> Q<A, B, C, D>
+impl<const A: Precision, B, C, D> Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
+    C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
@@ -94,16 +105,7 @@ where
         (): SupportedPrecision<E>,
         (): Supported<E, B> {
         let n: B = self.n;
-        match D::cast::<A, E, _>(n)? {
-            lossy::Lossy::Exact(n) => {
-                let n: Q<E, B, C, D> = n.into();
-                Ok(lossy::Lossy::Exact(n))
-            },
-            lossy::Lossy::Trunc(n) => {
-                let n: Q<E, B, C, D> = n.into();
-                Ok(lossy::Lossy::Trunc(n))
-            }
-        }
+        D::cast(n);
     }
 
     #[inline]
@@ -117,6 +119,7 @@ where
     B: ops::Int,
     B: ops::Prim,
     B: ops::Signed,
+    C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
@@ -150,15 +153,14 @@ impl<const A: u8, B, C, D> From<B> for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
+    C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    // raw conversion no scaling involved.
-    #[inline]
-    fn from(n: B) -> Self {
+    fn from(value: B) -> Self {
         Self {
-            n,
+            n: value,
             mode: ::core::marker::PhantomData,
             engine: ::core::marker::PhantomData
         }
@@ -169,6 +171,7 @@ impl<const A: u8, B, C, D> ops::ToPrim for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
+    C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,

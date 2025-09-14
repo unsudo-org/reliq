@@ -3,9 +3,9 @@ use super::*;
 macro_rules! ty {
     ($($n:literal)*) => {
         ::paste::paste!(
-            pub type Rad<const A: u8, B> = Q<A, B, RadMode>;
+            pub type Rad<const A: u8, B = usize, C = DefaultEngine> = Q<A, B, RadMode, C>;
             $(
-                pub type [< Rad $n >]<T> = Q<$n, T, RadMode>;
+                pub type [< Rad $n >]<A = usize, B = DefaultEngine> = Q<$n, A, RadMode, B>;
             )*
         );
     };
@@ -23,7 +23,7 @@ ty!(
 #[derive(Copy)]
 pub struct RadMode;
 
-impl<const A: u8, B, C> TryFrom<Q<A, B, DegMode, C>> for Q<A, B, RadMode, C>
+impl<const A: u8, B, C> TryFrom<Deg<A, B, C>> for Rad<A, B, C>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -33,7 +33,7 @@ where
     (): Supported<A, B> {
     type Error = Error;
 
-    fn try_from(value: Q<A, B, DegMode, C>) -> ::core::result::Result<Self, Self::Error> {
+    fn try_from(value: Deg<A, B, C>) -> ::core::result::Result<Self, Self::Error> {
         value.to_rad()
     }
 }
@@ -47,26 +47,26 @@ where
     (): SupportedInt<B>,
     (): Supported<A, B> {
     #[inline]
-    pub fn tan(self) -> Result<Q<A, B, DefaultMode, C>> {
+    pub fn tan(self) -> Result<Q<A, B, UnitMode, C>> {
         let ret: B = self.n;
         let ret: B = C::tan(ret)?;
-        let ret: Q<A, B, DefaultMode, C> = ret.into();
+        let ret: Q<A, B, UnitMode, C> = ret.into();
         Ok(ret)
     }
 
     #[inline]
-    pub fn sin(self) -> Result<Q<A, B, DefaultMode, C>> {
+    pub fn sin(self) -> Result<Q<A, B, UnitMode, C>> {
         let ret: B = self.n;
         let ret: B = C::sin(ret)?;
-        let ret: Q<A, B, DefaultMode, C> = ret.into();
+        let ret: Q<A, B, UnitMode, C> = ret.into();
         Ok(ret)
     }
 
     #[inline]
-    pub fn cos(self) -> Result<Q<A, B, DefaultMode, C>> {
+    pub fn cos(self) -> Result<Q<A, B, UnitMode, C>> {
         let ret: B = self.n;
         let ret: B = C::cos(ret)?;
-        let ret: Q<A, B, DefaultMode, C> = ret.into();
+        let ret: Q<A, B, UnitMode, C> = ret.into();
         Ok(ret)
     }
 
@@ -76,6 +76,23 @@ where
         let ret: B = C::to_deg(ret)?;
         let ret: Q<A, B, DegMode, C> = ret.into();
         Ok(ret)
+    }
+}
+
+impl<const A: u8, B, C> From<B> for Rad<A, B, C>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    fn from(value: B) -> Self {
+        Self {
+            n: value,
+            mode: ::core::marker::PhantomData,
+            engine: ::core::marker::PhantomData
+        }
     }
 }
 

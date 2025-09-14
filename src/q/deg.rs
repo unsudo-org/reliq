@@ -3,9 +3,9 @@ use super::*;
 macro_rules! ty {
     ($($n:literal)*) => {
         ::paste::paste!(
-            pub type Deg<const A: u8, B> = Q<A, B, DegMode>;
+            pub type Deg<const A: u8 = 2, B = usize, C = DefaultEngine> = Q<A, B, DegMode, C>;
             $(
-                pub type [< Deg $n >]<T> = Q<$n, T, DegMode>;
+                pub type [< Deg $n >]<A = usize, B = DefaultEngine> = Q<$n, A, DegMode, B>;
             )*
         );
     };
@@ -23,7 +23,39 @@ ty!(
 #[derive(Copy)]
 pub struct DegMode;
 
-impl<const A: u8, B, C> TryFrom<Q<A, B, RadMode, C>> for Q<A, B, DegMode, C>
+impl<const A: u8, B, C> Deg<A, B, C> 
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    #[inline]
+    pub fn tan(self) -> Result<Unit<A, B, C>> {
+        self.to_rad()?.tan()
+    }
+
+    #[inline]
+    pub fn sin(self) -> Result<Unit<A, B, C>> {
+        self.to_rad()?.sin()
+    }
+
+    #[inline]
+    pub fn cos(self) -> Result<Unit<A, B, C>> {
+        self.to_rad()?.cos()
+    }
+
+    #[inline]
+    pub fn to_rad(self) -> Result<Rad<A, B, C>> {
+        let ret: B = self.n;
+        let ret: B = C::to_rad(ret)?;
+        let ret: Rad<A, B, C> = ret.into();
+        Ok(ret)
+    }
+}
+
+impl<const A: u8, B, C> TryFrom<Rad<A, B, C>> for Deg<A, B, C>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -33,40 +65,8 @@ where
     (): Supported<A, B> {
     type Error = Error;
 
-    fn try_from(value: Q<A, B, RadMode, C>) -> ::core::result::Result<Self, Self::Error> {
+    fn try_from(value: Rad<A, B, C>) -> ::core::result::Result<Self, Self::Error> {
         value.to_deg()
-    }
-}
-
-impl<const A: u8, B, C> Q<A, B, DegMode, C> 
-where
-    B: ops::Int,
-    B: ops::Prim,
-    C: Engine,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
-    #[inline]
-    pub fn tan(self) -> Result<Q<A, B, DefaultMode, C>> {
-        self.to_rad()?.tan()
-    }
-
-    #[inline]
-    pub fn sin(self) -> Result<Q<A, B, DefaultMode, C>> {
-        self.to_rad()?.sin()
-    }
-
-    #[inline]
-    pub fn cos(self) -> Result<Q<A, B, DefaultMode, C>> {
-        self.to_rad()?.cos()
-    }
-
-    #[inline]
-    pub fn to_rad(self) -> Result<Q<A, B, RadMode, C>> {
-        let ret: B = self.n;
-        let ret: B = C::to_rad(ret)?;
-        let ret: Q<A, B, RadMode, C> = ret.into();
-        Ok(ret)
     }
 }
 
@@ -78,7 +78,7 @@ mod test {
     #[::rstest::rstest]
     #[case(25_00.into(), 0_46.into())]
     fn tan(#[case] angle: Deg2<u32>, #[case] expected: Q2<u32>) {
-        let ret: Q2<_> = angle.tan().unwrap();
+        let ret: Unit = angle.tan().unwrap();
         assert_eq!(ret, expected);
     }
 

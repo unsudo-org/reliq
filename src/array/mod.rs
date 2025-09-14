@@ -304,7 +304,7 @@ where
     }
 }
 
-impl<const A: u8, const B: usize, C, D> From<point::Point<A, B, C, D>> for Array<B, q::Q<A, C, q::DefaultMode, D>>
+impl<const A: u8, const B: usize, C, D> From<point::Point<A, B, C, D>> for Array<B, q::Q<A, C, q::UnitMode, D>>
 where
     C: ops::Int,
     C: ops::Prim,

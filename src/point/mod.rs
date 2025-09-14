@@ -6,7 +6,7 @@ use super::*;
     pub ty
 );
 
-type Q<const A: u8, B, C> = q::Q<A, B, q::DefaultMode, C>;
+type Q<const A: u8, B, C> = q::Q<A, B, q::UnitMode, C>;
 
 #[repr(transparent)]
 #[derive(Debug)]

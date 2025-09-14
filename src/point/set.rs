@@ -27,9 +27,9 @@ where
             return self.next_linear()
         }
         let mut dimensions: array::Array<B, Q<A, C, D>> = array::Array::default();
-        let l: &Point<A, B, C, D> = self.points.get(len - 1)?;
-        let m: &Point<A, B, C, D> = self.points.get(len - 2)?;
-        let p: &Point<A, B, C, D> = self.points.get(len - 3)?;
+        let l: &Point<A, B, C, D> = self.points.get(len - 1).unwrap();
+        let m: &Point<A, B, C, D> = self.points.get(len - 2).unwrap();
+        let p: &Point<A, B, C, D> = self.points.get(len - 3).unwrap();
         for i in 0..B {
             let p: Q<A, C, D> = *p.dimension(i).unwrap();
             let m: Q<A, C, D> = *m.dimension(i).unwrap();

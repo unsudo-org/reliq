@@ -3,6 +3,7 @@ use super::*;
 pub type Precision = u8;
 pub type Len = usize;
 pub type Dimension = usize;
+
 pub struct PredictionEngine<
     const A: Precision,
     const B: Len,

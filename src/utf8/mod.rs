@@ -78,7 +78,7 @@ impl<const A: usize> Utf8<A> {
     }
 
     #[inline]
-    pub const fn push(&mut self, c: char) -> Result<()> {
+    pub fn push(&mut self, c: char) -> Result<()> {
         let code: u32 = c as u32;
         let arr: &mut array::Array<A, u8> = &mut self.buf;
         let req: usize = if code <= 0x7f {

@@ -46,10 +46,10 @@ where
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
     Hex(u32),
-    Hsl(u16, q::Q<A, B, q::DefaultMode, C>, q::Q<A, B, q::DefaultMode, C>),
+    Hsl(u16, q::Q<A, B, q::UnitMode, C>, q::Q<A, B, q::UnitMode, C>),
     Rgb(u8, u8, u8),
-    Rgba(u8, u8, u8, q::Q<A, B, q::DefaultMode, C>),
-    Hsla(u16, q::Q<A, B, q::DefaultMode, C>, q::Q<A, B, q::DefaultMode, C>, q::Q<A, B, q::DefaultMode, C>)
+    Rgba(u8, u8, u8, q::Q<A, B, q::UnitMode, C>),
+    Hsla(u16, q::Q<A, B, q::UnitMode, C>, q::Q<A, B, q::UnitMode, C>, q::Q<A, B, q::UnitMode, C>)
 }
 
 impl<const A: u8, B, C> Color<A, B, C>
@@ -63,59 +63,96 @@ where
     (): q::Supported<1, B> {
     #[inline]
     pub fn is_hex(self) -> bool {
-        let ret: Self = self.normalize();
+        let ret: Self = self.normalize().anyhow();
         matches!(ret, Self::Hex(_))
     }
 
     #[inline]
     pub fn is_rgb(self) -> bool {
-        let ret: Self = self.normalize();
+        let ret: Self = self.normalize().anyhow();
         matches!(ret, Self::Rgb(_, _, _))
     }
 
     #[inline]
     pub fn is_rgba(self) -> bool {
-        let ret: Self = self.normalize();
+        let ret: Self = self.normalize().anyhow();
         matches!(ret, Self::Rgba(_, _, _, _))
     }
 
     #[inline]
     pub fn lighten<D>(self, multiplier: D) -> Result<Self> 
     where
-        D: Into<q::Q<A, B, q::DefaultMode, C>> {
-        let multiplier: q::Q<A, B, q::DefaultMode, C> = multiplier.into();
-        self.interpolate::<_, q::Q<A, B, q::DefaultMode, C>>((255, 255, 255), multiplier)
+        D: Into<q::Q<A, B, q::UnitMode, C>> {
+        let multiplier: q::Q<A, B, q::UnitMode, C> = multiplier.into();
+        self.interpolate::<_, q::Q<A, B, q::UnitMode, C>>((255, 255, 255), multiplier)
     }
 
     #[inline]
     pub fn darken<D>(self, multiplier: D) -> Result<Self> 
     where
-        D: Into<q::Q<A, B, q::DefaultMode, C>> {
-        let multiplier: q::Q<A, B, q::DefaultMode, C> = multiplier.into();
-        self.interpolate::<_, q::Q<A, B, q::DefaultMode, C>>((0, 0, 0), multiplier)
+        D: Into<q::Q<A, B, q::UnitMode, C>> {
+        let multiplier: q::Q<A, B, q::UnitMode, C> = multiplier.into();
+        self.interpolate::<_, q::Q<A, B, q::UnitMode, C>>((0, 0, 0), multiplier)
     }
 
     #[inline]
-    pub fn saturate<D>(self, multiplier: q::Q<A, B, C>) -> Result<Self> 
+    pub fn saturate<D>(self, percentage: q::Percentage<A, B, C>) -> Result<Self> 
     where
-        D: Into<q::Q<A, B, q::DefaultMode, C>> {
+        D: Into<q::Q<A, B, q::UnitMode, C>> {
 
     }
 
     #[inline]
-    pub fn desaturate<D>(self, multiplier: q::Q<A, B, C>) -> Result<Self> 
+    pub fn desaturate<D>(self, percentage: q::Percentage<A, B, C>) -> Result<Self> 
     where
-        D: Into<q::Q<A, B, q::DefaultMode, C>> {
-
+        D: Into<q::Q<A, B, q::UnitMode, C>> {
+        let multiplier: q::Q<A, B, q::UnitMode, C> = percentage.into();
+        match self.to_hsl().anyhow() {
+            Self::Hsl(h, s, l) => {
+                let s: q::Q<A, B, q::UnitMode, C> = (s * (q::as_1() - multiplier)?)?;
+                let s: q::Q<A, B, q::UnitMode, C> = s.clamp(q::as_0(), q::as_1());
+                Ok(Self::Hsl(h, s, l))
+            },
+            Self::Hsla(h, s, l, a) => {
+                let s = (s * (q::as_1() - multiplier)?)?;
+                
+            },
+            _ => {
+                self.to_hsl().anyhow().desaturate()
+            }
+        }
     }
 
     #[inline]
     pub fn complement(self) -> Result<Self> {
-
+        match self.to_hsl().anyhow() {
+            Self::Hsl(h, s, l) => {
+                let new_h: u16 = (h + 180) % 360;
+                Ok(Self::Hsl(new_h, s, l))
+            },
+            Self::Hsla(h, s, l, a) => {
+                let new_h: u16 = (h + 180) % 360;
+                Ok(Self::Hsla(new_h, s, l, a))
+            },
+            _ => {
+                self.to_hsl().anyhow().complement()
+            }
+        }
     }
 
-    pub fn triadic(self) {
+    pub fn triadic(self) -> Result<[Self; 3]> {
+        match self.to_hsl().anyhow() {
+            Self::Hsl(h, s, l) => {
+                let h_0: u16 = (h + 120) % 360;
+                let h_1: u16 = (h + 240) % 360;
+                Ok([
+                    self,
+                    Self::Hsl(h_0, s, l),
+                    Self::Hsl(h_1, s, l)
+                ])
+            },
 
+        }
     }
 
     pub fn tetradic(self) {
@@ -134,12 +171,12 @@ where
     pub fn interpolate<D, E>(self, rhs: D, t: E) -> Result<Self>
     where
         D: Into<Self>,
-        E: Into<q::Q<A, B, q::DefaultMode, C>> {
+        E: Into<q::Q<A, B, q::UnitMode, C>> {
         let x: Color<A, B, C> = self.normalize().anyhow();
         let y: Self = rhs.into();
         let y: Color<A, B, C> = y.normalize().anyhow();
-        let t: q::Q<A, B, q::DefaultMode, C> = t.into();
-        let t: q::Q<A, B, q::DefaultMode, C> = t.clamp(q::as_0(), q::as_1());
+        let t: q::Q<A, B, q::UnitMode, C> = t.into();
+        let t: q::Q<A, B, q::UnitMode, C> = t.clamp(q::as_0(), q::as_1());
         match (x, y) {
             (Self::Rgb(r_0, g_0, b_0), Self::Rgb(r_1, g_1, b_1)) => {
                 let lerp: _ = |a: u8, b: u8| -> q::Result<u8> {
@@ -147,13 +184,13 @@ where
                         .try_into()
                         .ok()
                         .ok_or(q::Error::UnsupportedConversion)?;
-                    let a: q::Q<A, B, q::DefaultMode, C> = a.into();
+                    let a: q::Q<A, B, q::UnitMode, C> = a.into();
                     let b: B = b
                         .try_into()
                         .ok()
                         .ok_or(q::Error::UnsupportedConversion)?;
-                    let b: q::Q<A, B, q::DefaultMode, C> = b.into();
-                    let ret: q::Q<A, B, q::DefaultMode, C> = ((a + (b - a)?)? * t)?;
+                    let b: q::Q<A, B, q::UnitMode, C> = b.into();
+                    let ret: q::Q<A, B, q::UnitMode, C> = ((a + (b - a)?)? * t)?;
                     let ret: B = ret.as_int();
                     let ret: u8 = ret
                         .try_into()
@@ -172,13 +209,13 @@ where
                         .try_into()
                         .ok()
                         .ok_or(q::Error::UnsupportedConversion)?;
-                    let a: q::Q::<A, B, q::DefaultMode, C> = a.into();
+                    let a: q::Q::<A, B, q::UnitMode, C> = a.into();
                     let b: B = b
                         .try_into()
                         .ok()
                         .ok_or(q::Error::UnsupportedConversion)?;
-                    let b: q::Q::<A, B, q::DefaultMode, C> = b.into();
-                    let ret: q::Q<A, B, q::DefaultMode, C> = ((a + (b - a)?)? * t)?;
+                    let b: q::Q::<A, B, q::UnitMode, C> = b.into();
+                    let ret: q::Q<A, B, q::UnitMode, C> = ((a + (b - a)?)? * t)?;
                     let ret: B = ret.as_int();
                     let ret: u8 = ret
                         .try_into()
@@ -186,9 +223,9 @@ where
                         .ok_or(q::Error::UnsupportedConversion)?;
                     Ok(ret)
                 };
-                let a: q::Q<A, B, q::DefaultMode, C> = {
-                    let ret: q::Q<A, B, q::DefaultMode, C> = ((a_0 + (a_1 - a_0)?)? * t)?;
-                    let ret: q::Q<A, B, q::DefaultMode, C> = ret.clamp(q::as_0(), q::as_1());
+                let a: q::Q<A, B, q::UnitMode, C> = {
+                    let ret: q::Q<A, B, q::UnitMode, C> = ((a_0 + (a_1 - a_0)?)? * t)?;
+                    let ret: q::Q<A, B, q::UnitMode, C> = ret.clamp(q::as_0(), q::as_1());
                     ret
                 };
                 let r: u8 = lerp(r_0, r_1)?;
@@ -223,10 +260,9 @@ where
     }
 
     #[inline]
-    pub fn to_hex(self) -> Self {
-        match self.normalize() {
+    pub fn to_hex(self) -> lossy::Lossy<Self> {
+        match self.normalize().anyhow() {
             Self::Rgb(r, g, b) => {
-                
                 let ret: u32 = ((r as u32) << 16) | ((g as u32) << 8) | (b as u32);
                 let ret: Self = Self::Hex(ret);
                 ret
@@ -241,7 +277,7 @@ where
     }
 
     #[inline]
-    pub fn to_rgb(self) -> Lossy<Self> {
+    pub fn to_rgb(self) -> lossy::Lossy<Self> {
         match self.normalize().anyhow() {
             Self::Hex(hex) => {
                 let (r, g, b) = (
@@ -297,23 +333,21 @@ where
     }
 
     #[inline]
-    fn normalize(self) -> Lossy<Self> {
+    fn normalize(self) -> lossy::Lossy<Self> {
         match self {
             Self::Hex(code) => {
                 let ret: u32 = code.clamp(0x000000, 0xFFFFFF);
                 let ret: Self = Self::Hex(ret);
-                ret
+                lossy::Lossy::Trunc(ret)
             },
-            Self::Rgb(_, _, _) => self,
+            Self::Rgb(_, _, _) => lossy::Lossy::Exact(self),
             Self::Rgba(r, g, b, a) => {
-                let ret: q::Q<A, B, q::DefaultMode, C> = a.clamp(q::as_0(), q::as_1());
+                let ret: q::Q<A, B, q::UnitMode, C> = a.clamp(q::as_0(), q::as_1());
                 let ret: Self = Self::Rgba(r, g, b, ret);
-                ret
+                lossy::Lossy::Trunc(ret)
             }
         }
     }
-
-
 }
 
 impl<const A: u8, B, C> From<(u8, u8, u8)> for Color<A, B, C>
@@ -388,7 +422,7 @@ where
     B: ops::Int,
     B: ops::Prim,
     C: q::Engine,
-    D: Into<q::Q<A, B, q::DefaultMode, C>>,
+    D: Into<q::Q<A, B, q::UnitMode, C>>,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B>,
@@ -398,7 +432,7 @@ where
         let r: u8 = value.0;
         let g: u8 = value.1;
         let b: u8 = value.2;
-        let a: q::Q<A, B, q::DefaultMode, C> = value.3.into();
+        let a: q::Q<A, B, q::UnitMode, C> = value.3.into();
         Self::Rgba(r, g, b, a).normalize()
     }
 }

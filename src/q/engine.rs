@@ -6,7 +6,7 @@ use super::*;
 #[derive(Copy)]
 #[derive(PartialEq)]
 #[derive(Eq)]
-pub struct DefaultEngine; 
+pub struct DefaultEngine;
 
 impl Engine for DefaultEngine {}
 
@@ -14,35 +14,20 @@ pub trait Engine
 where
     Self: Sized,
     Self: Clone,
-    Self: Copy {
-    #[inline]
-    fn sqrt<const A: u8, B>(n: B) -> Result<B>
-    where
-        B: ops::Int,
-        B: ops::Prim,
-        B: ops::Signed,
-        (): SupportedPrecision<A>,
-        (): SupportedInt<B>,
-        (): Supported<A, B> {
-        if n < B::AS_0 {
-            return Err(Error::Underflow)
-        }
-        if n == B::AS_0 || n == B::AS_1 {
-            return Ok(n)
-        }
-        let mut ret: B = n.checked_div(B::AS_2).ok_or(Error::DivisionByZero)?;
-        let mut last: B;
-        loop {
-            last = ret;
-            ret = Self::add(ret, Self::div::<A, _>(n, ret)?)?;
-            ret = Self::div::<A, _>(ret, B::AS_2)?;
-            if ret == last || ret == last.checked_add(B::AS_1).unwrap_or(ret) {
-                break
-            }
-        }
-        Ok(ret)
-    }
+    Self: Copy,
+    Self: Trig,
+    Self: TrigConversionEngine,
+    Self: ConversionEngine,
+    Self: SignEngine,
+    Self: LerpEngine,
+    Self: SqrtEngine,
+    Self: ArithmeticEngine,
+    Self: MuldivEngine {}
 
+pub trait Trig 
+where
+    Self: ArithmeticEngine,
+    Self: TrigConversionEngine {
     #[inline]
     fn tan<const A: u8, B>(rad_angle: B) -> Result<B>
     where
@@ -110,7 +95,15 @@ where
         }
         Ok(ret)
     }
+}
 
+impl<T> Trig for T
+where
+    T: Engine {}
+
+pub trait TrigConversionEngine 
+where
+    Self: MuldivEngine {
     #[inline]
     fn to_rad<const A: u8, B>(deg_angle: B) -> Result<B>
     where
@@ -132,20 +125,15 @@ where
         (): Supported<A, B> {
         Self::muldiv(rad_angle, as_180::<B>() * scale::<A, B>(), pi())
     }
+}
 
-    #[inline]
-    fn lerp<const A: u8, B>(x: B, y: B, t: B) -> Result<B>
-    where
-        B: ops::Int,
-        B: ops::Prim,
-        (): SupportedPrecision<A>,
-        (): SupportedInt<B>,
-        (): Supported<A, B> {
-        let d: B = Self::sub(y, x)?;
-        let s: B = Self::muldiv(d, t, scale())?;
-        Self::add(x, s)
-    }
+impl<T> TrigConversionEngine for T
+where
+    T: Engine {}
 
+pub trait ConversionEngine
+where
+    Self: MuldivEngine {
     #[inline]
     fn cast<const A: u8, const B: u8, C>(n: C) -> Result<lossy::Lossy<C>>
     where
@@ -165,7 +153,13 @@ where
             Ok(lossy::Lossy::Exact(ret))
         }
     }
+}
 
+impl<T> ConversionEngine for T
+where
+    T: Engine {}
+
+pub trait SignEngine {
     #[inline]
     fn to_negative<T>(n: T) -> T
     where
@@ -193,7 +187,64 @@ where
             T::AS_0 - n
         }
     }
-    
+}
+
+impl<T> SignEngine for T
+where
+    T: Engine {}
+
+pub trait LerpEngine
+where
+    Self: ArithmeticEngine {
+    #[inline]
+    fn lerp<const A: u8, B>(x: B, y: B, t: B) -> Result<B>
+    where
+        B: ops::Int,
+        B: ops::Prim,
+        (): SupportedPrecision<A>,
+        (): SupportedInt<B>,
+        (): Supported<A, B> {
+        let d: B = Self::sub(y, x)?;
+        let s: B = Self::muldiv(d, t, scale())?;
+        Self::add(x, s)
+    }
+}
+
+pub trait SqrtEngine 
+where
+    Self: ArithmeticEngine {
+    #[inline]
+    fn sqrt<const A: u8, B>(n: B) -> Result<B>
+    where
+        B: ops::Int,
+        B: ops::Prim,
+        B: ops::Signed,
+        (): SupportedPrecision<A>,
+        (): SupportedInt<B>,
+        (): Supported<A, B> {
+        if n < B::AS_0 {
+            return Err(Error::Underflow)
+        }
+        if n == B::AS_0 || n == B::AS_1 {
+            return Ok(n)
+        }
+        let mut ret: B = n.checked_div(B::AS_2).ok_or(Error::DivisionByZero)?;
+        let mut last: B;
+        loop {
+            last = ret;
+            ret = Self::add(ret, Self::div::<A, _>(n, ret)?)?;
+            ret = Self::div::<A, _>(ret, B::AS_2)?;
+            if ret == last || ret == last.checked_add(B::AS_1).unwrap_or(ret) {
+                break
+            }
+        }
+        Ok(ret)
+    }
+}
+
+pub trait ArithmeticEngine 
+where
+    Self: MuldivEngine {
     #[inline]
     fn add<T>(x: T, y: T) -> Result<T>
     where
@@ -239,7 +290,13 @@ where
         }
         Self::muldiv(x, scale::<A, _>(), y)
     }
+}
 
+impl<T> ArithmeticEngine for T
+where
+    T: Engine {}
+
+pub trait MuldivEngine {
     #[inline]
     fn muldiv<T>(x: T, y: T, z: T) -> Result<T> 
     where 
@@ -275,6 +332,10 @@ where
         }
     }
 }
+
+impl<T> MuldivEngine for T
+where
+    T: Engine {}
 
 #[inline]
 fn wide_mul<T>(x: T, y: T) -> Result<(T, T)>

@@ -4,20 +4,21 @@ macro_rules! r#as {
     ($($n:literal)*) => {
         ::paste::paste!(
             $(
-                pub fn [< as _ $n >]<const A: u8, B, C>() -> Q<A, B, DefaultMode, C>
+                pub fn [< as _ $n >]<const A: u8, B, C, D>() -> Q<A, B, C, D>
                 where
                     B: ops::Int,
                     B: ops::Prim,
-                    C: Engine,
+                    C: Mode,
+                    D: Engine,
                     (): SupportedPrecision<A>,
                     (): SupportedInt<B>,
                     (): Supported<A, B>,
                     (): Supported<1, B> {
                     let ret: B = B::[< AS _ $n >];
                     let ret: B = unsafe {
-                        C::cast::<1, A, _>(ret).unwrap_unchecked().anyhow()
+                        D::cast::<1, A, _>(ret).unwrap_unchecked().anyhow()
                     };
-                    let ret: Q<A, B, DefaultMode, C> = ret.into();
+                    let ret: Q<A, B, C, D> = ret.into();
                     ret
                 }
             )*

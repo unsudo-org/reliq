@@ -6,6 +6,9 @@ where
     Self: Clone,
     Self: Copy {}
 
-impl Mode for DefaultMode {}
-impl Mode for RadMode {}
+impl Mode for ChanceMode {}
+impl Mode for UnitMode {}
 impl Mode for DegMode {}
+impl Mode for RadMode {}
+impl Mode for PercentageMode {}
+impl Mode for FactorMode {}
