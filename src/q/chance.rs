@@ -23,23 +23,6 @@ ty!(
 #[derive(Copy)]
 pub struct ChanceMode;
 
-impl<const A: u8, B, C> From<B> for Chance<A, B, C>
-where
-    B: ops::Int,
-    B: ops::Prim,
-    C: Engine,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
-    fn from(value: B) -> Self {
-        Self {
-            n: value,
-            mode: ::core::marker::PhantomData,
-            engine: ::core::marker::PhantomData
-        }
-    }
-}
-
 impl<const A: u8, B, C> From<Unit<A, B, C>> for Chance<A, B, C>
 where
     B: ops::Int,

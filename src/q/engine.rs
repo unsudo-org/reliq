@@ -210,6 +210,10 @@ where
     }
 }
 
+impl<T> LerpEngine for T
+where 
+    T: Engine {}
+
 pub trait SqrtEngine 
 where
     Self: ArithmeticEngine {
@@ -239,6 +243,32 @@ where
             }
         }
         Ok(ret)
+    }
+}
+
+impl<T> SqrtEngine for T
+where
+    T: Engine {}
+
+pub trait CardinalArithmeticEngine 
+where
+    Self: ArithmeticEngine {
+    //! An engine to handle cardinal mode
+
+    fn add<T>(x: T, y: T) -> Result<T> 
+    where
+        T: ops::Int,
+        T: ops::Prim,
+        (): SupportedInt<T> {
+        <Self as ArithmeticEngine>::add(x, y)
+    }
+
+    fn sub<T>(x: T, y: T) -> Result<T>
+    where
+        T: ops::Int,
+        T: ops::Prim,
+        (): SupportedInt<T> {
+        <Self as ArithmeticEngine>::sub(x, y)
     }
 }
 

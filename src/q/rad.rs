@@ -5,7 +5,7 @@ macro_rules! ty {
         ::paste::paste!(
             pub type Rad<const A: u8, B = usize, C = DefaultEngine> = Q<A, B, RadMode, C>;
             $(
-                pub type [< Rad $n >]<A = usize, B = DefaultEngine> = Q<$n, A, RadMode, B>;
+                pub type [< Rad $n >]<A = usize, B = DefaultEngine> = Rad<$n, A, B>;
             )*
         );
     };
@@ -47,10 +47,10 @@ where
     (): SupportedInt<B>,
     (): Supported<A, B> {
     #[inline]
-    pub fn tan(self) -> Result<Q<A, B, UnitMode, C>> {
+    pub fn tan(self) -> Result<Unit<A, B, C>> {
         let ret: B = self.n;
         let ret: B = C::tan(ret)?;
-        let ret: Q<A, B, UnitMode, C> = ret.into();
+        let ret: Unit<A, B, C> = ret.into();
         Ok(ret)
     }
 
@@ -58,7 +58,7 @@ where
     pub fn sin(self) -> Result<Q<A, B, UnitMode, C>> {
         let ret: B = self.n;
         let ret: B = C::sin(ret)?;
-        let ret: Q<A, B, UnitMode, C> = ret.into();
+        let ret: Unit<A, B, C> = ret.into();
         Ok(ret)
     }
 
@@ -79,27 +79,10 @@ where
     }
 }
 
-impl<const A: u8, B, C> From<B> for Rad<A, B, C>
-where
-    B: ops::Int,
-    B: ops::Prim,
-    C: Engine,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
-    fn from(value: B) -> Self {
-        Self {
-            n: value,
-            mode: ::core::marker::PhantomData,
-            engine: ::core::marker::PhantomData
-        }
-    }
-}
-
 #[cfg(test)]
 #[::rstest::rstest]
 #[case(1_00.into(), 0_84.into())]
-fn test_sin(#[case] angle: Rad2<i32>, #[case] ok: Q2<i32>) {
+fn test_sin(#[case] angle: Rad, #[case] ok: Unit) {
     let ret: Q2<i32> = angle.sin().unwrap();
     assert_eq!(ret, ok);
 }

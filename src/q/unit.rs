@@ -61,3 +61,29 @@ where
         value.n.into()
     }
 }
+
+impl<const A: u8, B, C> From<Ratio<A, B, C>> for Unit<A, B, C>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    fn from(value: Ratio<A, B, C>) -> Self {
+        value.n.into()
+    }
+}
+
+impl<const A: u8, B, C> From<Delta<A, B, C>> for Unit<A, B, C>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    fn from(value: Delta<A, B, C>) -> Self {
+        value.n.into()
+    }
+}

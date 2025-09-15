@@ -44,6 +44,20 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
+    pub fn is_increase(&self) -> bool {
+        self.n > B::AS_1
+    }
+
+    pub fn is_decrease(&self) -> bool {
+        self.n < B::AS_1
+    }
+
+    pub fn is_neutral(&self) -> bool {
+        self.n == B::AS_1
+    }
+
+
+
     pub fn to_unit(self) -> Unit<A, B, C> {
         self.into()
     }
@@ -53,20 +67,17 @@ where
     }
 }
 
-impl<const A: u8, B, C> From<B> for Factor<A, B, C>
+impl<const A: u8, B, C> Factor<A, B, C>
 where
     B: ops::Int,
     B: ops::Prim,
+    B: ops::Signed,
     C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    fn from(value: B) -> Self {
-        Self {
-            n: value,
-            mode: ::core::marker::PhantomData,
-            engine: ::core::marker::PhantomData
-        }
+    pub fn delta(self) -> Result<Delta<A, B, C>> {
+        self.try_into()
     }
 }
 

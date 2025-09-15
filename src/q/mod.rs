@@ -2,8 +2,10 @@ use super::*;
 
 ::modwire::expose!(
     pub r#as
+    pub cardinal
     pub chance
     pub deg
+    pub delta
     pub engine
     pub factor
     pub mode
@@ -104,8 +106,11 @@ where
     where
         (): SupportedPrecision<E>,
         (): Supported<E, B> {
-        let n: B = self.n;
-        D::cast(n);
+        let ret: B = self.n;
+        match D::cast::<A, E, B>(ret)? {
+            lossy::Lossy::Exact(n) => Ok(lossy::Lossy::Exact(n.into())),
+            lossy::Lossy::Trunc(n) => Ok(lossy::Lossy::Trunc(n.into()))
+        }
     }
 
     #[inline]
@@ -316,6 +321,7 @@ impl<const A: u8, B, C, D> ::core::ops::Add for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
+    C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
@@ -336,6 +342,7 @@ impl<const A: u8, B, C, D> ::core::ops::Sub for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
+    C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
@@ -356,6 +363,7 @@ impl<const A: u8, B, C, D> ::core::ops::Mul for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
+    C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
@@ -376,6 +384,7 @@ impl<const A: u8, B, C, D> ::core::ops::Div for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
+    C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
@@ -396,6 +405,7 @@ impl<const A: u8, B, C, D> Eq for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
+    C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
@@ -405,6 +415,7 @@ impl<const A: u8, B, C, D> PartialEq for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
+    C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
@@ -419,6 +430,7 @@ impl<const A: u8, B, C, D> Ord for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
+    C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
@@ -472,11 +484,11 @@ where
     }
 }
 
-#[allow(clippy::non_canonical_partial_ord_impl)]
 impl<const A: u8, B, C, D> PartialOrd for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
+    C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
@@ -509,6 +521,7 @@ where
         x < y
     }
 
+    #[allow(clippy::non_canonical_partial_ord_impl)]
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<::core::cmp::Ordering> {
         let x: B = self.n;
@@ -522,6 +535,7 @@ impl<const A: u8, B, C, D> ::core::fmt::Debug for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
+    C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
@@ -535,6 +549,7 @@ impl<const A: u8, B, C, D> ::core::fmt::Display for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
+    C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
