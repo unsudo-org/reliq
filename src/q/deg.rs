@@ -1,27 +1,6 @@
 use super::*;
 
-macro_rules! ty {
-    ($($n:literal)*) => {
-        ::paste::paste!(
-            pub type Deg<const A: u8 = 2, B = usize, C = DefaultEngine> = Q<A, B, DegMode, C>;
-            $(
-                pub type [< Deg $n >]<A = usize, B = DefaultEngine> = Deg<$n, A, B>;
-            )*
-        );
-    };
-}
-
-ty!(
-    0 1 2 3 4 5 6 7 8 9
-    10 11 12 13 14 15 16 17 18 19
-    20 21 22 23 24 25 26 27 28 29
-    30 31 32 33 34 35 36 37
-);
-
-#[repr(transparent)]
-#[derive(Clone)]
-#[derive(Copy)]
-pub struct DegMode;
+mode!(Deg);
 
 impl<const A: u8, B, C> Deg<A, B, C> 
 where

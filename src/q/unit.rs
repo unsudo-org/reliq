@@ -2,7 +2,9 @@ use super::*;
 
 macro_rules! ty {
     ($($n:literal)*) => {
+        /// A general unit
         pub type Unit<const A: u8 = 2, B = usize, C = DefaultEngine> = Q<A, B, UnitMode, C>;
+
         $(
             ::paste::paste!(
                 pub type [< Unit $n >]<A = usize, B = DefaultEngine> = Unit<$n, A, B>;
@@ -18,7 +20,6 @@ ty!(
     30 31 32 33 34 35 36 37
 );
 
-#[repr(transparent)]
 #[derive(Clone)]
 #[derive(Copy)]
 pub struct UnitMode;
@@ -31,11 +32,7 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    pub fn adjust_by<D>(self, proportion: D) -> Self 
-    where
-        D: Into<Proportion<A, B, C>> {
-        
-    }
+
 }
 
 impl<const A: u8, B, C> From<Deg<A, B, C>> for Unit<A, B, C>

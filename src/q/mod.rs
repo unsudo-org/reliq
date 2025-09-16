@@ -2,7 +2,6 @@ use super::*;
 
 ::modwire::expose!(
     pub r#as
-    pub cardinal
     pub chance
     pub deg
     pub delta
@@ -17,6 +16,137 @@ use super::*;
     pub supported
     pub unit
 );
+
+#[macro_export(local_inner_macros)]
+macro_rules! mode {
+    (
+        $(#[$attr:meta])*
+        $mode:ident
+    ) => {
+        ::paste::paste!(
+            $(#[$attr])*
+            pub type $mode<const A: u8, B = usize, C = DefaultEngine> = Q<A, B, [< $mode Mode >], C>;
+            
+            $(#[$attr])*
+            pub type [< $mode 1 >]<A = usize, B = DefaultEngine> = $mode<1, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 2 >]<A = usize, B = DefaultEngine> = $mode<2, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 3 >]<A = usize, B = DefaultEngine> = $mode<3, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 4 >]<A = usize, B = DefaultEngine> = $mode<4, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 5 >]<A = usize, B = DefaultEngine> = $mode<5, A, B>;
+           
+            $(#[$attr])*
+            pub type [< $mode 6 >]<A = usize, B = DefaultEngine> = $mode<6, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 7 >]<A = usize, B = DefaultEngine> = $mode<7, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 8 >]<A = usize, B = DefaultEngine> = $mode<8, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 9 >]<A = usize, B = DefaultEngine> = $mode<9, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 10 >]<A = usize, B = DefaultEngine> = $mode<10, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 11 >]<A = usize, B = DefaultEngine> = $mode<11, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 12 >]<A = usize, B = DefaultEngine> = $mode<12, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 13 >]<A = usize, B = DefaultEngine> = $mode<13, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 14 >]<A = usize, B = DefaultEngine> = $mode<14, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 15 >]<A = usize, B = DefaultEngine> = $mode<15, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 16 >]<A = usize, B = DefaultEngine> = $mode<16, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 17 >]<A = usize, B = DefaultEngine> = $mode<17, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 18 >]<A = usize, B = DefaultEngine> = $mode<18, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 19 >]<A = usize, B = DefaultEngine> = $mode<19, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 20 >]<A = usize, B = DefaultEngine> = $mode<20, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 21 >]<A = usize, B = DefaultEngine> = $mode<21, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 22 >]<A = usize, B = DefaultEngine> = $mode<22, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 23 >]<A = usize, B = DefaultEngine> = $mode<23, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 24 >]<A = usize, B = DefaultEngine> = $mode<24, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 25 >]<A = usize, B = DefaultEngine> = $mode<25, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 26 >]<A = usize, B = DefaultEngine> = $mode<26, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 27 >]<A = usize, B = DefaultEngine> = $mode<27, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 28 >]<A = usize, B = DefaultEngine> = $mode<28, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 29 >]<A = usize, B = DefaultEngine> = $mode<29, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 30 >]<A = usize, B = DefaultEngine> = $mode<30, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 31 >]<A = usize, B = DefaultEngine> = $mode<31, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 32 >]<A = usize, B = DefaultEngine> = $mode<32, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 33 >]<A = usize, B = DefaultEngine> = $mode<33, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 34 >]<A = usize, B = DefaultEngine> = $mode<34, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 35 >]<A = usize, B = DefaultEngine> = $mode<35, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 36 >]<A = usize, B = DefaultEngine> = $mode<36, A, B>;
+            
+            $(#[$attr])*
+            pub type [< $mode 37 >]<A = usize, B = DefaultEngine> = $mode<37, A, B>;
+
+            #[derive(Debug)]
+            #[derive(Clone)]
+            #[derive(Copy)]
+            pub struct [< $mode Mode >];
+
+            impl Mode for [< $mode Mode >] {}
+        );
+    };
+}
 
 pub type Precision = u8;
 

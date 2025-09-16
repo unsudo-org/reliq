@@ -1,61 +1,28 @@
 use super::*;
 
-macro_rules! ty {
-    ($($n:literal)*) => {
-        ::paste::paste!(
-            /// Represents a multiplicative scaling factor.
-            ///
-            /// Mathematically:
-            /// ```
-            /// Factor = 1.0 + (Percentage / 100)
-            /// ```
-            ///
-            /// A `Factor` is commonly used for scaling, compounding, and normalizing values.
-            /// Unlike `Percentage`, it is **multiplicative**, not additive.
-            ///
-            /// # Examples
-            /// - `1.00` → no change (`0%`)
-            /// - `1.50` → +50% increase
-            /// - `0.75` → -25% decrease
-            ///
-            /// # Usage
-            /// Use `Factor` when you need:
-            /// - Growth or shrinkage ratios
-            /// - Price multipliers (e.g. taxes, discounts)
-            /// - Compounding interest multipliers
-            pub type Factor<const A: u8, B, C = DefaultEngine> = Q<A, B, FactorMode, C>;
-            
-            $(
-                pub type [< Factor $n >]<A = usize, B = DefaultEngine> = Q<$n, A, FactorMode, B>;
-            )*
-        );
-    };
-}
-
-ty!(
-    0 1 2 3 4 5 6 7 8 9
-    10 11 12 13 14 15 16 17 18 19
-    20 21 22 23 24 25 26 27 28 29
-    30 31 32 33 34 35 36 37
+mode!(
+    /// Represents a multiplicative scaling factor.
+    ///
+    /// Mathematically:
+    /// ```
+    /// Factor = 1.0 + (Percentage / 100)
+    /// ```
+    ///
+    /// A `Factor` is commonly used for scaling, compounding, and normalizing values.
+    /// Unlike `Percentage`, it is **multiplicative**, not additive.
+    ///
+    /// # Examples
+    /// - `1.00` → no change (`0%`)
+    /// - `1.50` → +50% increase
+    /// - `0.75` → -25% decrease
+    ///
+    /// # Usage
+    /// Use `Factor` when you need:
+    /// - Growth or shrinkage ratios
+    /// - Price multipliers (e.g. taxes, discounts)
+    /// - Compounding interest multipliers
+    Factor
 );
-
-/// A factor represents an alternative form to a `Percentage`,
-/// where anything less than `1.0` represents a negative `%`,
-/// and anything more than `1.0` represents a positive `%`.
-/// 
-/// # Example
-/// * 1.0 -> 0%
-/// * 2.0 -> 100%
-/// * 0.5 -> -50%
-/// * 0.25 -> -75%
-/// 
-/// # Conversion: From
-/// * `Unit`
-/// * `Percentage`
-#[repr(transparent)]
-#[derive(Clone)]
-#[derive(Copy)]
-pub struct FactorMode;
 
 impl<const A: u8, B, C> Factor<A, B, C>
 where
