@@ -5,12 +5,11 @@ mode!(
     /// Δx = x₂ - x₁
     /// ```
     /// 
-    /// Represents a `Signed` value that expresses change.
+    /// A signed value that represents change.
     /// A value of `3.0` or `-2.0` models change in a property.
     /// A value of `0.0` represents no change.
     /// 
     /// Mathematically, it's analogous to the Greek letter Δ (delta), which denotes difference:
-    /// 
     /// 
     /// For example:
     /// 
@@ -26,16 +25,24 @@ mode!(
     /// - `Δθ` - Angle correction.
     /// - `Δerror` - Control system error correction.
     /// 
-    /// # Alias
-    /// - `Delta2` -> `Delta<2>` - A `2` decimal precision `Delta`.
-    /// - `Delta4` -> `Delta<4>` - A `4` decimal precision `Delta`.
+    /// # Example
+    /// 
+    /// - `delta_from_raw_signed_int(5_00)`     -> `+5.00`
+    /// 
+    /// # Precision
+    /// 
+    /// - `Delta2` -> 2 decimal places (`Delta<2>`)
+    /// - `Delta4` -> 4 decimal places (`Delta<4>`)
+    /// 
+    /// # See Also
+    /// 
+    /// Greek letter Δ (*delta*)
+    /// 
+    /// ```text
+    /// Δx = x₂ - x₁
+    /// ```
     Delta
 );
-
-
-
-
-
 
 impl<const A: u8, B, C> Delta<A, B, C>
 where
@@ -71,10 +78,6 @@ where
         let ret: Percentage<_, _, _> = ret.into();
         Ok(ret)
     }
-
-    pub fn into_percentage_base_one(self) {
-        self.into_percentage(1);
-    }
 }
 
 impl<const A: u8, B, C> TryFrom<Factor<A, B, C>> for Delta<A, B, C> 
@@ -94,53 +97,52 @@ where
     }
 }
 
+/// Construct a `Delta` directly from a signed integer.
+/// 
+/// # Note
+/// 
+/// - No scaling is applied.
+/// - Expects the integer to be precision-adjusted.
+/// 
+/// # Example
+/// 
+/// ```rs
+/// let delta: Delta2 = delta_from_raw_signed_int(1_25); // `1.25`.
+/// ```
+pub fn delta_from_raw_signed_int<const A: u8, B, C>(n: B) -> Delta<A, B, C> 
+where
+    B: ops::Int,
+    B: ops::Prim,
+    B: ops::Signed,
+    C: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    n.into()
+}
 
-    /// Construct a `Delta` directly from a signed integer.
-    /// 
-    /// # Note
-    /// 
-    /// - No scaling is applied.
-    /// - Expects the integer to be precision-adjusted.
-    /// 
-    /// # Example
-    /// 
-    /// ```rs
-    /// let delta: Delta2 = delta_from_raw_signed_int(1_25); // `1.25`.
-    /// ```
-    pub fn delta_from_raw_signed_int<const A: u8, B, C>(n: B) -> Delta<A, B, C> 
-    where
-        B: ops::Int,
-        B: ops::Prim,
-        B: ops::Signed,
-        C: Engine,
-        (): SupportedPrecision<A>,
-        (): SupportedInt<B>,
-        (): Supported<A, B> {
-        n.into()
-    }
-
-    /// Construct a `Delta` from a signed integer.
-    /// 
-    /// For example, `148` will become a `Delta2` representing `148.00`.
-    /// 
-    /// # Example
-    /// 
-    /// ```rs
-    /// let delta: Delta2 = delta_from_signed_int(148); // `148.00`.
-    /// ```
-    pub fn delta_from_signed_int<const A: u8, B, C>(n: B) -> Result<Delta<A, B, C>>
-    where
-        B: ops::Int,
-        B: ops::Prim,
-        B: ops::Signed,
-        C: Engine,
-        (): SupportedPrecision<A>,
-        (): SupportedInt<B>,
-        (): Supported<A, B> {
-        let ret: B = n.checked_mul(scale::<A, B>()).ok_or(Error::Overflow)?;
-        let ret: Delta<_, _, _> = ret.into();
-        Ok(ret)
-    }
+/// Construct a `Delta` from a signed integer.
+/// 
+/// For example, `148` will become a `Delta2` representing `148.00`.
+/// 
+/// # Example
+/// 
+/// ```rs
+/// let delta: Delta2 = delta_from_signed_int(148); // `148.00`.
+/// ```
+pub fn delta_from_signed_int<const A: u8, B, C>(n: B) -> Result<Delta<A, B, C>>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    B: ops::Signed,
+    C: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    let ret: B = n.checked_mul(scale::<A, B>()).ok_or(Error::Overflow)?;
+    let ret: Delta<_, _, _> = ret.into();
+    Ok(ret)
+}
 
 
 /// Construct a `Delta` from a floating-point value.

@@ -1,7 +1,16 @@
 use super::*;
 
 mode!(
+    /// ```text
+    /// r = x₂ / x₁
+    /// ```
+    /// 
+    /// Represents a proportional value.
+    /// 
+    /// A *unitless*, positive value used
+    /// 
     Ratio
+);
 
     impl<const A: u8, B, C> Ratio<A, B, C> 
     where
@@ -35,4 +44,3 @@ mode!(
             }
         }
     }
-);

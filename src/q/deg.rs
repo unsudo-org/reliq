@@ -1,6 +1,30 @@
 use super::*;
 
-mode!(Deg);
+mode!(
+    /// ```text
+    /// 360° 
+    /// ```
+    /// 
+    /// An angular measurement in °.
+    /// 
+    /// # Conversion
+    /// 
+    /// ```text
+    /// θ° = (180 / π) × θʳ
+    /// θʳ = (π / 180) × θ°
+    /// ```
+    /// 
+    /// # Where
+    /// 
+    /// - `θ°` is the angle in degrees.
+    /// - `θʳ` is the angle in radians.
+    /// 
+    /// # Alias
+    /// 
+    /// - `Deg2` → `Deg<2>` — Precision to 2 decimal places.
+    /// - `Deg3` → `Deg<3>` — Precision to 3 decimal places.
+    Deg
+);
 
 impl<const A: u8, B, C> Deg<A, B, C> 
 where
