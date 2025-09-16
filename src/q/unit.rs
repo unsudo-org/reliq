@@ -23,6 +23,21 @@ ty!(
 #[derive(Copy)]
 pub struct UnitMode;
 
+impl<const A: u8, B, C> Unit<A, B, C>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    pub fn adjust_by<D>(self, proportion: D) -> Self 
+    where
+        D: Into<Proportion<A, B, C>> {
+        
+    }
+}
+
 impl<const A: u8, B, C> From<Deg<A, B, C>> for Unit<A, B, C>
 where
     B: ops::Int,
@@ -58,6 +73,19 @@ where
     (): SupportedInt<B>,
     (): Supported<A, B> {
     fn from(value: Percentage<A, B, C>) -> Self {
+        value.n.into()
+    }
+}
+
+impl<const A: u8, B, C> From<Factor<A, B, C>> for Unit<A, B, C>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    fn from(value: Factor<A, B, C>) -> Self {
         value.n.into()
     }
 }

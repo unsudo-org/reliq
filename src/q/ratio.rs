@@ -31,11 +31,7 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    pub fn is_proper(self) -> bool {
-        let ret = B::AS_1;
-        self.n < ret
-    }
-
+    #[inline]
     pub fn invert(self) -> Result<Self> {
         let ret: B = B::AS_1;
         let ret: Self = C::div(ret, self.n)?.into();
@@ -54,8 +50,8 @@ where
     fn from(value: Unit<A, B, C>) -> Self {
         Self {
             n: value.n,
-            mode: ::core::marker::PhantomData,
-            engine: ::core::marker::PhantomData
+            m_0: ::core::marker::PhantomData,
+            m_1: ::core::marker::PhantomData
         }
     }
 }

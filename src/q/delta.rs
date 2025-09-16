@@ -60,7 +60,7 @@ macro_rules! ty {
                 /// # Alias
                 /// - `Delta2` -> `Delta<2>` - A `2` decimal precision `Delta`.
                 /// - `Delta4` -> `Delta<4>` - A `4` decimal precision `Delta`.
-                pub type [< Delta $n >]<A = usize, B = DefaultEngine> = Delta<$n, A, B>;
+                pub type [< Delta $n >]<A = isize, B = DefaultEngine> = Delta<$n, A, B>;
             )*
         );
     };
@@ -76,6 +76,49 @@ ty!(
 #[derive(Clone)]
 #[derive(Copy)]
 pub struct DeltaMode;
+
+impl<const A: u8, B, C> Delta<A, B, C>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    B: ops::Signed,
+    C: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B>,
+    (): Supported<1, B> {
+    pub fn anyhow(self) -> Unit<A, B, C> {
+        self.into()
+    }
+
+    /// Converts a `Delta` into a `Percentage`, relative to a given base value.
+    /// 
+    /// # Formula
+    /// 
+    /// ```text
+    /// Percentage = (Delta / Base) * 100
+    /// ```
+    /// 
+    /// # Safety
+    /// 
+    /// - The base can not be 0.
+    pub fn to_percentage<D>(self, base: D) -> Result<Percentage<A, B, C>> 
+    where
+        D: Into<Unit<A, B, C>> {
+        let base: Unit<_, _, _> = base.into();
+        if base.n == B::AS_0 {
+            return Err(Error::DivisionByZero)
+        }
+        let ret: Unit<_, _, _> = self.anyhow();
+        let ret: Unit<_, _, _> = ((ret * as_100())? / base)?;
+        let ret: Percentage<_, _, _> = ret.into();
+        Ok(ret)
+    }
+
+    pub fn to_percentage_as_base_one(self) {
+        
+    }
+}
 
 impl<const A: u8, B, C> TryFrom<Factor<A, B, C>> for Delta<A, B, C> 
 where
@@ -118,8 +161,16 @@ where
     n.into()
 }
 
-// 1_48 is 148.00
-pub fn delta_from_signed_int<const A: u8, B, C>(n: B) -> Delta<A, B, C>
+/// Construct a `Delta` from a signed integer.
+/// 
+/// For example, `148` will become a `Delta2` representing `148.00`.
+/// 
+/// # Example
+/// 
+/// ```rs
+/// let delta: Delta2 = delta_from_signed_int(148); // `148.00`.
+/// ```
+pub fn delta_from_signed_int<const A: u8, B, C>(n: B) -> Result<Delta<A, B, C>>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -128,10 +179,15 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    // scale properly to precision.
+    let ret: B = n.checked_mul(scale::<A, B>()).ok_or(Error::Overflow)?;
+    let ret: Delta<_, _, _> = ret.into();
+    Ok(ret)
 }
 
-pub fn delta_from_float<const A: u8, B, C, D>(n: C) -> Delta<A, B, D>
+/// Construct a `Delta` from a floating-point value.
+/// 
+/// The floating is scaled to the appropriate integer representation based on precision.
+pub fn delta_from_float<const A: u8, B, C, D>(n: C) -> Result<Delta<A, B, D>>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -142,4 +198,11 @@ where
     (): SupportedInt<B>,
     (): Supported<A, B> {
     
+    let ret: B = 
+}
+
+#[test]
+fn test_delta_from_float() {
+    let n: f32 = 3.45;
+    let _: Delta2 = delta_from_float(n).unwrap();
 }

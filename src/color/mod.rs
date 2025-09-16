@@ -191,7 +191,7 @@ where
                         .ok_or(q::Error::UnsupportedConversion)?;
                     let b: q::Q<A, B, q::UnitMode, C> = b.into();
                     let ret: q::Q<A, B, q::UnitMode, C> = ((a + (b - a)?)? * t)?;
-                    let ret: B = ret.as_int();
+                    let ret: B = ret.into_int();
                     let ret: u8 = ret
                         .try_into()
                         .ok()
@@ -216,7 +216,7 @@ where
                         .ok_or(q::Error::UnsupportedConversion)?;
                     let b: q::Q::<A, B, q::UnitMode, C> = b.into();
                     let ret: q::Q<A, B, q::UnitMode, C> = ((a + (b - a)?)? * t)?;
-                    let ret: B = ret.as_int();
+                    let ret: B = ret.into_int();
                     let ret: u8 = ret
                         .try_into()
                         .ok()

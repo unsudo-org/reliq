@@ -34,8 +34,8 @@ where
     fn from(value: Unit<A, B, C>) -> Self {
         Self {
             n: value.n,
-            mode: ::core::marker::PhantomData,
-            engine: ::core::marker::PhantomData
+            m_0: ::core::marker::PhantomData,
+            m_1: ::core::marker::PhantomData
         }
     }
 }
@@ -51,8 +51,8 @@ where
     fn from(value: Percentage<A, B, C>) -> Self {
         Self {
             n: value.n,
-            mode: ::core::marker::PhantomData,
-            engine: ::core::marker::PhantomData
+            m_0: ::core::marker::PhantomData,
+            m_1: ::core::marker::PhantomData
         }
     }
 }

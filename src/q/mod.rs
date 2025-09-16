@@ -12,7 +12,6 @@ use super::*;
     pub percentage
     pub pi
     pub rad
-    pub rate
     pub ratio
     pub scale
     pub supported
@@ -72,8 +71,8 @@ where
     (): SupportedInt<B>,
     (): Supported<A, B> {
     n: B,
-    engine: ::core::marker::PhantomData<D>,
-    mode: ::core::marker::PhantomData<C>
+    m_0: ::core::marker::PhantomData<C>,
+    m_1: ::core::marker::PhantomData<D>
 }
 
 impl<const A: Precision, B, C, D> Q<A, B, C, D>
@@ -85,19 +84,19 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
+
     #[inline]
     pub fn lerp<E, F>(self, rhs: E, t: F) -> Result<Self> 
     where
         E: Into<Self>,
         F: Into<Self> {
         let x: Self = self;
-        let x: B = x.n;
+        let x: B = x.into_int();
         let y: Self = rhs.into();
-        let y: B = y.n;
+        let y: B = y.into_int();
         let t: Self = t.into();
-        let t: B = t.n;
-        let ret: B = D::lerp(x, y, t)?;
-        let ret: Self = ret.into();
+        let t: B = t.into_int();
+        let ret: Self = D::lerp(x, y, t)?.into();
         Ok(ret)
     }
 
@@ -113,8 +112,36 @@ where
         }
     }
 
+    pub fn round_up(self) -> Self {
+        let n: B = self.n;
+        let ret: B = D::round_up(n);
+        let ret: Self = ret.into();
+        ret
+    }
+
+    pub fn round_down(self) -> Self {
+        let n: B = self.n;
+        let ret: B = D::round_down(n);
+        let ret: Self = ret.into();
+        ret
+    }
+
+    pub fn round_towards_zero(self) -> Self {
+        let n: B = self.n;
+        let ret: B = D::round_towards_zero(n);
+        let ret: Self = ret.into();
+        ret
+    }
+
+    pub fn round_away_from_zero(self) -> Self {
+        let n: B = self.n;
+        let ret: B = D::round_away_from_zero(n);
+        let ret: Self = ret.into();
+        ret
+    }
+
     #[inline]
-    pub fn as_int(self) -> B {
+    pub fn into_int(self) -> B {
         self.n
     }
 }
@@ -154,7 +181,121 @@ where
     }
 }
 
-impl<const A: u8, B, C, D> From<B> for Q<A, B, C, D>
+impl<const A: u8, B, C, D, E> ::core::ops::Add<Q<A, B, D, E>> for Q<A, B, C, E>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Mode,
+    D: Mode,
+    E: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    type Output = Result<Self>;
+
+    #[inline]
+    fn add(self, rhs: Q<A, B, D, E>) -> Self::Output {
+        let x: B = self.n;
+        let y: B = rhs.n;
+        let ret: B = E::add(x, y)?;
+        let ret: Self = ret.into();
+        Ok(ret)
+    }
+}
+
+impl<const A: u8, B, C, D, E> ::core::ops::Sub<Q<A, B, D, E>> for Q<A, B, C, E>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Mode,
+    D: Mode,
+    E: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    type Output = Result<Self>;
+
+    #[inline]
+    fn sub(self, rhs: Q<A, B, D, E>) -> Self::Output {
+        let x: B = self.n;
+        let y: B = rhs.n;
+        let ret: B = E::sub(x, y)?;
+        let ret: Self = ret.into();
+        Ok(ret)
+    }
+}
+
+impl<const A: u8, B, C, D, E> ::core::ops::Mul<Q<A, B, D, E>> for Q<A, B, C, E>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Mode,
+    D: Mode,
+    E: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    type Output = Result<Self>;
+
+    #[inline]
+    fn mul(self, rhs: Q<A, B, D, E>) -> Self::Output {
+        let x: B = self.n;
+        let y: B = rhs.n;
+        let ret: B = E::mul::<A, _>(x, y)?;
+        let ret: Self = ret.into();
+        Ok(ret)
+    }
+}
+
+impl<const A: u8, B, C, D, E> ::core::ops::Div<Q<A, B, D, E>> for Q<A, B, C, E>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Mode,
+    D: Mode,
+    E: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    type Output = Result<Self>;
+
+    #[inline]
+    fn div(self, rhs: Q<A, B, D, E>) -> Self::Output {
+        let x: B = self.n;
+        let y: B = rhs.n;
+        let ret: B = E::div::<A, _>(x, y)?;
+        let ret: Self = ret.into();
+        Ok(ret)
+    }
+}
+
+impl<const A: u8, B, C, D> Eq for Q<A, B, C, D>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Mode,
+    D: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {}
+
+impl<const A: u8, B, C, D, E> PartialEq<Q<A, B, D, E>> for Q<A, B, C, E>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Mode,
+    D: Mode,
+    E: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+
+    fn eq(&self, other: &Q<A, B, D, E>) -> bool {
+        self == other
+    }
+}
+
+impl<const A: u8, B, C, D> Ord for Q<A, B, C, D>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -163,12 +304,123 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    fn from(value: B) -> Self {
-        Self {
-            n: value,
-            mode: ::core::marker::PhantomData,
-            engine: ::core::marker::PhantomData
+
+    fn clamp(self, min: Self, max: Self) -> Self
+    where
+        Self: Sized {
+        if self < min {
+            min
+        } else if self > max {
+            max
+        } else {
+            self
         }
+    }
+
+    fn max(self, other: Self) -> Self
+    where
+        Self: Sized {
+        if self > other {
+            self
+        } else {
+            other
+        }
+    }
+
+    #[inline]
+    fn min(self, other: Self) -> Self
+    where
+        Self: Sized {
+        if self < other {
+            self
+        } else {
+            other
+        }
+    }
+
+    #[inline]
+    fn cmp(&self, other: &Self) -> ::core::cmp::Ordering {
+        let x: B = self.n;
+        let y: B = other.n;
+        if x > y {
+            ::core::cmp::Ordering::Greater
+        } else if x < y {
+            ::core::cmp::Ordering::Less
+        } else {
+            ::core::cmp::Ordering::Equal
+        }
+    }
+}
+
+impl<const A: u8, B, C, D, E> PartialOrd<Q<A, B, D, E>> for Q<A, B, C, E>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Mode,
+    D: Mode,
+    E: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+
+    fn ge(&self, other: &Q<A, B, D, E>) -> bool {
+        let x: B = self.n;
+        let y: B = other.n;
+        x >= y
+    }
+
+    fn le(&self, other: &Q<A, B, D, E>) -> bool {
+        let x: B = self.n;
+        let y: B = other.n;
+        x <= y
+    }
+
+    fn gt(&self, other: &Q<A, B, D, E>) -> bool {
+        let x: B = self.n;
+        let y: B = other.n;
+        x > y
+    }
+
+    fn lt(&self, other: &Q<A, B, D, E>) -> bool {
+        let x: B = self.n;
+        let y: B = other.n;
+        x < y
+    }
+
+    #[allow(clippy::non_canonical_partial_ord_impl)]
+    fn partial_cmp(&self, other: &Q<A, B, D, E>) -> Option<core::cmp::Ordering> {
+        let x: B = self.n;
+        let y: B = other.n;
+        let ret: ::core::cmp::Ordering = x.cmp(&y);
+        Some(ret)
+    }
+}
+
+impl<const A: u8, B, C, D> ::core::fmt::Debug for Q<A, B, C, D>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Mode,
+    D: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write!(f, "Q({})", self.n)
+    }
+}
+
+impl<const A: u8, B, C, D> ::core::fmt::Display for Q<A, B, C, D>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Mode,
+    D: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write!(f, "Q({})", self.n)
     }
 }
 
@@ -316,249 +568,6 @@ where
     }
 }
 
-
-impl<const A: u8, B, C, D> ::core::ops::Add for Q<A, B, C, D>
-where
-    B: ops::Int,
-    B: ops::Prim,
-    C: Mode,
-    D: Engine,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
-    type Output = Result<Self>;
-
-    #[inline]
-    fn add(self, rhs: Self) -> Self::Output {
-        let x: B = self.n;
-        let y: B = rhs.n;
-        let ret: B = D::add(x, y)?;
-        let ret: Self = ret.into();
-        Ok(ret)
-    }
-}
-
-impl<const A: u8, B, C, D> ::core::ops::Sub for Q<A, B, C, D>
-where
-    B: ops::Int,
-    B: ops::Prim,
-    C: Mode,
-    D: Engine,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
-    type Output = Result<Self>;
-
-    #[inline]
-    fn sub(self, rhs: Self) -> Self::Output {
-        let x: B = self.n;
-        let y: B = rhs.n;
-        let ret: B = D::sub(x, y)?;
-        let ret: Self = ret.into();
-        Ok(ret)
-    }
-}
-
-impl<const A: u8, B, C, D> ::core::ops::Mul for Q<A, B, C, D>
-where
-    B: ops::Int,
-    B: ops::Prim,
-    C: Mode,
-    D: Engine,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
-    type Output = Result<Self>;
-
-    #[inline]
-    fn mul(self, rhs: Self) -> Self::Output {
-        let x: B = self.n;
-        let y: B = rhs.n;
-        let ret: B = D::mul(x, y)?;
-        let ret: Self = ret.into();
-        Ok(ret)
-    }
-}
-
-impl<const A: u8, B, C, D> ::core::ops::Div for Q<A, B, C, D>
-where
-    B: ops::Int,
-    B: ops::Prim,
-    C: Mode,
-    D: Engine,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
-    type Output = Result<Self>;
-
-    #[inline]
-    fn div(self, rhs: Self) -> Self::Output {
-        let x: B = self.n;
-        let y: B = rhs.n;
-        let ret: B = D::div::<A, _>(x, y)?;
-        let ret: Self = ret.into();
-        Ok(ret)
-    }
-}
-
-impl<const A: u8, B, C, D> Eq for Q<A, B, C, D>
-where
-    B: ops::Int,
-    B: ops::Prim,
-    C: Mode,
-    D: Engine,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {}
-
-impl<const A: u8, B, C, D> PartialEq for Q<A, B, C, D>
-where
-    B: ops::Int,
-    B: ops::Prim,
-    C: Mode,
-    D: Engine,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
-    #[inline]
-    fn eq(&self, other: &Self) -> bool {
-        self.n == other.n
-    }
-}
-
-impl<const A: u8, B, C, D> Ord for Q<A, B, C, D>
-where
-    B: ops::Int,
-    B: ops::Prim,
-    C: Mode,
-    D: Engine,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
-    #[inline]
-    fn clamp(self, min: Self, max: Self) -> Self
-    where
-        Self: Sized {
-        if self < min {
-            min
-        } else if self > max {
-            max
-        } else {
-            self
-        }
-    }
-
-    #[inline]
-    fn max(self, other: Self) -> Self
-    where
-        Self: Sized {
-        if self > other {
-            self
-        } else {
-            other
-        }
-    }
-
-    #[inline]
-    fn min(self, other: Self) -> Self
-    where
-        Self: Sized {
-        if self < other {
-            self
-        } else {
-            other
-        }
-    }
-
-    #[inline]
-    fn cmp(&self, other: &Self) -> ::core::cmp::Ordering {
-        let x: B = self.n;
-        let y: B = other.n;
-        if x > y {
-            ::core::cmp::Ordering::Greater
-        } else if x < y {
-            ::core::cmp::Ordering::Less
-        } else {
-            ::core::cmp::Ordering::Equal
-        }
-    }
-}
-
-impl<const A: u8, B, C, D> PartialOrd for Q<A, B, C, D>
-where
-    B: ops::Int,
-    B: ops::Prim,
-    C: Mode,
-    D: Engine,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
-    #[inline]
-    fn ge(&self, other: &Self) -> bool {
-        let x: B = self.n;
-        let y: B = other.n;
-        x >= y
-    }
-
-    #[inline]
-    fn le(&self, other: &Self) -> bool {
-        let x: B = self.n;
-        let y: B = other.n;
-        x <= y
-    }
-
-    #[inline]
-    fn gt(&self, other: &Self) -> bool {
-        let x: B = self.n;
-        let y: B = other.n;
-        x > y
-    }
-
-    #[inline]
-    fn lt(&self, other: &Self) -> bool {
-        let x: B = self.n;
-        let y: B = other.n;
-        x < y
-    }
-
-    #[allow(clippy::non_canonical_partial_ord_impl)]
-    #[inline]
-    fn partial_cmp(&self, other: &Self) -> Option<::core::cmp::Ordering> {
-        let x: B = self.n;
-        let y: B = other.n;
-        let ret: ::core::cmp::Ordering = x.cmp(&y);
-        Some(ret)
-    }
-}
-
-impl<const A: u8, B, C, D> ::core::fmt::Debug for Q<A, B, C, D>
-where
-    B: ops::Int,
-    B: ops::Prim,
-    C: Mode,
-    D: Engine,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-        write!(f, "Q({})", self.n)
-    }
-}
-
-impl<const A: u8, B, C, D> ::core::fmt::Display for Q<A, B, C, D>
-where
-    B: ops::Int,
-    B: ops::Prim,
-    C: Mode,
-    D: Engine,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-        write!(f, "Q({})", self.n)
-    }
-}
-
 #[cfg(test)]
 #[::rstest::rstest]
 #[case(295_34, 295)]
@@ -577,8 +586,10 @@ where
 #[case(295_34, 295.0)]
 fn test_float_conversion<T>(#[case] n: T, #[case] ok: f64) 
 where
-    T: Into<Q2<u128>> {
+    T: Into<Unit2<u128>> {
     use ops::ToPrim as _;
+
+    
 
     let n: Q2<u128> = n.into();
     let n: f64 = n.to_f64().unwrap();
@@ -588,8 +599,10 @@ where
 #[cfg(test)]
 #[::rstest::rstest]
 #[case(1_00.into(), 1_00.into(), 2_00.into())]
-fn test_add(#[case] x: Q2<u32>, #[case] y: Q2<u32>, #[case] expected: Q2<u32>) {
-    let ret: Q2<_> = (x + y).unwrap();
+fn test_add(#[case] x: Unit2, #[case] y: Unit2, #[case] expected: Unit2) {
+    let ret: Unit2 = (x + y).unwrap();
+    ret.lerp(4_00, 5_00).unwrap();
+    ret.lerp(5_00, 4).unwrap();
     assert_eq!(ret, expected);
 }
 

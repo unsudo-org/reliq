@@ -4,6 +4,7 @@ macro_rules! ty {
     ($($n:literal)*) => {
         ::paste::paste!(
             pub type Rad<const A: u8, B = usize, C = DefaultEngine> = Q<A, B, RadMode, C>;
+            
             $(
                 pub type [< Rad $n >]<A = usize, B = DefaultEngine> = Rad<$n, A, B>;
             )*
@@ -38,7 +39,7 @@ where
     }
 }
 
-impl<const A: u8, B, C> Q<A, B, RadMode, C> 
+impl<const A: u8, B, C> Rad<A, B, C>
 where
     B: ops::Int,
     B: ops::Prim,
@@ -47,34 +48,37 @@ where
     (): SupportedInt<B>,
     (): Supported<A, B> {
     #[inline]
-    pub fn tan(self) -> Result<Unit<A, B, C>> {
+    pub fn tan(self) -> Result<Ratio<A, B, C>> {
         let ret: B = self.n;
         let ret: B = C::tan(ret)?;
-        let ret: Unit<A, B, C> = ret.into();
+        let ret: Unit<_, _, _> = ret.into();
+        let ret: Ratio<_, _, _> = ret.into();
         Ok(ret)
     }
 
     #[inline]
-    pub fn sin(self) -> Result<Q<A, B, UnitMode, C>> {
+    pub fn sin(self) -> Result<Ratio<A, B, C>> {
         let ret: B = self.n;
         let ret: B = C::sin(ret)?;
-        let ret: Unit<A, B, C> = ret.into();
+        let ret: Unit<_, _, _> = ret.into();
+        let ret: Ratio<_, _, _> = ret.into();
         Ok(ret)
     }
 
     #[inline]
-    pub fn cos(self) -> Result<Q<A, B, UnitMode, C>> {
+    pub fn cos(self) -> Result<Ratio<A, B, C>> {
         let ret: B = self.n;
         let ret: B = C::cos(ret)?;
-        let ret: Q<A, B, UnitMode, C> = ret.into();
+        let ret: Unit<_, _, _> = ret.into();
+        let ret: Ratio<_, _, _> = ret.into();
         Ok(ret)
     }
 
     #[inline]
-    pub fn to_deg(self) -> Result<Q<A, B, DegMode, C>> {
+    pub fn to_deg(self) -> Result<Deg<_, _, _>> {
         let ret: B = self.n;
         let ret: B = C::to_deg(ret)?;
-        let ret: Q<A, B, DegMode, C> = ret.into();
+        let ret: Deg<_, _, _> = ret.into();
         Ok(ret)
     }
 }
@@ -82,7 +86,7 @@ where
 #[cfg(test)]
 #[::rstest::rstest]
 #[case(1_00.into(), 0_84.into())]
-fn test_sin(#[case] angle: Rad, #[case] ok: Unit) {
+fn test_sin(#[case] angle: Rad2, #[case] ok: Unit) {
     let ret: Q2<i32> = angle.sin().unwrap();
     assert_eq!(ret, ok);
 }

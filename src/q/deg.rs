@@ -5,7 +5,7 @@ macro_rules! ty {
         ::paste::paste!(
             pub type Deg<const A: u8 = 2, B = usize, C = DefaultEngine> = Q<A, B, DegMode, C>;
             $(
-                pub type [< Deg $n >]<A = usize, B = DefaultEngine> = Q<$n, A, DegMode, B>;
+                pub type [< Deg $n >]<A = usize, B = DefaultEngine> = Deg<$n, A, B>;
             )*
         );
     };
@@ -32,17 +32,17 @@ where
     (): SupportedInt<B>,
     (): Supported<A, B> {
     #[inline]
-    pub fn tan(self) -> Result<Unit<A, B, C>> {
+    pub fn tan(self) -> Result<Ratio<A, B, C>> {
         self.to_rad()?.tan()
     }
 
     #[inline]
-    pub fn sin(self) -> Result<Unit<A, B, C>> {
+    pub fn sin(self) -> Result<Ratio<A, B, C>> {
         self.to_rad()?.sin()
     }
 
     #[inline]
-    pub fn cos(self) -> Result<Unit<A, B, C>> {
+    pub fn cos(self) -> Result<Ratio<A, B, C>> {
         self.to_rad()?.cos()
     }
 

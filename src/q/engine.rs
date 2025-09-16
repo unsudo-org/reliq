@@ -10,26 +10,9 @@ pub struct DefaultEngine;
 
 impl Engine for DefaultEngine {}
 
-pub trait Engine 
-where
-    Self: Sized,
-    Self: Clone,
-    Self: Copy,
-    Self: Trig,
-    Self: TrigConversionEngine,
-    Self: ConversionEngine,
-    Self: SignEngine,
-    Self: LerpEngine,
-    Self: SqrtEngine,
-    Self: ArithmeticEngine,
-    Self: MuldivEngine {}
-
-pub trait Trig 
-where
-    Self: ArithmeticEngine,
-    Self: TrigConversionEngine {
+pub trait Engine {
     #[inline]
-    fn tan<const A: u8, B>(rad_angle: B) -> Result<B>
+    fn tan<const A: Precision, B>(rad_angle: B) -> Result<B>
     where
         B: ops::Int,
         B: ops::Prim,
@@ -42,7 +25,7 @@ where
     }
 
     #[inline]
-    fn sin<const A: u8, B>(rad_angle: B) -> Result<B>
+    fn sin<const A: Precision, B>(rad_angle: B) -> Result<B>
     where
         B: ops::Int,
         B: ops::Prim,
@@ -53,7 +36,7 @@ where
     }
 
     #[inline]
-    fn cos<const A: u8, B>(rad_angle: B) -> Result<B>
+    fn cos<const A: Precision, B>(rad_angle: B) -> Result<B>
     where
         B: ops::Int,
         B: ops::Prim,
@@ -95,17 +78,9 @@ where
         }
         Ok(ret)
     }
-}
 
-impl<T> Trig for T
-where
-    T: Engine {}
-
-pub trait TrigConversionEngine 
-where
-    Self: MuldivEngine {
     #[inline]
-    fn to_rad<const A: u8, B>(deg_angle: B) -> Result<B>
+    fn to_rad<const A: Precision, B>(deg_angle: B) -> Result<B>
     where
         B: ops::Int,
         B: ops::Prim,
@@ -116,7 +91,7 @@ where
     }
 
     #[inline]
-    fn to_deg<const A: u8, B>(rad_angle: B) -> Result<B>
+    fn to_deg<const A: Precision, B>(rad_angle: B) -> Result<B>
     where
         B: ops::Int,
         B: ops::Prim,
@@ -125,17 +100,110 @@ where
         (): Supported<A, B> {
         Self::muldiv(rad_angle, as_180::<B>() * scale::<A, B>(), pi())
     }
-}
 
-impl<T> TrigConversionEngine for T
-where
-    T: Engine {}
-
-pub trait ConversionEngine
-where
-    Self: MuldivEngine {
     #[inline]
-    fn cast<const A: u8, const B: u8, C>(n: C) -> Result<lossy::Lossy<C>>
+    fn round_up<const A: Precision, B>(n: B) -> B
+    where
+        B: ops::Int,
+        (): SupportedPrecision<A>,
+        (): SupportedInt<B>,
+        (): Supported<A, B> {
+        let scale: B = scale::<A, B>();
+        if n % scale == B::AS_0 {
+            return n
+        }
+        if n >= B::AS_0 {
+            let n: B = n / scale;
+            let n: B = n + B::AS_1;
+            let n: B = n * scale;
+            return n
+        }
+        let n: B = n / scale;
+        let n: B = n * scale;
+        n
+    }
+
+    fn round_down<const A: Precision, B>(n: B) -> B 
+    where
+        B: ops::Int,
+        (): SupportedPrecision<A>,
+        (): SupportedInt<B>,
+        (): Supported<A, B> {
+        let scale: B = scale::<A, B>();
+        if n % scale == B::AS_0 {
+            return n
+        }
+        if n >= B::AS_0 {
+            let n: B = n / scale;
+            let n: B = n * scale;
+            return n
+        }
+        let n: B = n / scale;
+        let n: B = n - B::AS_1;
+        let n: B = n * scale;
+        n
+    }
+
+    fn round_towards_zero<const A: Precision, B>(n: B) -> B 
+    where
+        B: ops::Int,
+        (): SupportedPrecision<A>,
+        (): SupportedInt<B>,
+        (): Supported<A, B> {
+        let scale: B = scale();
+        let n: B = n / scale;
+        let n: B = n * scale;
+        n
+    }
+
+    fn round_away_from_zero<const A: Precision, B>(n: B) -> B
+    where
+        B: ops::Int,
+        (): SupportedPrecision<A>,
+        (): SupportedInt<B>,
+        (): Supported<A, B> {
+        let scale: B = scale::<A, B>();
+        if n % scale == B::AS_0 {
+            return n
+        }
+        if n < B::AS_0 {
+            let n: B = n / scale;
+            let n: B = n * scale;
+            let n: B = n - scale;
+            return n
+        }
+        let n: B = n / scale;
+        let n: B = n * scale;
+        let n: B = n + scale;
+        n
+    }
+
+    #[inline]
+    fn to_negative<T>(n: T) -> T
+    where
+        T: ops::Int,
+        T: ops::Signed,
+        (): SupportedInt<T> {
+        if n == T::AS_0 {
+            return n
+        }
+        T::AS_0 - n    
+    }
+
+    #[inline]
+    fn to_positive<T>(n: T) -> T
+    where
+        T: ops::Int,
+        T: ops::Signed,
+        (): SupportedInt<T> {
+        if n >= T::AS_0 {
+            return n
+        }
+        T::AS_0 - n    
+    }
+
+    #[inline]
+    fn cast<const A: Precision, const B: Precision, C>(n: C) -> Result<lossy::Lossy<C>>
     where
         C: ops::Int,
         C: ops::Prim,
@@ -146,58 +214,16 @@ where
         (): Supported<B, C> {
         let old_scale: C = scale::<A, _>();
         let new_scale: C = scale::<B, _>();
-        let ret: C = Self::muldiv(n, new_scale, old_scale)?;
+        let n: C = Self::muldiv(n, new_scale, old_scale)?;
         if B < A {
-            Ok(lossy::Lossy::Trunc(ret))
+            Ok(lossy::Lossy::Trunc(n))
         } else {
-            Ok(lossy::Lossy::Exact(ret))
-        }
-    }
-}
-
-impl<T> ConversionEngine for T
-where
-    T: Engine {}
-
-pub trait SignEngine {
-    #[inline]
-    fn to_negative<T>(n: T) -> T
-    where
-        T: ops::Int,
-        T: ops::Prim,
-        T: ops::Signed,
-        (): SupportedInt<T> {
-        if n == T::AS_0 {
-            n
-        } else {
-            T::AS_0 - n
+            Ok(lossy::Lossy::Exact(n))
         }
     }
 
     #[inline]
-    fn to_positive<T>(n: T) -> T
-    where
-        T: ops::Int,
-        T: ops::Prim,
-        T: ops::Signed,
-        (): SupportedInt<T> {
-        if n >= T::AS_0 {
-            n
-        } else {
-            T::AS_0 - n
-        }
-    }
-}
-
-impl<T> SignEngine for T
-where
-    T: Engine {}
-
-pub trait LerpEngine
-where
-    Self: ArithmeticEngine {
-    #[inline]
-    fn lerp<const A: u8, B>(x: B, y: B, t: B) -> Result<B>
+    fn lerp<const A: Precision, B>(x: B, y: B, t: B) -> Result<B>
     where
         B: ops::Int,
         B: ops::Prim,
@@ -208,17 +234,9 @@ where
         let s: B = Self::muldiv(d, t, scale())?;
         Self::add(x, s)
     }
-}
 
-impl<T> LerpEngine for T
-where 
-    T: Engine {}
-
-pub trait SqrtEngine 
-where
-    Self: ArithmeticEngine {
     #[inline]
-    fn sqrt<const A: u8, B>(n: B) -> Result<B>
+    fn sqrt<const A: Precision, B>(n: B) -> Result<B>
     where
         B: ops::Int,
         B: ops::Prim,
@@ -244,37 +262,7 @@ where
         }
         Ok(ret)
     }
-}
 
-impl<T> SqrtEngine for T
-where
-    T: Engine {}
-
-pub trait CardinalArithmeticEngine 
-where
-    Self: ArithmeticEngine {
-    //! An engine to handle cardinal mode
-
-    fn add<T>(x: T, y: T) -> Result<T> 
-    where
-        T: ops::Int,
-        T: ops::Prim,
-        (): SupportedInt<T> {
-        <Self as ArithmeticEngine>::add(x, y)
-    }
-
-    fn sub<T>(x: T, y: T) -> Result<T>
-    where
-        T: ops::Int,
-        T: ops::Prim,
-        (): SupportedInt<T> {
-        <Self as ArithmeticEngine>::sub(x, y)
-    }
-}
-
-pub trait ArithmeticEngine 
-where
-    Self: MuldivEngine {
     #[inline]
     fn add<T>(x: T, y: T) -> Result<T>
     where
@@ -320,13 +308,7 @@ where
         }
         Self::muldiv(x, scale::<A, _>(), y)
     }
-}
 
-impl<T> ArithmeticEngine for T
-where
-    T: Engine {}
-
-pub trait MuldivEngine {
     #[inline]
     fn muldiv<T>(x: T, y: T, z: T) -> Result<T> 
     where 
@@ -362,10 +344,6 @@ pub trait MuldivEngine {
         }
     }
 }
-
-impl<T> MuldivEngine for T
-where
-    T: Engine {}
 
 #[inline]
 fn wide_mul<T>(x: T, y: T) -> Result<(T, T)>
