@@ -1,42 +1,21 @@
 use super::*;
 
-macro_rules! ty {
-    ($($n:literal)*) => {
-        ::paste::paste!(
-            /// Represents a relative change.
-            /// 
-            /// Mathematically, a percentage is a normalized value relative to 100:
-            /// 
-            /// ```text
-            /// Percentage = (Factor - 1.0) * 100
-            /// ```
-            /// 
-            /// For example:
-            /// 
-            /// - `Percentage<2>` with value `50` represents `+0.50%`
-            /// - `Percentage<2>` with value `-10000` represents `-100.00%`
-            /// - `Percentage<2>` with value `0` represents no change (`0.00%`)
-            pub type Percentage<const A: u8, B, C = DefaultEngine> = Q<A, B, PercentageMode, C>;
-            
-            $(
-                pub type [< Percentage $n >]<A, B = DefaultEngine> = Percentage<$n, A, B>;
-            )*
-        );
-    };
-}
-
-ty!(
-    0 1 2 3 4 5 6 7 8 9
-    10 11 12 13 14 15 16 17 18 19
-    20 21 22 23 24 25 26 27 28 29
-    30 31 32 33 34 35 36 37
+mode!(
+    /// Represents a relative change.
+    /// 
+    /// Mathematically, a percentage is a normalized value relative to 100:
+    /// 
+    /// ```text
+    /// Percentage = (Factor - 1.0) * 100
+    /// ```
+    /// 
+    /// For example:
+    /// 
+    /// - `Percentage<2>` with value `50` represents `+0.50%`
+    /// - `Percentage<2>` with value `-10000` represents `-100.00%`
+    /// - `Percentage<2>` with value `0` represents no change (`0.00%`)
+    Percentage
 );
-
-// cannot have less than -100, but can be higher.
-#[repr(transparent)]
-#[derive(Clone)]
-#[derive(Copy)]
-pub struct PercentageMode;
 
 impl<const A: u8, B, C> Percentage<A, B, C>
 where

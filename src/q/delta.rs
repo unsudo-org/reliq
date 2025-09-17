@@ -97,18 +97,6 @@ where
     }
 }
 
-/// Construct a `Delta` directly from a signed integer.
-/// 
-/// # Note
-/// 
-/// - No scaling is applied.
-/// - Expects the integer to be precision-adjusted.
-/// 
-/// # Example
-/// 
-/// ```rs
-/// let delta: Delta2 = delta_from_raw_signed_int(1_25); // `1.25`.
-/// ```
 pub fn delta_from_raw_signed_int<const A: u8, B, C>(n: B) -> Delta<A, B, C> 
 where
     B: ops::Int,
@@ -121,15 +109,6 @@ where
     n.into()
 }
 
-/// Construct a `Delta` from a signed integer.
-/// 
-/// For example, `148` will become a `Delta2` representing `148.00`.
-/// 
-/// # Example
-/// 
-/// ```rs
-/// let delta: Delta2 = delta_from_signed_int(148); // `148.00`.
-/// ```
 pub fn delta_from_signed_int<const A: u8, B, C>(n: B) -> Result<Delta<A, B, C>>
 where
     B: ops::Int,
@@ -158,8 +137,8 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    
-    let ret: B = 
+    let ret: B = n.into();
+    Ok(ret.into())
 }
 
 #[test]

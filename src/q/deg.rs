@@ -2,10 +2,11 @@ use super::*;
 
 mode!(
     /// ```text
-    /// 360° 
+    /// τ = 360°
     /// ```
     /// 
-    /// An angular measurement in °.
+    /// Represents an angular measurement (`°`).
+    /// 
     /// 
     /// # Conversion
     /// 
@@ -14,15 +15,33 @@ mode!(
     /// θʳ = (π / 180) × θ°
     /// ```
     /// 
+    /// ```text
+    /// |-----------|-----------|--------|
+    /// | θ = τ     | 2π        | ≈ 360° |
+    /// | θ = π     |  π        | ≈ 180° |
+    /// | θ = π / 2 |  π / 2    | ≈ 90°  |
+    /// ```
+    /// 
+    /// 
     /// # Where
     /// 
     /// - `θ°` is the angle in degrees.
     /// - `θʳ` is the angle in radians.
     /// 
-    /// # Alias
     /// 
-    /// - `Deg2` → `Deg<2>` — Precision to 2 decimal places.
-    /// - `Deg3` → `Deg<3>` — Precision to 3 decimal places.
+    /// # Variant
+    /// 
+    /// ```text
+    /// | Alias                | Precision |
+    /// |----------------------|-----------|
+    /// | `Deg1` -> `Deg<1>`   | 1         |
+    /// | `Deg2` -> `Deg<2>`   | 2         |
+    /// | `Deg3` -> `Deg<3>`   | 3         |
+    /// | ...                              |
+    /// | `Deg35` -> `Deg<35>` | 35        |
+    /// | `Deg36` -> `Deg<36>` | 36        |
+    /// | `Deg37` -> `Deg<37>` | 37        |
+    /// ```
     Deg
 );
 
@@ -74,28 +93,40 @@ where
 }
 
 #[cfg(test)]
-#[allow(clippy::zero_prefixed_literal)]
-mod test {
-    use super::*;
+#[::rstest::rstest]
+#[case(25_00, 0_46)]
+fn tan<A, B>(#[case] angle: A, #[case] ok: B) 
+where
+    A: Into<Deg2>,
+    B: Into<Unit2> {
+    let angle: Deg2 = angle.into();
+    let ok: Unit2 = ok.into();
+    let ret: Ratio2 = angle.tan().unwrap();
+    assert_eq!(ret, ok);
+}
 
-    #[::rstest::rstest]
-    #[case(25_00.into(), 0_46.into())]
-    fn tan(#[case] angle: Deg2<u32>, #[case] expected: Q2<u32>) {
-        let ret: Unit = angle.tan().unwrap();
-        assert_eq!(ret, expected);
-    }
+#[cfg(test)]
+#[::rstest::rstest]
+#[case(25_00, 0_42)]
+fn sin<A, B>(#[case] angle: A, #[case] ok: B) 
+where
+    A: Into<Deg2>,
+    B: Into<Unit2> {
+    let angle: Deg2 = angle.into();
+    let ok: Unit2 = ok.into();
+    let ret: Ratio2 = angle.sin().unwrap();
+    assert_eq!(ret, ok);
+}
 
-    #[::rstest::rstest]
-    #[case(25_00.into(), 0_42.into())]
-    fn sin(#[case] angle: Deg2<u32>, #[case] expected: Q2<u32>) {
-        let ret: Q2<_> = angle.sin().unwrap();
-        assert_eq!(ret, expected);
-    }
-
-    #[::rstest::rstest]
-    #[case(1_00.into(), 1_00.into())]
-    fn cos(#[case] angle: Deg2<u32>, #[case] expected: Q2<u32>) {
-        let ret: Q2<_> = angle.cos().unwrap();
-        assert_eq!(ret, expected);
-    }
+#[cfg(test)]
+#[::rstest::rstest]
+#[case(1_00, 1_00)]
+fn cos<A, B>(#[case] angle: A, #[case] ok: B) 
+where
+    A: Into<Deg2>,
+    B: Into<Unit2> {
+    let angle: Deg2 = angle.into();
+    let ok: Unit2 = ok.into();
+    let ret: Ratio2 = angle.cos().unwrap();
+    assert_eq!(ret, ok);
 }

@@ -1,28 +1,49 @@
 use super::*;
 
-macro_rules! ty {
-    ($($n:literal)*) => {
-        ::paste::paste!(
-            pub type Rad<const A: u8, B = usize, C = DefaultEngine> = Q<A, B, RadMode, C>;
-            
-            $(
-                pub type [< Rad $n >]<A = usize, B = DefaultEngine> = Rad<$n, A, B>;
-            )*
-        );
-    };
-}
-
-ty!(
-    0 1 2 3 4 5 6 7 8 9
-    10 11 12 13 14 15 16 17 18 19
-    20 21 22 23 24 25 26 27 28 29
-    30 31 32 33 34 35 36 37
+mode!(
+    /// ```text
+    /// τ = 2π
+    /// ```
+    /// 
+    /// Represents an angular measurement (`ʳ`).
+    /// 
+    /// 
+    /// # Conversion
+    /// 
+    /// ```text
+    /// θ° = (180 / π) × θʳ
+    /// θʳ = (π / 180) × θ°
+    /// ```
+    /// 
+    /// ```text
+    /// |-----------|-----------|--------|
+    /// | θ = τ     | 2π        | ≈ 360° |
+    /// | θ = π     |  π        | ≈ 180° |
+    /// | θ = π / 2 |  π / 2    | ≈ 90°  |
+    /// ```
+    /// 
+    /// 
+    /// # Where
+    /// 
+    /// - `θ°` is the angle in degrees.
+    /// - `θʳ` is the angle in radians.
+    /// 
+    /// 
+    /// # Variant
+    /// 
+    /// ```text
+    /// | Alias                | Precision |
+    /// |----------------------|-----------|
+    /// | `Rad1` -> `Rad<1>`   | 1         |
+    /// | `Rad2` -> `Rad<2>`   | 2         |
+    /// | `Rad3` -> `Rad<3>`   | 3         |
+    /// | ...                              |
+    /// | `Rad35` -> `Rad<35>` | 35        |
+    /// | `Rad36` -> `Rad<36>` | 36        |
+    /// | `Rad37` -> `Rad<37>` | 37        |
+    /// ```
+    Rad
 );
-
-#[repr(transparent)]
-#[derive(Clone)]
-#[derive(Copy)]
-pub struct RadMode;
 
 impl<const A: u8, B, C> TryFrom<Deg<A, B, C>> for Rad<A, B, C>
 where

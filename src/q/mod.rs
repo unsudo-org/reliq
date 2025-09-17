@@ -425,6 +425,20 @@ where
     }
 }
 
+impl<const A: u8, B, C, D> PartialEq<B> for Q<A, B, C, D>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Mode,
+    D: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    fn eq(&self, other: &B) -> bool {
+        &self.n == other
+    }
+}
+
 impl<const A: u8, B, C, D> Ord for Q<A, B, C, D>
 where
     B: ops::Int,
@@ -700,13 +714,15 @@ where
 
 #[cfg(test)]
 #[::rstest::rstest]
-#[case(295_34, 295)]
-fn test_int_conversion<T>(#[case] n: T, #[case] ok: u128)
+#[case(295_34, 295_00)]
+fn test_int_conversion<A, B>(#[case] n: A, #[case] ok: B)
 where
-    T: Into<Q2<u128>> {
+    A: Into<Unit2>,
+    B: Into<Unit2> {
     use ops::ToPrim as _;
 
-    let n: Q2<u128> = n.into();
+    let ok: Unit2 = ok.into();
+    let n: Unit2 = n.into();
     let n: u128 = n.to_u128().unwrap();
     assert_eq!(n, ok);
 }
@@ -746,17 +762,32 @@ fn test_sub(#[case] x: Q2<u32>, #[case] y: Q2<u32>, #[case] expected: Q2<u32>) {
 
 #[cfg(test)]
 #[::rstest::rstest]
-#[case(1_00.into(), 1_00.into(), 1_00.into())]
-#[case(0_50.into(), 0_25.into(), 0_12.into())]
-fn test_mul(#[case] x: Q2<u32>, #[case] y: Q2<u32>, #[case] expected: Q2<u32>) {
-    let ret: Q2<_> = (x * y).unwrap();
-    assert_eq!(ret, expected);
+#[case(1_00, 1_00, 1_00)]
+#[case(0_50, 0_25, 0_12)]
+fn test_mul<A, B, C>(#[case] x: A, #[case] y: B, #[case] ok: C) 
+where
+    A: Into<Unit2>,
+    B: Into<Unit2>,
+    C: Into<Unit2> {
+    let x: Unit2 = x.into();
+    let y: Unit2 = y.into();
+    let ok: Unit2 = ok.into();
+    let ret: Unit2 = (x * y).unwrap();
+    assert_eq!(ret, ok);
 }
 
 #[cfg(test)]
 #[::rstest::rstest]
-#[case(1_00.into(), 1_00.into(), 1_00.into())]
-fn test_div(#[case] x: Q2<u32>, #[case] y: Q2<u32>, #[case] expected: Q2<u32>) {
-    let ret: Q2<_> = (x / y).unwrap();
-    assert_eq!(ret, expected);
+#[case(1_00, 1_00, 1_00)]
+#[case(1_00, 0_50, 2_00)]
+fn test_div<A, B, C>(#[case] x: A, #[case] y: B, #[case] ok: C) 
+where
+    A: Into<Unit2>,
+    B: Into<Unit2>,
+    C: Into<Unit2> {
+    let x: Unit2 = x.into();
+    let y: Unit2 = y.into();
+    let ok: Unit2 = ok.into();
+    let ret: Unit2 = (x / y).unwrap();
+    assert_eq!(ret, ok);
 }
