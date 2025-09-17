@@ -27,8 +27,30 @@ pub enum Error {
     #[error("Alpha overflow.")]
     AlphaOverflow,
     #[error("Alpha underflow.")]
-    AlphaUnderflow
+    AlphaUnderflow,
+    #[error("")]
+    UnsupportedConversion
 }
+
+pub type Hex = u32;
+pub type Hsl<const A: q::Precision, B, C> = (
+    u16, 
+    q::Unit<A, B, C>, 
+    q::Unit<A, B, C>
+);
+pub type Rgb = (u8, u8, u8);
+pub type Rgba<const A: q::Precision, B, C> = (
+    u8, 
+    u8, 
+    u8, 
+    q::Unit<A, B, C>
+);
+pub type Hsla<const A: q::Precision, B, C> = (
+    u16, 
+    q::Unit<A, B, C>,
+    q::Unit<A, B, C>,
+    q::Unit<A, B, C>
+);
 
 #[repr(u8)]
 #[derive(Debug)]
@@ -45,11 +67,11 @@ where
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
-    Hex(u32),
-    Hsl(u16, q::Q<A, B, q::UnitMode, C>, q::Q<A, B, q::UnitMode, C>),
-    Rgb(u8, u8, u8),
-    Rgba(u8, u8, u8, q::Q<A, B, q::UnitMode, C>),
-    Hsla(u16, q::Q<A, B, q::UnitMode, C>, q::Q<A, B, q::UnitMode, C>, q::Q<A, B, q::UnitMode, C>)
+    Hex(Hex),
+    Hsl(Hsl<A, B, C>),
+    Rgb(Rgb),
+    Rgba(Rgba<A, B, C>),
+    Hsla(Hsla<A, B, C>)
 }
 
 impl<const A: u8, B, C> Color<A, B, C>
@@ -70,29 +92,29 @@ where
     #[inline]
     pub fn is_rgb(self) -> bool {
         let ret: Self = self.normalize().anyhow();
-        matches!(ret, Self::Rgb(_, _, _))
+        matches!(ret, Self::Rgb((_, _, _)))
     }
 
     #[inline]
     pub fn is_rgba(self) -> bool {
         let ret: Self = self.normalize().anyhow();
-        matches!(ret, Self::Rgba(_, _, _, _))
+        matches!(ret, Self::Rgba((_, _, _, _)))
     }
 
     #[inline]
     pub fn lighten<D>(self, multiplier: D) -> Result<Self> 
     where
-        D: Into<q::Q<A, B, q::UnitMode, C>> {
-        let multiplier: q::Q<A, B, q::UnitMode, C> = multiplier.into();
-        self.interpolate::<_, q::Q<A, B, q::UnitMode, C>>((255, 255, 255), multiplier)
+        D: Into<q::Unit<A, B, C>> {
+        let multiplier: q::Unit<A, B, C> = multiplier.into();
+        self.interpolate::<(u8, u8, u8), q::Unit<A, B, C>>((255, 255, 255), multiplier)
     }
 
     #[inline]
     pub fn darken<D>(self, multiplier: D) -> Result<Self> 
     where
-        D: Into<q::Q<A, B, q::UnitMode, C>> {
+        D: Into<q::Unit<A, B, C>> {
         let multiplier: q::Q<A, B, q::UnitMode, C> = multiplier.into();
-        self.interpolate::<_, q::Q<A, B, q::UnitMode, C>>((0, 0, 0), multiplier)
+        self.interpolate::<(u8, u8, u8), q::Q<A, B, q::UnitMode, C>>((0, 0, 0), multiplier)
     }
 
     #[inline]
@@ -347,6 +369,31 @@ where
                 lossy::Lossy::Trunc(ret)
             }
         }
+    }
+
+    fn rgb_to_hsl(rgb: Rgb) -> Result<Hsl<A, B, C>> {
+        let (r, g, b) = rgb;
+        let n255: B = 255.try_into()?;
+        let n255: q::Unit<A, B, C> = n255.into();
+        let rf: B = r.try_into().ok().ok_or(Error::UnsupportedConversion)?;
+        let rf: q::Unit<A, B, C> = rf.into();
+        let rf: q::Unit<A, B, C> = (rf / n255)?;
+        let gf: B = g.try_into().ok().ok_or(Error::UnsupportedConversion)?;
+        let gf: q::Unit<A, B, C> = gf.into();
+        let gf: q::Unit<A, B, C> = (gf / n255)?;
+        let bf: B = b.try_into().ok().ok_or(Error::UnsupportedConversion)?;
+        let bf: q::Unit<A, B, C> = bf.into();
+        let bf: q::Unit<A, B, C> = (bf / n255)?;
+        let max: q::Unit<A, B, C> = rf.max(gf).max(bf);
+        let min: q::Unit<A, B, C> = rf.min(gf).min(bf);
+        let delta: q::Delta<A, B, C> = (max - min)?.into();
+        let l: q::Unit<A, B, C> = (max + min)?;
+        let l: q::Unit<A, B, C>  = (l / as_2())?;
+        let s = if delta == 0.0 {
+            
+        } else {
+
+        };
     }
 }
 

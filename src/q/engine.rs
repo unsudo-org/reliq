@@ -10,7 +10,10 @@ pub struct DefaultEngine;
 
 impl Engine for DefaultEngine {}
 
-pub trait Engine {
+pub trait Engine 
+where
+    Self: Clone,
+    Self: Copy {
     #[inline]
     fn tan<const A: Precision, B>(rad_angle: B) -> Result<B>
     where

@@ -8,6 +8,7 @@ use super::*;
     pub engine
     pub factor
     pub mode
+    pub partial
     pub percentage
     pub pi
     pub rad
@@ -344,15 +345,34 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    type Output = Result<Self>;
+    type Output = Partial<A, B, C, E>;
 
     #[inline]
     fn add(self, rhs: Q<A, B, D, E>) -> Self::Output {
         let x: B = self.n;
         let y: B = rhs.n;
-        let ret: B = E::add(x, y)?;
-        let ret: Self = ret.into();
-        Ok(ret)
+        match E::add(x, y) {
+            Ok(n) => n.into(),
+            Err(e) => Err::<Q<A, B, C, E>, Error>(e).into()
+        }
+    }
+}
+
+impl<const A: u8, B, C, D> ::core::ops::Add<B> for Q<A, B, C, D>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Mode,
+    D: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    type Output = Result<Self>;
+        
+    /// This expects rhs to be in the same precision
+    fn add(self, rhs: B) -> Self::Output {
+        let rhs: Self = rhs.into();
+        self + rhs
     }
 }
 
@@ -375,6 +395,24 @@ where
         let ret: B = E::sub(x, y)?;
         let ret: Self = ret.into();
         Ok(ret)
+    }
+}
+
+impl<const A: u8, B, C, D> ::core::ops::Sub<B> for Q<A, B, C, D>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Mode,
+    D: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    type Output = Result<Self>;
+
+    #[inline]
+    fn sub(self, rhs: B) -> Self::Output {
+        let rhs: Self = rhs.into();
+        self - rhs
     }
 }
 
@@ -475,7 +513,6 @@ where
     #[inline]
     fn eq(&self, other: &f32) -> bool {
         use ops::ToPrim as _;
-
         &self.to_f32().unwrap_or_default() == other
     }
 }
@@ -492,7 +529,6 @@ where
     #[inline]
     fn eq(&self, other: &f64) -> bool {
         use ops::ToPrim as _;
-
         &self.n.to_f64().unwrap_or_default() == other
     }
 }
@@ -506,7 +542,7 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-
+    #[inline]
     fn clamp(self, min: Self, max: Self) -> Self
     where
         Self: Sized {
@@ -519,6 +555,7 @@ where
         }
     }
 
+    #[inline]
     fn max(self, other: Self) -> Self
     where
         Self: Sized {
@@ -564,32 +601,37 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-
+    
+    #[inline]
     fn ge(&self, other: &Q<A, B, D, E>) -> bool {
         let x: B = self.n;
         let y: B = other.n;
         x >= y
     }
 
+    #[inline]
     fn le(&self, other: &Q<A, B, D, E>) -> bool {
         let x: B = self.n;
         let y: B = other.n;
         x <= y
     }
 
+    #[inline]
     fn gt(&self, other: &Q<A, B, D, E>) -> bool {
         let x: B = self.n;
         let y: B = other.n;
         x > y
     }
 
+    #[inline]
     fn lt(&self, other: &Q<A, B, D, E>) -> bool {
         let x: B = self.n;
         let y: B = other.n;
         x < y
     }
-
+    
     #[allow(clippy::non_canonical_partial_ord_impl)]
+    #[inline]
     fn partial_cmp(&self, other: &Q<A, B, D, E>) -> Option<core::cmp::Ordering> {
         let x: B = self.n;
         let y: B = other.n;
@@ -607,6 +649,7 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
+    #[inline]
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         write!(f, "Q({})", self.n)
     }
@@ -621,6 +664,7 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
+    #[inline]
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         write!(f, "Q({})", self.n)
     }
@@ -635,6 +679,7 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
+    #[inline]
     fn to_u8(&self) -> ops::Result<u8> {
         let ret: B = scale::<A, B>();
         let ret: B = self.n / ret;
@@ -645,6 +690,7 @@ where
         Ok(ret)
     }
 
+    #[inline]
     fn to_u16(&self) -> ops::Result<u16> {
         let ret: B = scale::<A, B>();
         let ret: B = self.n / ret;
@@ -655,6 +701,7 @@ where
         Ok(ret)
     }
 
+    #[inline]
     fn to_u32(&self) -> ops::Result<u32> {
         let ret: B = scale::<A, B>();
         let ret: B = self.n / ret;
@@ -665,6 +712,7 @@ where
         Ok(ret)
     }
 
+    #[inline]
     fn to_u64(&self) -> ops::Result<u64> {
         let ret: B = scale::<A, B>();
         let ret: B = self.n / ret;
@@ -675,6 +723,7 @@ where
         Ok(ret)
     }
 
+    #[inline]
     fn to_u128(&self) -> ops::Result<u128> {
         let ret: B = scale::<A, B>();
         let ret: B = self.n / ret;
@@ -685,6 +734,7 @@ where
         Ok(ret)   
     }
 
+    #[inline]
     fn to_usize(&self) -> ops::Result<usize> {
         let ret: B = scale::<A, B>();
         let ret: B = self.n / ret;
@@ -695,6 +745,7 @@ where
         Ok(ret)
     }
 
+    #[inline]
     fn to_i8(&self) -> ops::Result<i8> {
         let ret: B = scale::<A, B>();
         let ret: B = self.n / ret;
@@ -705,6 +756,7 @@ where
         Ok(ret)
     }
 
+    #[inline]
     fn to_i16(&self) -> ops::Result<i16> {
         let ret: B = scale::<A, B>();
         let ret: B = self.n / ret;
@@ -715,6 +767,7 @@ where
         Ok(ret)
     }
 
+    #[inline]
     fn to_i32(&self) -> ops::Result<i32> {
         let ret: B = scale::<A, B>();
         let ret: B = self.n / ret;
@@ -725,6 +778,7 @@ where
         Ok(ret)   
     }
 
+    #[inline]
     fn to_i64(&self) -> ops::Result<i64> {
         let ret: B = scale::<A, B>();
         let ret: B = self.n / ret;
@@ -735,6 +789,7 @@ where
         Ok(ret)
     }
 
+    #[inline]
     fn to_i128(&self) -> ops::Result<i128> {
         let ret: B = scale::<A, B>();
         let ret: B = self.n / ret;
@@ -745,6 +800,7 @@ where
         Ok(ret)
     }
 
+    #[inline]
     fn to_isize(&self) -> ops::Result<isize> {
         let ret: B = scale::<A, B>();
         let ret: B = self.n / ret;
@@ -755,6 +811,7 @@ where
         Ok(ret)   
     }
 
+    #[inline]
     fn to_f32(&self) -> ops::Result<f32> {
         let ret: B = scale::<A, B>();
         let ret: B = self.n / ret;
@@ -762,6 +819,7 @@ where
         Ok(ret)
     }
 
+    #[inline]
     fn to_f64(&self) -> ops::Result<f64> {
         let ret: B = scale::<A, B>();
         let ret: B = self.n / ret;
