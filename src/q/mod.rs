@@ -7,8 +7,8 @@ use super::*;
     pub delta
     pub engine
     pub factor
+    pub fragment
     pub mode
-    pub partial
     pub percentage
     pub pi
     pub rad
@@ -345,7 +345,7 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    type Output = Partial<A, B, C, E>;
+    type Output = Fragment<A, B, C, E>;
 
     #[inline]
     fn add(self, rhs: Q<A, B, D, E>) -> Self::Output {
@@ -367,9 +367,8 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    type Output = Result<Self>;
+    type Output = Fragment<A, B, C, D>;
         
-    /// This expects rhs to be in the same precision
     fn add(self, rhs: B) -> Self::Output {
         let rhs: Self = rhs.into();
         self + rhs
@@ -386,15 +385,16 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    type Output = Result<Self>;
+    type Output = Fragment<A, B, C, E>;
 
     #[inline]
     fn sub(self, rhs: Q<A, B, D, E>) -> Self::Output {
         let x: B = self.n;
         let y: B = rhs.n;
-        let ret: B = E::sub(x, y)?;
-        let ret: Self = ret.into();
-        Ok(ret)
+        match E::sub(x, y) {
+            Ok(n) => n.into(),
+            Err(e) => Err::<Q<A, B, C, E>, Error>(e).into()
+        }
     }
 }
 
@@ -407,7 +407,7 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    type Output = Result<Self>;
+    type Output = Fragment<A, B, C, D>;
 
     #[inline]
     fn sub(self, rhs: B) -> Self::Output {
@@ -426,15 +426,34 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    type Output = Result<Self>;
+    type Output = Fragment<A, B, C, E>;
 
     #[inline]
     fn mul(self, rhs: Q<A, B, D, E>) -> Self::Output {
         let x: B = self.n;
         let y: B = rhs.n;
-        let ret: B = E::mul::<A, _>(x, y)?;
-        let ret: Self = ret.into();
-        Ok(ret)
+        match E::mul::<A, B>(x, y) {
+            Ok(n) => n.into(),
+            Err(e) => Err::<Q<A, B, C, E>, Error>(e).into()
+        }
+    }
+}
+
+impl<const A: u8, B, C, D> ::core::ops::Mul<B> for Q<A, B, C, D>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Mode,
+    D: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    type Output = Fragment<A, B, C, D>;
+
+    #[inline]
+    fn mul(self, rhs: B) -> Self::Output {
+        let rhs: Self = rhs.into();
+        self * rhs
     }
 }
 
@@ -448,15 +467,34 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    type Output = Result<Self>;
+    type Output = Fragment<A, B, C, E>;
 
     #[inline]
     fn div(self, rhs: Q<A, B, D, E>) -> Self::Output {
         let x: B = self.n;
         let y: B = rhs.n;
-        let ret: B = E::div::<A, _>(x, y)?;
-        let ret: Self = ret.into();
-        Ok(ret)
+        match E::div::<A, B>(x, y) {
+            Ok(n) => n.into(),
+            Err(e) => Err::<Q<A, B, C, E>, Error>(e).into()
+        }
+    }
+}
+
+impl<const A: u8, B, C, D> ::core::ops::Div<B> for Q<A, B, C, D>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Mode,
+    D: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    type Output = Fragment<A, B, C, D>;
+
+    #[inline]
+    fn div(self, rhs: B) -> Self::Output {
+        let rhs: Self = rhs.into();
+        self / rhs
     }
 }
 
@@ -868,7 +906,7 @@ where
     let x: Unit2 = x.into();
     let y: Unit2 = y.into();
     let ok: Unit2 = ok.into();
-    let ret: Unit2 = (x + y).unwrap();
+    let ret: Unit2 = (x + y).into_result().unwrap();
     assert_eq!(ret, ok);
 }
 
@@ -884,7 +922,7 @@ where
     let x: Unit2 = x.into();
     let y: Unit2 = y.into();
     let ok: Unit2 = ok.into();
-    let ret: Unit2 = (x - y).unwrap();
+    let ret: Unit2 = (x - y).into_result().unwrap();
     assert_eq!(ret, ok);
 }
 
@@ -900,7 +938,7 @@ where
     let x: Unit2 = x.into();
     let y: Unit2 = y.into();
     let ok: Unit2 = ok.into();
-    let ret: Unit2 = (x * y).unwrap();
+    let ret: Unit2 = (x * y).into_result().unwrap();
     assert_eq!(ret, ok);
 }
 
@@ -916,6 +954,6 @@ where
     let x: Unit2 = x.into();
     let y: Unit2 = y.into();
     let ok: Unit2 = ok.into();
-    let ret: Unit2 = (x / y).unwrap();
+    let ret: Unit2 = (x / y).into_result().unwrap();
     assert_eq!(ret, ok);
 }
