@@ -19,9 +19,9 @@ pub trait Engine {
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
         (): Supported<A, B> {
-        let x: B = Self::sin(rad_angle)?;
-        let y: B = Self::cos(rad_angle)?;
-        Ok(Self::div(x, y)?.into())
+        let x: B = Self::sin::<A, B>(rad_angle)?;
+        let y: B = Self::cos::<A, B>(rad_angle)?;
+        Ok(Self::div::<A, B>(x, y)?.into())
     }
 
     #[inline]
@@ -32,7 +32,7 @@ pub trait Engine {
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
         (): Supported<A, B> {
-        Self::cos(Self::sub(Self::to_rad::<A, B>(deg90()?)?, rad_angle)?)
+        Self::cos::<A, B>(Self::sub::<B>(Self::to_rad::<A, B>(deg90::<A, B>()?)?, rad_angle)?)
     }
 
     #[inline]
@@ -44,8 +44,8 @@ pub trait Engine {
         (): SupportedInt<B>,
         (): Supported<A, B> {
         let (scale, pi, pi_2) = {
-            let scale: B = scale::<A, _>();
-            let pi: B = pi::<A, _>();
+            let scale: B = scale::<A, B>();
+            let pi: B = pi::<A, B>();
             let pi_2: B = pi.checked_mul(B::AS_2).ok_or(Error::Overflow)?;
             (scale, pi, pi_2)
         };
@@ -62,8 +62,8 @@ pub trait Engine {
         let mut k: B = B::AS_1;
         loop {
             let f: B = (B::AS_2 * k - B::AS_1) * (B::AS_2 * k);
-            term = Self::muldiv(term, n, scale)?;
-            term = Self::muldiv(term, n, scale)?;
+            term = Self::muldiv::<B>(term, n, scale)?;
+            term = Self::muldiv::<B>(term, n, scale)?;
             term = term.checked_div(f).ok_or(Error::DivisionByZero)?;
             if term == B::AS_0 {
                 break
@@ -87,7 +87,7 @@ pub trait Engine {
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
         (): Supported<A, B> {
-        Self::muldiv(deg_angle, pi::<A, _>(), as_180::<B>() * scale::<A, B>())
+        Self::muldiv(deg_angle, pi::<A, B>(), as_180::<B>() * scale::<A, B>())
     }
 
     #[inline]
@@ -98,7 +98,7 @@ pub trait Engine {
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
         (): Supported<A, B> {
-        Self::muldiv(rad_angle, as_180::<B>() * scale::<A, B>(), pi())
+        Self::muldiv::<B>(rad_angle, as_180::<B>() * scale::<A, B>(), pi::<A, B>())
     }
 
     #[inline]
@@ -150,7 +150,7 @@ pub trait Engine {
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
         (): Supported<A, B> {
-        let scale: B = scale();
+        let scale: B = scale::<A, B>();
         let n: B = n / scale;
         let n: B = n * scale;
         n
@@ -212,9 +212,9 @@ pub trait Engine {
         (): SupportedInt<C>,
         (): Supported<A, C>,
         (): Supported<B, C> {
-        let old_scale: C = scale::<A, _>();
-        let new_scale: C = scale::<B, _>();
-        let n: C = Self::muldiv(n, new_scale, old_scale)?;
+        let old_scale: C = scale::<A, C>();
+        let new_scale: C = scale::<B, C>();
+        let n: C = Self::muldiv::<C>(n, new_scale, old_scale)?;
         if B < A {
             Ok(lossy::Lossy::Trunc(n))
         } else {
@@ -230,9 +230,10 @@ pub trait Engine {
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
         (): Supported<A, B> {
-        let d: B = Self::sub(y, x)?;
-        let s: B = Self::muldiv(d, t, scale())?;
-        Self::add(x, s)
+        let d: B = Self::sub::<B>(y, x)?;
+        let s: B = Self::muldiv::<B>(d, t, scale::<A, B>())?;
+        let ret: B = Self::add::<B>(x, s)?;
+        Ok(ret)
     }
 
     #[inline]
@@ -254,8 +255,8 @@ pub trait Engine {
         let mut last: B;
         loop {
             last = ret;
-            ret = Self::add(ret, Self::div::<A, _>(n, ret)?)?;
-            ret = Self::div::<A, _>(ret, B::AS_2)?;
+            ret = Self::add::<B>(ret, Self::div::<A, B>(n, ret)?)?;
+            ret = Self::div::<A, B>(ret, B::AS_2)?;
             if ret == last || ret == last.checked_add(B::AS_1).unwrap_or(ret) {
                 break
             }
@@ -292,7 +293,7 @@ pub trait Engine {
         if A == 0 {
             return x.checked_mul(y).ok_or(Error::Overflow)
         }
-        Self::muldiv(x, y, scale::<A, _>())
+        Self::muldiv::<B>(x, y, scale::<A, B>())
     }
 
     #[inline]
@@ -306,7 +307,7 @@ pub trait Engine {
         if A == 0 {
             return x.checked_div(y).ok_or(Error::DivisionByZero)
         }
-        Self::muldiv(x, scale::<A, _>(), y)
+        Self::muldiv::<B>(x, scale::<A, B>(), y)
     }
 
     #[inline]
@@ -325,13 +326,13 @@ pub trait Engine {
                 Ok(n)
             },
             (_, false) if T::BITS_AS_U128 < 128 => {
-                let (a, b) = wide_mul(x, y)?;
+                let (a, b) = wide_mul::<T>(x, y)?;
                 if b >= z {
                     Err(Error::Overflow)
                 } else if b == T::AS_0 {
                     Ok(a / z)
                 } else {
-                    Ok(fold(a, b, z)? / z)
+                    Ok(fold::<T>(a, b, z)? / z)
                 }
             },
             (128, _) => {
@@ -352,9 +353,9 @@ where
     T: ops::Prim,
     (): SupportedInt<T> {
     if T::SIGNED {
-        signed_wide_mul(x, y)
+        signed_wide_mul::<T>(x, y)
     } else {
-        unsigned_wide_mul(x, y)
+        unsigned_wide_mul::<T>(x, y)
     }
 }
 
@@ -461,9 +462,9 @@ where
     T: ops::Prim,
     (): SupportedInt<T> {
     if T::SIGNED {
-        signed_fold(x, y, z)
+        signed_fold::<T>(x, y, z)
     } else {
-        unsigned_fold(x, y, z)
+        unsigned_fold::<T>(x, y, z)
     }
 }
 

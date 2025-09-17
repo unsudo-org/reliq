@@ -71,7 +71,7 @@ where
     #[inline]
     pub fn tan(self) -> Result<Ratio<A, B, C>> {
         let ret: B = self.n;
-        let ret: B = C::tan(ret)?;
+        let ret: B = C::tan::<A, B>(ret)?;
         let ret: Unit<_, _, _> = ret.into();
         let ret: Ratio<_, _, _> = ret.into();
         Ok(ret)
@@ -80,7 +80,7 @@ where
     #[inline]
     pub fn sin(self) -> Result<Ratio<A, B, C>> {
         let ret: B = self.n;
-        let ret: B = C::sin(ret)?;
+        let ret: B = C::sin::<A, B>(ret)?;
         let ret: Unit<_, _, _> = ret.into();
         let ret: Ratio<_, _, _> = ret.into();
         Ok(ret)
@@ -89,16 +89,16 @@ where
     #[inline]
     pub fn cos(self) -> Result<Ratio<A, B, C>> {
         let ret: B = self.n;
-        let ret: B = C::cos(ret)?;
+        let ret: B = C::cos::<A, B>(ret)?;
         let ret: Unit<_, _, _> = ret.into();
         let ret: Ratio<_, _, _> = ret.into();
         Ok(ret)
     }
 
     #[inline]
-    pub fn to_deg(self) -> Result<Deg<_, _, _>> {
+    pub fn to_deg(self) -> Result<Deg<A, B, C>> {
         let ret: B = self.n;
-        let ret: B = C::to_deg(ret)?;
+        let ret: B = C::to_deg::<A, B>(ret)?;
         let ret: Deg<_, _, _> = ret.into();
         Ok(ret)
     }

@@ -46,24 +46,6 @@ where
     }
 }
 
-impl<const A: u8, B, C> From<B> for Factor<A, B, C>
-where
-    B: ops::Int,
-    B: ops::Prim,
-    B: ops::Unsigned,
-    C: Engine,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
-    fn from(value: B) -> Self {
-        Self {
-            n: value,
-            m_0: ::core::marker::PhantomData,
-            m_1: ::core::marker::PhantomData
-        }
-    }
-}
-
 impl<const A: u8, B, C> From<Unit<A, B, C>> for Factor<A, B, C>
 where
     B: ops::Int,
@@ -89,21 +71,21 @@ where
     (): Supported<1, B> {
     #[inline]
     fn from(value: Percentage<A, B, C>) -> Self {
-        let n: Unit<_, _, _> = value.into();
-        if n == as_0() {
-            return as_0()
+        let n: Unit<A, B, C> = value.into();
+        if n == as_0::<A, B, UnitMode, C>() {
+            return as_0::<A, B, FactorMode, C>()
         }
-        if n > as_0() {
-            let n: Unit<_, _, _> = (n / as_100()).unwrap();
-            let n: Unit<_, _, _> = (n + as_1()).unwrap();
-            let ret: Self = n.into();
+        if n > as_0::<A, B, UnitMode, C>() {
+            let n: Unit<A, B, C> = (n / as_100::<A, B, UnitMode, C>()).unwrap();
+            let n: Unit<A, B, C> = (n + as_1::<A, B, UnitMode, C>()).unwrap();
+            let ret: Self = n.into_int().into();
             return ret
         }
-        let min: Unit<_, _, _> = (as_0() - as_100()).unwrap();
-        let n: Unit<_, _, _> = n.max(min);
-        let n: Unit<_, _, _> = (n / as_100()).unwrap();
-        let n: Unit<_, _, _> = (n + as_1()).unwrap();
-        let ret: Self = n.into();
+        let min: Unit<A, B, C> = (as_0::<A, B, UnitMode, C>() - as_100::<A, B, UnitMode, C>()).unwrap();
+        let n: Unit<A, B, C> = n.max(min);
+        let n: Unit<A, B, C> = (n / as_100::<A, B, UnitMode, C>()).unwrap();
+        let n: Unit<A, B, C> = (n + as_1::<A, B, UnitMode, C>()).unwrap();
+        let ret: Self = n.into_int().into();
         ret
     }
 }

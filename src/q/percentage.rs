@@ -28,17 +28,17 @@ where
     (): Supported<1, B> {
     #[inline]
     pub fn is_gain(self) -> bool {
-        self > as_100()
+        self > as_0::<A, B, PercentageMode, C>()
     }
 
     #[inline]
     pub fn is_loss(self) -> bool {
-        self < (B::AS_100.into() - (B::AS_100.into() * B::AS_2.into()))
+        self < as_0::<A, B, PercentageMode, C>()
     }
 
     #[inline]
     pub fn is_neutral(self) -> bool {
-        self == as_0()
+        self == as_0::<A, B, PercentageMode, C>()
     }
 
     #[inline]
@@ -47,16 +47,16 @@ where
         D: Into<Unit<A, B, C>> {
         let percentage: Unit<_, _, _> = self.into();
         if B::SIGNED {
-            let min: Unit<_, _, _> = (as_100() * as_2()).unwrap();
-            let min: Unit<_, _, _> = (as_100() - min).unwrap();
+            let min: Unit<_, _, _> = (as_100::<A, B, UnitMode, C>() * as_2::<A, B, UnitMode, C>())?;
+            let min: Unit<_, _, _> = (as_100::<A, B, UnitMode, C>() - min)?;
             let percentage: Unit<_, _, _> = percentage.max(min);
             let n: Unit<_, _, _> = n.into();
-            let n: Unit<_, _, _> = (n / as_100())?;
+            let n: Unit<_, _, _> = (n / as_100::<A, B, UnitMode, C>())?;
             let n: Unit<_, _, _> = (n * percentage)?;
             return Ok(n)
         }
         let n: Unit<_, _, _> = n.into();
-        let n: Unit<_, _, _> = (n / as_100())?;
+        let n: Unit<_, _, _> = (n / as_100::<A, B, UnitMode, C>())?;
         let n: Unit<_, _, _> = (n * percentage)?;
         Ok(n)
     }
@@ -85,23 +85,23 @@ where
     (): Supported<A, B>,
     (): Supported<1, B> {
     type Error = Error;
-    
+
     fn try_from(value: Factor<A, B, C>) -> ::core::result::Result<Self, Self::Error> {
-        let n: Unit<_, _, _> = value.into();
-        if (n < as_1() && !B::SIGNED) || n < as_0() {
+        let n: Unit<A, B, C> = value.into();
+        if (n < as_1::<A, B, UnitMode, C>() && !B::SIGNED) || n < as_0::<A, B, UnitMode, C>() {
             return Err(Error::Underflow)
         }
-        if n == as_1() {
+        if n == as_1::<A, B, UnitMode, C>() {
             return Ok(as_0())
         }
-        if n > as_1() {
-            let n: Unit<_, _, _> = (n - as_1())?;
-            let n: Unit<_, _, _> = (n * as_100())?;
+        if n > as_1::<A, B, UnitMode, C>() {
+            let n: Unit<A, B, C> = (n - as_1::<A, B, UnitMode, C>())?;
+            let n: Unit<A, B, C> = (n * as_100::<A, B, UnitMode, C>())?;
             let ret: Self = n.into();
             return Ok(ret)
         }
-        let n: Unit<_, _, _> = (n - as_1())?;
-        let n: Unit<_, _, _> = (n * as_100())?;
+        let n: Unit<A, B, C> = (n - as_1::<A, B, UnitMode, C>())?;
+        let n: Unit<A, B, C> = (n * as_100::<A, B, UnitMode, C>())?;
         let ret: Self = n.into();
         Ok(ret)
     }

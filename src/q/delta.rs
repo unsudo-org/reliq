@@ -74,7 +74,7 @@ where
             return Err(Error::DivisionByZero)
         }
         let ret: Unit<_, _, _> = self.into();
-        let ret: Unit<_, _, _> = ((ret * as_100())? / base)?;
+        let ret: Unit<_, _, _> = ((ret * as_100::<A, B, UnitMode, C>())? / base)?;
         let ret: Percentage<_, _, _> = ret.into();
         Ok(ret)
     }
@@ -95,54 +95,4 @@ where
         let ret: Self = value.n.checked_sub(B::AS_1).ok_or(Error::Underflow)?.into();
         Ok(ret)
     }
-}
-
-pub fn delta_from_raw_signed_int<const A: u8, B, C>(n: B) -> Delta<A, B, C> 
-where
-    B: ops::Int,
-    B: ops::Prim,
-    B: ops::Signed,
-    C: Engine,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
-    n.into()
-}
-
-pub fn delta_from_signed_int<const A: u8, B, C>(n: B) -> Result<Delta<A, B, C>>
-where
-    B: ops::Int,
-    B: ops::Prim,
-    B: ops::Signed,
-    C: Engine,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
-    let ret: B = n.checked_mul(scale::<A, B>()).ok_or(Error::Overflow)?;
-    let ret: Delta<_, _, _> = ret.into();
-    Ok(ret)
-}
-
-
-/// Construct a `Delta` from a floating-point value.
-/// 
-/// The floating is scaled to the appropriate integer representation based on precision.
-pub fn delta_from_float<const A: u8, B, C, D>(n: C) -> Result<Delta<A, B, D>>
-where
-    B: ops::Int,
-    B: ops::Prim,
-    B: ops::Signed,
-    C: ops::Float,
-    D: Engine,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
-    let ret: B = n.into();
-    Ok(ret.into())
-}
-
-#[test]
-fn test_delta_from_float() {
-    let n: f32 = 3.45;
-    let _: Delta2 = delta_from_float(n).unwrap();
 }

@@ -315,6 +315,25 @@ where
     }
 }
 
+impl<const A: u8, B, C, D> From<B> for Q<A, B, C, D>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Mode,
+    D: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    #[inline]
+    fn from(value: B) -> Self {
+        Self {
+            n: value,
+            m_0: ::core::marker::PhantomData,
+            m_1: ::core::marker::PhantomData
+        }
+    }
+}
+
 impl<const A: u8, B, C, D, E> ::core::ops::Add<Q<A, B, D, E>> for Q<A, B, C, E>
 where
     B: ops::Int,
@@ -457,7 +476,7 @@ where
     fn eq(&self, other: &f32) -> bool {
         use ops::ToPrim as _;
 
-        self.to_f32().unwrap_or_default() == other
+        &self.to_f32().unwrap_or_default() == other
     }
 }
 
@@ -474,7 +493,7 @@ where
     fn eq(&self, other: &f64) -> bool {
         use ops::ToPrim as _;
 
-        self.n.to_f64().unwrap_or_default() == other
+        &self.n.to_f64().unwrap_or_default() == other
     }
 }
 
@@ -754,6 +773,21 @@ where
 #[cfg(test)]
 #[::rstest::rstest]
 #[case(295_34, 295_00)]
+fn test_int_conversion<A, B>(#[case] n: A, #[case] ok: B)
+where
+    A: Into<Unit2>,
+    B: Into<Unit2> {
+    use ops::ToPrim as _;
+    let ok: Unit2 = ok.into();
+    let n: Unit2 = n.into();
+    let n: usize = n.to_usize().unwrap();
+    let n: Unit2 = n.into();
+    assert_eq!(ok, n);
+}
+
+#[cfg(test)]
+#[::rstest::rstest]
+#[case(295_34, 295_00)]
 fn test_float_conversion<A, B>(#[case] n: A, #[case] ok: B) 
 where
     A: Into<Unit2>,
@@ -762,7 +796,7 @@ where
     let ok: Unit2 = ok.into();
     let n: Unit2 = n.into();
     let n: f64 = n.to_f64().unwrap();
-    assert_eq!(n, ok);
+    assert_eq!(ok, n);
 }
 
 #[cfg(test)]
