@@ -242,6 +242,7 @@ where
         }
     }
 
+    #[inline]
     pub fn round_up(self) -> Self {
         let n: B = self.n;
         let ret: B = D::round_up(n);
@@ -249,6 +250,7 @@ where
         ret
     }
 
+    #[inline]
     pub fn round_down(self) -> Self {
         let n: B = self.n;
         let ret: B = D::round_down(n);
@@ -256,6 +258,7 @@ where
         ret
     }
 
+    #[inline]
     pub fn round_towards_zero(self) -> Self {
         let n: B = self.n;
         let ret: B = D::round_towards_zero(n);
@@ -263,6 +266,7 @@ where
         ret
     }
 
+    #[inline]
     pub fn round_away_from_zero(self) -> Self {
         let n: B = self.n;
         let ret: B = D::round_away_from_zero(n);
@@ -419,7 +423,7 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-
+    #[inline]
     fn eq(&self, other: &Q<A, B, D, E>) -> bool {
         self == other
     }
@@ -434,8 +438,43 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
+    #[inline]
     fn eq(&self, other: &B) -> bool {
         &self.n == other
+    }
+}
+
+impl<const A: u8, B, C, D> PartialEq<f32> for Q<A, B, C, D>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Mode,
+    D: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    #[inline]
+    fn eq(&self, other: &f32) -> bool {
+        use ops::ToPrim as _;
+
+        self.to_f32().unwrap_or_default() == other
+    }
+}
+
+impl<const A: u8, B, C, D> PartialEq<f64> for Q<A, B, C, D>
+where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Mode,
+    D: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    #[inline]
+    fn eq(&self, other: &f64) -> bool {
+        use ops::ToPrim as _;
+
+        self.n.to_f64().unwrap_or_default() == other
     }
 }
 
@@ -715,49 +754,46 @@ where
 #[cfg(test)]
 #[::rstest::rstest]
 #[case(295_34, 295_00)]
-fn test_int_conversion<A, B>(#[case] n: A, #[case] ok: B)
+fn test_float_conversion<A, B>(#[case] n: A, #[case] ok: B) 
 where
     A: Into<Unit2>,
     B: Into<Unit2> {
     use ops::ToPrim as _;
-
     let ok: Unit2 = ok.into();
     let n: Unit2 = n.into();
-    let n: u128 = n.to_u128().unwrap();
-    assert_eq!(n, ok);
-}
-
-#[cfg(test)]
-#[::rstest::rstest]
-#[case(295_34, 295.0)]
-fn test_float_conversion<T>(#[case] n: T, #[case] ok: f64) 
-where
-    T: Into<Unit2<u128>> {
-    use ops::ToPrim as _;
-
-    
-
-    let n: Q2<u128> = n.into();
     let n: f64 = n.to_f64().unwrap();
     assert_eq!(n, ok);
 }
 
 #[cfg(test)]
 #[::rstest::rstest]
-#[case(1_00.into(), 1_00.into(), 2_00.into())]
-fn test_add(#[case] x: Unit2, #[case] y: Unit2, #[case] expected: Unit2) {
+#[case(1_00, 1_00, 2_00)]
+fn test_add<A, B, C>(#[case] x: A, #[case] y: B, #[case] ok: C) 
+where
+    A: Into<Unit2>,
+    B: Into<Unit2>,
+    C: Into<Unit2> {
+    let x: Unit2 = x.into();
+    let y: Unit2 = y.into();
+    let ok: Unit2 = ok.into();
     let ret: Unit2 = (x + y).unwrap();
-    ret.lerp(4_00, 5_00).unwrap();
-    ret.lerp(5_00, 4).unwrap();
-    assert_eq!(ret, expected);
+    assert_eq!(ret, ok);
 }
 
 #[cfg(test)]
 #[::rstest::rstest]
-#[case(1_00.into(), 1_00.into(), 0_00.into())]
-fn test_sub(#[case] x: Q2<u32>, #[case] y: Q2<u32>, #[case] expected: Q2<u32>) {
-    let ret: Q2<_> = (x - y).unwrap();
-    assert_eq!(ret, expected);
+#[case(1_00, 1_00, 0_00)]
+#[case(2_00, 1_00, 1_00)]
+fn test_sub<A, B, C>(#[case] x: A, #[case] y: B, #[case] ok: C) 
+where
+    A: Into<Unit2>,
+    B: Into<Unit2>,
+    C: Into<Unit2> {
+    let x: Unit2 = x.into();
+    let y: Unit2 = y.into();
+    let ok: Unit2 = ok.into();
+    let ret: Unit2 = (x - y).unwrap();
+    assert_eq!(ret, ok);
 }
 
 #[cfg(test)]

@@ -1,5 +1,3 @@
-use super::*;
-
 /// # Brief
 /// `Q` can be represented in several semantic contexts.
 /// Each context has a `Mode`.
