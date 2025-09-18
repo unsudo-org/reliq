@@ -47,9 +47,10 @@ where
         D: Into<Unit<A, B, C>> {
         let percentage: Unit<_, _, _> = self.into();
         if B::SIGNED {
-            let min: Unit<_, _, _> = (as_100::<A, B, UnitMode, C>() * as_2::<A, B, UnitMode, C>())?;
-            let min: Unit<_, _, _> = (as_100::<A, B, UnitMode, C>() - min)?;
-            let percentage: Unit<_, _, _> = percentage.max(min);
+            let min: Fragment<A, B, UnitMode, C> = as_100::<A, B, UnitMode, C>() * as_2::<A, B, UnitMode, C>();
+            let min: Fragment<A, B, UnitMode, C> = as_100::<A, B, UnitMode, C>() - min;
+            let min: Unit<A, B, C> = min.ok().unwrap();
+            let percentage: Unit<A, B, C> = percentage.max(min);
             let n: Unit<_, _, _> = n.into();
             let n: Unit<_, _, _> = (n / as_100::<A, B, UnitMode, C>())?;
             let n: Unit<_, _, _> = (n * percentage)?;

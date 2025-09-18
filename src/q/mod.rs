@@ -2,6 +2,7 @@ use super::*;
 
 ::modwire::expose!(
     pub r#as
+    pub cardinal
     pub chance
     pub deg
     pub delta
@@ -398,6 +399,23 @@ where
     }
 }
 
+impl<const A: u8, B, C, D, E> ::core::ops::Sub<Fragment<A, B, D, E>> for Q<A, B, C, E>
+ where
+    B: ops::Int,
+    B: ops::Prim,
+    C: Mode,
+    D: Mode,
+    E: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    type Output = Fragment<A, B, C, E>;
+
+    fn sub(self, rhs: Fragment<A, B, D, E>) -> Self::Output {
+        
+    }
+}
+
 impl<const A: u8, B, C, D> ::core::ops::Sub<B> for Q<A, B, C, D>
 where
     B: ops::Int,
@@ -566,7 +584,6 @@ where
     (): Supported<A, B> {
     #[inline]
     fn eq(&self, other: &f64) -> bool {
-        use ops::ToPrim as _;
         &self.n.to_f64().unwrap_or_default() == other
     }
 }
