@@ -15,9 +15,6 @@ pub mod utf8;
 
 
 fn hello(n: q::Unit2, y: q::Unit2) {
-    if n + y {
-
-    }
-
-    let x = n + y + y;
+    let x = n + y - y + n;
+    x.into_result().unwrap();
 }

@@ -7,7 +7,6 @@ macro_rules! r#as {
                 pub fn [< as _ $n >]<const A: u8, B, C, D>() -> Q<A, B, C, D>
                 where
                     B: ops::Int,
-                    B: ops::Prim,
                     C: Mode,
                     D: Engine,
                     (): SupportedPrecision<A>,

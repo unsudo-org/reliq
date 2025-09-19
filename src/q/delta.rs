@@ -47,7 +47,6 @@ mode!(
 impl<const A: u8, B, C> Delta<A, B, C>
 where
     B: ops::Int,
-    B: ops::Prim,
     B: ops::Signed,
     C: Engine,
     (): SupportedPrecision<A>,

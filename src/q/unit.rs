@@ -12,7 +12,6 @@ mode!(
 impl<const A: u8, B, C> Unit<A, B, C>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
@@ -23,7 +22,6 @@ where
 impl<const A: u8, B, C> From<Deg<A, B, C>> for Unit<A, B, C>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
@@ -36,7 +34,6 @@ where
 impl<const A: u8, B, C> From<Rad<A, B, C>> for Unit<A, B, C>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
@@ -49,7 +46,6 @@ where
 impl<const A: u8, B, C> From<Percentage<A, B, C>> for Unit<A, B, C>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
@@ -62,7 +58,6 @@ where
 impl<const A: u8, B, C> From<Factor<A, B, C>> for Unit<A, B, C>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
@@ -75,7 +70,6 @@ where
 impl<const A: u8, B, C> From<Ratio<A, B, C>> for Unit<A, B, C>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
@@ -88,7 +82,6 @@ where
 impl<const A: u8, B, C> From<Delta<A, B, C>> for Unit<A, B, C>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,

@@ -48,7 +48,6 @@ mode!(
 impl<const A: u8, B, C> Deg<A, B, C> 
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
@@ -80,7 +79,6 @@ where
 impl<const A: u8, B, C> TryFrom<Rad<A, B, C>> for Deg<A, B, C>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
