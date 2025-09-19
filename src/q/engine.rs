@@ -18,7 +18,6 @@ where
     fn tan<const A: Precision, B>(rad_angle: B) -> Result<B>
     where
         B: ops::Int,
-        B: ops::Prim,
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
         (): Supported<A, B> {
@@ -31,7 +30,6 @@ where
     fn sin<const A: Precision, B>(rad_angle: B) -> Result<B>
     where
         B: ops::Int,
-        B: ops::Prim,
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
         (): Supported<A, B> {
@@ -42,7 +40,6 @@ where
     fn cos<const A: Precision, B>(rad_angle: B) -> Result<B>
     where
         B: ops::Int,
-        B: ops::Prim,
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
         (): Supported<A, B> {
@@ -86,7 +83,6 @@ where
     fn to_rad<const A: Precision, B>(deg_angle: B) -> Result<B>
     where
         B: ops::Int,
-        B: ops::Prim,
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
         (): Supported<A, B> {
@@ -97,7 +93,6 @@ where
     fn to_deg<const A: Precision, B>(rad_angle: B) -> Result<B>
     where
         B: ops::Int,
-        B: ops::Prim,
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
         (): Supported<A, B> {
@@ -209,7 +204,6 @@ where
     fn cast<const A: Precision, const B: Precision, C>(n: C) -> Result<lossy::Lossy<C>>
     where
         C: ops::Int,
-        C: ops::Prim,
         (): SupportedPrecision<A>,
         (): SupportedPrecision<B>,
         (): SupportedInt<C>,
@@ -229,7 +223,6 @@ where
     fn lerp<const A: Precision, B>(x: B, y: B, t: B) -> Result<B>
     where
         B: ops::Int,
-        B: ops::Prim,
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
         (): Supported<A, B> {
@@ -243,7 +236,6 @@ where
     fn sqrt<const A: Precision, B>(n: B) -> Result<B>
     where
         B: ops::Int,
-        B: ops::Prim,
         B: ops::Signed,
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
@@ -271,7 +263,6 @@ where
     fn add<T>(x: T, y: T) -> Result<T>
     where
         T: ops::Int,
-        T: ops::Prim,
         (): SupportedInt<T> {
         x.checked_add(y).ok_or(Error::Overflow)
     }
@@ -280,7 +271,6 @@ where
     fn sub<T>(x: T, y: T) -> Result<T>
     where
         T: ops::Int,
-        T: ops::Prim,
         (): SupportedInt<T> {
         x.checked_sub(y).ok_or(Error::Underflow)
     }
@@ -289,7 +279,6 @@ where
     fn mul<const A: u8, B>(x: B, y: B) -> Result<B>
     where
         B: ops::Int,
-        B: ops::Prim,
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
         (): Supported<A, B> {
@@ -303,7 +292,6 @@ where
     fn div<const A: u8, B>(x: B, y: B) -> Result<B>
     where
         B: ops::Int,
-        B: ops::Prim,
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
         (): Supported<A, B> {
@@ -317,7 +305,6 @@ where
     fn muldiv<T>(x: T, y: T, z: T) -> Result<T> 
     where 
         T: ops::Int,
-        T: ops::Prim,
         (): SupportedInt<T> {
         if z == T::AS_0 {
             return Err(Error::DivisionByZero);
@@ -353,7 +340,6 @@ where
 fn wide_mul<T>(x: T, y: T) -> Result<(T, T)>
 where 
     T: ops::Int,
-    T: ops::Prim,
     (): SupportedInt<T> {
     if T::SIGNED {
         signed_wide_mul::<T>(x, y)
@@ -366,7 +352,6 @@ where
 fn signed_wide_mul<T>(x: T, y: T) -> Result<(T, T)> 
 where 
     T: ops::Int,
-    T: ops::Prim,
     (): SupportedInt<T> {    
     assert!(T::SIGNED);
     assert!(T::BITS_AS_U128 <= 64);
@@ -405,7 +390,6 @@ where
 fn unsigned_wide_mul<T>(x: T, y: T) -> Result<(T, T)> 
 where 
     T: ops::Int,
-    T: ops::Prim,
     (): SupportedInt<T> {
     assert!(!T::SIGNED);
     assert!(T::BITS_AS_U128 <= 64);
@@ -462,7 +446,6 @@ where
 fn fold<T>(x: T, y: T, z: T) -> Result<T> 
 where 
     T: ops::Int,
-    T: ops::Prim,
     (): SupportedInt<T> {
     if T::SIGNED {
         signed_fold::<T>(x, y, z)
@@ -475,7 +458,6 @@ where
 fn signed_fold<T>(x: T, y: T, z: T) -> Result<T> 
 where 
     T: ops::Int,
-    T: ops::Prim,
     (): SupportedInt<T> {    
     let (x, y, z) = unsafe {
         let x: i128 = x.try_into().unwrap_unchecked();
@@ -500,7 +482,6 @@ where
 fn unsigned_fold<T>(x: T, y: T, z: T) -> Result<T> 
 where 
     T: ops::Int,
-    T: ops::Prim,
     (): SupportedInt<T> {
     let (x, y, z) = unsafe {
         let x: u128 = x.try_into().unwrap_unchecked();

@@ -20,7 +20,6 @@ mode!(
 impl<const A: u8, B, C> Percentage<A, B, C>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,

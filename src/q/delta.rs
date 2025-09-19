@@ -74,7 +74,7 @@ where
             return Err(Error::DivisionByZero)
         }
         let ret: Unit<_, _, _> = self.into();
-        let ret: Unit<_, _, _> = ((ret * as_100::<A, B, UnitMode, C>())? / base)?;
+        let ret: Unit<_, _, _> = ((ret * as_100::<A, B, UnitMode, C>()) / base)?;
         let ret: Percentage<_, _, _> = ret.into();
         Ok(ret)
     }

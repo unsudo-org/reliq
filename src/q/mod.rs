@@ -1,4 +1,5 @@
 use super::*;
+use ops::ToPrim as _;
 
 ::modwire::expose!(
     pub r#as
@@ -196,7 +197,6 @@ pub struct Q<
           D = DefaultEngine>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
@@ -210,7 +210,6 @@ where
 impl<const A: Precision, B, C, D> Q<A, B, C, D>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
@@ -285,7 +284,6 @@ where
 impl<const A: u8, B, C, D> Q<A, B, C, D>
 where
     B: ops::Int,
-    B: ops::Prim,
     B: ops::Signed,
     C: Mode,
     D: Engine,
@@ -320,7 +318,6 @@ where
 impl<const A: u8, B, C, D> From<B> for Q<A, B, C, D>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
@@ -339,7 +336,6 @@ where
 impl<const A: u8, B, C, D, E> ::core::ops::Add<Q<A, B, D, E>> for Q<A, B, C, E>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Mode,
     D: Mode,
     E: Engine,
@@ -362,7 +358,6 @@ where
 impl<const A: u8, B, C, D> ::core::ops::Add<B> for Q<A, B, C, D>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
@@ -379,7 +374,6 @@ where
 impl<const A: u8, B, C, D, E> ::core::ops::Sub<Q<A, B, D, E>> for Q<A, B, C, E>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Mode,
     D: Mode,
     E: Engine,
@@ -400,9 +394,8 @@ where
 }
 
 impl<const A: u8, B, C, D, E> ::core::ops::Sub<Fragment<A, B, D, E>> for Q<A, B, C, E>
- where
+where
     B: ops::Int,
-    B: ops::Prim,
     C: Mode,
     D: Mode,
     E: Engine,
@@ -412,14 +405,16 @@ impl<const A: u8, B, C, D, E> ::core::ops::Sub<Fragment<A, B, D, E>> for Q<A, B,
     type Output = Fragment<A, B, C, E>;
 
     fn sub(self, rhs: Fragment<A, B, D, E>) -> Self::Output {
-        
+        match rhs {
+            Fragment::Success(rhs) => self - rhs,
+            Fragment::Failure(e) => e.into()
+        }
     }
 }
 
 impl<const A: u8, B, C, D> ::core::ops::Sub<B> for Q<A, B, C, D>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
@@ -437,7 +432,6 @@ where
 impl<const A: u8, B, C, D, E> ::core::ops::Mul<Q<A, B, D, E>> for Q<A, B, C, E>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Mode,
     D: Mode,
     E: Engine,
@@ -460,7 +454,6 @@ where
 impl<const A: u8, B, C, D> ::core::ops::Mul<B> for Q<A, B, C, D>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
@@ -478,7 +471,6 @@ where
 impl<const A: u8, B, C, D, E> ::core::ops::Div<Q<A, B, D, E>> for Q<A, B, C, E>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Mode,
     D: Mode,
     E: Engine,
@@ -501,7 +493,6 @@ where
 impl<const A: u8, B, C, D> ::core::ops::Div<B> for Q<A, B, C, D>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
@@ -519,7 +510,6 @@ where
 impl<const A: u8, B, C, D> Eq for Q<A, B, C, D>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
@@ -529,7 +519,6 @@ where
 impl<const A: u8, B, C, D, E> PartialEq<Q<A, B, D, E>> for Q<A, B, C, E>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Mode,
     D: Mode,
     E: Engine,
@@ -545,7 +534,6 @@ where
 impl<const A: u8, B, C, D> PartialEq<B> for Q<A, B, C, D>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
@@ -560,7 +548,6 @@ where
 impl<const A: u8, B, C, D> PartialEq<f32> for Q<A, B, C, D>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
@@ -568,7 +555,6 @@ where
     (): Supported<A, B> {
     #[inline]
     fn eq(&self, other: &f32) -> bool {
-        use ops::ToPrim as _;
         &self.to_f32().unwrap_or_default() == other
     }
 }
@@ -576,7 +562,6 @@ where
 impl<const A: u8, B, C, D> PartialEq<f64> for Q<A, B, C, D>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
@@ -591,7 +576,6 @@ where
 impl<const A: u8, B, C, D> Ord for Q<A, B, C, D>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
@@ -649,7 +633,6 @@ where
 impl<const A: u8, B, C, D, E> PartialOrd<Q<A, B, D, E>> for Q<A, B, C, E>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Mode,
     D: Mode,
     E: Engine,
@@ -698,7 +681,6 @@ where
 impl<const A: u8, B, C, D> ::core::fmt::Debug for Q<A, B, C, D>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
@@ -713,7 +695,6 @@ where
 impl<const A: u8, B, C, D> ::core::fmt::Display for Q<A, B, C, D>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
@@ -728,7 +709,6 @@ where
 impl<const A: u8, B, C, D> ops::ToPrim for Q<A, B, C, D>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: Mode,
     D: Engine,
     (): SupportedPrecision<A>,
