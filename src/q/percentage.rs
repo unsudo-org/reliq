@@ -51,13 +51,13 @@ where
             let min: Unit<A, B, C> = min.ok().unwrap();
             let percentage: Unit<A, B, C> = percentage.max(min);
             let n: Unit<_, _, _> = n.into();
-            let n: Unit<_, _, _> = (n / as_100::<A, B, UnitMode, C>())?;
-            let n: Unit<_, _, _> = (n * percentage)?;
+            let n: Unit<_, _, _> = (n / as_100::<A, B, UnitMode, C>()).into_result()?;
+            let n: Unit<_, _, _> = (n * percentage).into_result()?;
             return Ok(n)
         }
         let n: Unit<_, _, _> = n.into();
-        let n: Unit<_, _, _> = (n / as_100::<A, B, UnitMode, C>())?;
-        let n: Unit<_, _, _> = (n * percentage)?;
+        let n: Unit<_, _, _> = (n / as_100::<A, B, UnitMode, C>()).into_result()?;
+        let n: Unit<_, _, _> = (n * percentage).into_result()?;
         Ok(n)
     }
 }
@@ -93,13 +93,13 @@ where
             return Ok(as_0())
         }
         if n > as_1::<A, B, UnitMode, C>() {
-            let n: Unit<A, B, C> = (n - as_1::<A, B, UnitMode, C>())?;
-            let n: Unit<A, B, C> = (n * as_100::<A, B, UnitMode, C>())?;
+            let n: Unit<A, B, C> = (n - as_1::<A, B, UnitMode, C>()).into_result()?;
+            let n: Unit<A, B, C> = (n * as_100::<A, B, UnitMode, C>()).into_result()?;
             let ret: Self = n.into();
             return Ok(ret)
         }
-        let n: Unit<A, B, C> = (n - as_1::<A, B, UnitMode, C>())?;
-        let n: Unit<A, B, C> = (n * as_100::<A, B, UnitMode, C>())?;
+        let n: Unit<A, B, C> = (n - as_1::<A, B, UnitMode, C>()).into_result()?;
+        let n: Unit<A, B, C> = (n * as_100::<A, B, UnitMode, C>()).into_result()?;
         let ret: Self = n.into();
         Ok(ret)
     }

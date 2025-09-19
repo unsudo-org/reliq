@@ -15,7 +15,6 @@ mode!(
     impl<const A: u8, B, C> Ratio<A, B, C> 
     where
         B: ops::Int,
-        B: ops::Prim,
         C: Engine,
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
@@ -31,7 +30,6 @@ mode!(
     impl<const A: u8, B, C> From<Unit<A, B, C>> for Ratio<A, B, C>
     where
         B: ops::Int,
-        B: ops::Prim,
         C: Engine,
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
