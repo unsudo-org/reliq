@@ -1,8 +1,5 @@
 use super::*;
 
-// provide common colors as constants.
-
-
 pub type Result<T> = ::core::result::Result<T, Error>;
 
 #[repr(u8)]
@@ -62,7 +59,6 @@ pub type Hsla<const A: q::Precision, B, C> = (
 pub enum Color<const A: u8, B, C = q::DefaultEngine> 
 where
     B: ops::Int,
-    B: ops::Prim,
     C: q::Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
@@ -77,7 +73,6 @@ where
 impl<const A: u8, B, C> Color<A, B, C>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: q::Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
@@ -375,13 +370,22 @@ where
         let (r, g, b) = rgb;
         let n255: B = 255.try_into()?;
         let n255: q::Unit<A, B, C> = n255.into();
-        let rf: B = r.try_into().ok().ok_or(Error::UnsupportedConversion)?;
+        let rf: B = r
+            .try_into()
+            .ok()
+            .ok_or(Error::UnsupportedConversion)?;
         let rf: q::Unit<A, B, C> = rf.into();
-        let rf: q::Unit<A, B, C> = (rf / n255)?;
-        let gf: B = g.try_into().ok().ok_or(Error::UnsupportedConversion)?;
+        let rf: q::Unit<A, B, C> = (rf / n255).into_result()?;
+        let gf: B = g
+            .try_into()
+            .ok()
+            .ok_or(Error::UnsupportedConversion)?;
         let gf: q::Unit<A, B, C> = gf.into();
-        let gf: q::Unit<A, B, C> = (gf / n255)?;
-        let bf: B = b.try_into().ok().ok_or(Error::UnsupportedConversion)?;
+        let gf: q::Unit<A, B, C> = (gf / n255).into_result()?;
+        let bf: B = b
+            .try_into()
+            .ok()
+            .ok_or(Error::UnsupportedConversion)?;
         let bf: q::Unit<A, B, C> = bf.into();
         let bf: q::Unit<A, B, C> = (bf / n255)?;
         let max: q::Unit<A, B, C> = rf.max(gf).max(bf);
@@ -480,7 +484,7 @@ where
         let g: u8 = value.1;
         let b: u8 = value.2;
         let a: q::Q<A, B, q::UnitMode, C> = value.3.into();
-        Self::Rgba(r, g, b, a).normalize()
+        Self::Rgba((r, g, b, a)).normalize().anyhow()
     }
 }
 
@@ -495,10 +499,10 @@ where
     (): q::Supported<1, B> {
     #[inline]
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-        match self.normalize() {
+        match self.normalize().anyhow() {
             Self::Hex(code) => write!(f, "#{:06X}", code),
-            Self::Rgb(r, g, b) => write!(f, "rgb({}, {}, {})", r, g, b),
-            Self::Rgba(r, g, b, a) => write!(f, "rgba({}, {}, {}, {:.3})", r, g, b, a)
+            Self::Rgb((r, g, b)) => write!(f, "rgb({}, {}, {})", r, g, b),
+            Self::Rgba((r, g, b, a)) => write!(f, "rgba({}, {}, {}, {:.3})", r, g, b, a)
         }
     }
 }
@@ -524,18 +528,18 @@ where
     (): q::Supported<1, B> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
-        let x: Color<A, B, C> = self.normalize();
-        let y: Color<A, B, C> = other.normalize();
+        let x: Color<A, B, C> = self.normalize().anyhow();
+        let y: Color<A, B, C> = other.normalize().anyhow();
         match (x, y) {
             (Self::Hex(hex_0), Self::Hex(hex_1)) => {
                 hex_0 == hex_1
             },
-            (Self::Rgb(r_0, g_0, b_0), Self::Rgb(r_1, g_1, b_1)) => {
+            (Self::Rgb((r_0, g_0, b_0)), Self::Rgb((r_1, g_1, b_1))) => {
                 r_0 == r_1 
                 && g_0 == g_1 
                 && b_0 == b_1
             },
-            (Self::Rgba(r_0, g_0, b_0, a_0), Self::Rgba(r_1, g_1, b_1, a_1)) => {
+            (Self::Rgba((r_0, g_0, b_0, a_0)), Self::Rgba((r_1, g_1, b_1, a_1))) => {
                 r_0 == r_1 
                 && g_0 == g_1 
                 && b_0 == b_1

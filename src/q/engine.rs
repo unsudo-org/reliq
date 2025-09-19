@@ -302,6 +302,22 @@ where
     }
 
     #[inline]
+    fn rem<const A: Precision, B>(x: B, y: B) -> Result<B> 
+    where
+        B: ops::Int,
+        (): SupportedPrecision<A>,
+        (): SupportedInt<B>,
+        (): Supported<A, B> {
+        if y == B::AS_0 {
+            return Err(Error::DivisionByZero)
+        }
+        let n: B = Self::div::<A, B>(x, y)?;
+        let n: B = Self::mul::<A, B>(n, y)?;
+        let n: B = Self::sub::<B>(x, n)?;
+        Ok(n)
+    }
+
+    #[inline]
     fn muldiv<T>(x: T, y: T, z: T) -> Result<T> 
     where 
         T: ops::Int,

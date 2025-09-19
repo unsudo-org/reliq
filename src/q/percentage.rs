@@ -46,18 +46,17 @@ where
         D: Into<Unit<A, B, C>> {
         let percentage: Unit<_, _, _> = self.into();
         if B::SIGNED {
-            let min: Fragment<A, B, UnitMode, C> = as_100::<A, B, UnitMode, C>() * as_2::<A, B, UnitMode, C>();
-            let min: Fragment<A, B, UnitMode, C> = as_100::<A, B, UnitMode, C>() - min;
-            let min: Unit<A, B, C> = min.ok().unwrap();
+            let min: Unit<A, B, C> = (as_100::<A, B, UnitMode, C>() * as_2::<A, B, UnitMode, C>())?;
+            let min: Unit<A, B, C> = (as_100::<A, B, UnitMode, C>() - min)?;
             let percentage: Unit<A, B, C> = percentage.max(min);
-            let n: Unit<_, _, _> = n.into();
-            let n: Unit<_, _, _> = (n / as_100::<A, B, UnitMode, C>()).into_result()?;
-            let n: Unit<_, _, _> = (n * percentage).into_result()?;
+            let n: Unit<A, B, C> = n.into();
+            let n: Unit<A, B, C> = (n / as_100::<A, B, UnitMode, C>())?;
+            let n: Unit<A, B, C> = (n * percentage)?;
             return Ok(n)
         }
-        let n: Unit<_, _, _> = n.into();
-        let n: Unit<_, _, _> = (n / as_100::<A, B, UnitMode, C>()).into_result()?;
-        let n: Unit<_, _, _> = (n * percentage).into_result()?;
+        let n: Unit<A, B, C> = n.into();
+        let n: Unit<A, B, C> = (n / as_100::<A, B, UnitMode, C>())?;
+        let n: Unit<A, B, C> = (n * percentage)?;
         Ok(n)
     }
 }
@@ -93,13 +92,13 @@ where
             return Ok(as_0())
         }
         if n > as_1::<A, B, UnitMode, C>() {
-            let n: Unit<A, B, C> = (n - as_1::<A, B, UnitMode, C>()).into_result()?;
-            let n: Unit<A, B, C> = (n * as_100::<A, B, UnitMode, C>()).into_result()?;
+            let n: Unit<A, B, C> = (n - as_1::<A, B, UnitMode, C>())?;
+            let n: Unit<A, B, C> = (n * as_100::<A, B, UnitMode, C>())?;
             let ret: Self = n.into();
             return Ok(ret)
         }
-        let n: Unit<A, B, C> = (n - as_1::<A, B, UnitMode, C>()).into_result()?;
-        let n: Unit<A, B, C> = (n * as_100::<A, B, UnitMode, C>()).into_result()?;
+        let n: Unit<A, B, C> = (n - as_1::<A, B, UnitMode, C>())?;
+        let n: Unit<A, B, C> = (n * as_100::<A, B, UnitMode, C>())?;
         let ret: Self = n.into();
         Ok(ret)
     }

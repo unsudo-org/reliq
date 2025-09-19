@@ -68,13 +68,14 @@ where
     pub fn into_percentage<D>(self, base: D) -> Result<Percentage<A, B, C>> 
     where
         D: Into<Unit<A, B, C>> {
-        let base: Unit<_, _, _> = base.into();
+        let base: Unit<A, B, C> = base.into();
         if base.n == B::AS_0 {
             return Err(Error::DivisionByZero)
         }
-        let ret: Unit<_, _, _> = self.into();
-        let ret: Unit<_, _, _> = ((ret * as_100::<A, B, UnitMode, C>()) / base).into_result()?;
-        let ret: Percentage<_, _, _> = ret.into();
+        let ret: Unit<A, B, C> = self.into();
+        let ret: Unit<A, B, C> = (ret * as_100::<A, B, UnitMode, C>())?;
+        let ret: Unit<A, B, C> = (ret / base)?;
+        let ret: Percentage<A, B, C> = ret.into();
         Ok(ret)
     }
 }

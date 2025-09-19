@@ -9,7 +9,6 @@ use ops::ToPrim as _;
     pub delta
     pub engine
     pub factor
-    pub fragment
     pub mode
     pub percentage
     pub pi
@@ -18,6 +17,7 @@ use ops::ToPrim as _;
     pub scale
     pub supported
     pub unit
+    pub util
 );
 
 #[macro_export(local_inner_macros)]
@@ -333,6 +333,26 @@ where
     }
 }
 
+impl<const A: u8, B, C, D, E> ::core::ops::Add<Result<Q<A, B, D, E>>> for Q<A, B, C, E>
+where
+    B: ops::Int,
+    C: Mode,
+    D: Mode,
+    E: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    type Output = Result<Q<A, B, C, E>>;
+
+    #[inline]
+    fn add(self, rhs: Result<Q<A, B, D, E>>) -> Self::Output {
+        match rhs {
+            Ok(rhs) => self + rhs,
+            Err(e) => Err(e)
+        }
+    }
+}
+
 impl<const A: u8, B, C, D, E> ::core::ops::Add<Q<A, B, D, E>> for Q<A, B, C, E>
 where
     B: ops::Int,
@@ -342,14 +362,17 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    type Output = Fragment<A, B, C, E>;
+    type Output = Result<Q<A, B, C, E>>;
 
     #[inline]
     fn add(self, rhs: Q<A, B, D, E>) -> Self::Output {
         let x: B = self.n;
         let y: B = rhs.n;
         match E::add(x, y) {
-            Ok(n) => n.into(),
+            Ok(n) => {
+                let n: Self = n.into();
+                Ok(n)
+            },
             Err(e) => Err::<Q<A, B, C, E>, Error>(e).into()
         }
     }
@@ -363,11 +386,31 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    type Output = Fragment<A, B, C, D>;
-        
+    type Output = Result<Q<A, B, C, D>>;
+    
+    #[inline]
     fn add(self, rhs: B) -> Self::Output {
         let rhs: Self = rhs.into();
         self + rhs
+    }
+}
+
+impl<const A: u8, B, C, D, E> ::core::ops::Sub<Result<Q<A, B, D, E>>> for Q<A, B, C, E>
+where
+    B: ops::Int,
+    C: Mode,
+    D: Mode,
+    E: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    type Output = Result<Q<A, B, C, E>>;
+
+    fn sub(self, rhs: Result<Q<A, B, D, E>>) -> Self::Output {
+        match rhs {
+            Ok(rhs) => self - rhs,
+            Err(e) => Err(e)
+        }
     }
 }
 
@@ -380,34 +423,18 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    type Output = Fragment<A, B, C, E>;
+    type Output = Result<Q<A, B, C, E>>;
 
     #[inline]
     fn sub(self, rhs: Q<A, B, D, E>) -> Self::Output {
         let x: B = self.n;
         let y: B = rhs.n;
         match E::sub(x, y) {
-            Ok(n) => n.into(),
+            Ok(n) => {
+                let n: Self = n.into();
+                Ok(n)
+            },
             Err(e) => Err::<Q<A, B, C, E>, Error>(e).into()
-        }
-    }
-}
-
-impl<const A: u8, B, C, D, E> ::core::ops::Sub<Fragment<A, B, D, E>> for Q<A, B, C, E>
-where
-    B: ops::Int,
-    C: Mode,
-    D: Mode,
-    E: Engine,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
-    type Output = Fragment<A, B, C, E>;
-
-    fn sub(self, rhs: Fragment<A, B, D, E>) -> Self::Output {
-        match rhs {
-            Fragment::Success(rhs) => self - rhs,
-            Fragment::Failure(e) => e.into()
         }
     }
 }
@@ -420,7 +447,7 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    type Output = Fragment<A, B, C, D>;
+    type Output = Result<Q<A, B, C, D>>;
 
     #[inline]
     fn sub(self, rhs: B) -> Self::Output {
@@ -429,7 +456,7 @@ where
     }
 }
 
-impl<const A: u8, B, C, D, E> ::core::ops::Mul<Q<A, B, D, E>> for Q<A, B, C, E>
+impl<const A: Precision, B, C, D, E> ::core::ops::Mul<Result<Q<A, B, D, E>>> for Q<A, B, C, E>
 where
     B: ops::Int,
     C: Mode,
@@ -438,20 +465,43 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    type Output = Fragment<A, B, C, E>;
+    type Output = Result<Q<A, B, C, E>>;
+    
+    #[inline]
+    fn mul(self, rhs: Result<Q<A, B, D, E>>) -> Self::Output {
+        match rhs {
+            Ok(rhs) => self * rhs,
+            Err(e) => Err(e)
+        }
+    }
+}
+
+impl<const A: Precision, B, C, D, E> ::core::ops::Mul<Q<A, B, D, E>> for Q<A, B, C, E>
+where
+    B: ops::Int,
+    C: Mode,
+    D: Mode,
+    E: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    type Output = Result<Q<A, B, C, E>>;
 
     #[inline]
     fn mul(self, rhs: Q<A, B, D, E>) -> Self::Output {
         let x: B = self.n;
         let y: B = rhs.n;
         match E::mul::<A, B>(x, y) {
-            Ok(n) => n.into(),
+            Ok(n) => {
+                let n: Self = n.into();
+                Ok(n)
+            },
             Err(e) => Err::<Q<A, B, C, E>, Error>(e).into()
         }
     }
 }
 
-impl<const A: u8, B, C, D> ::core::ops::Mul<B> for Q<A, B, C, D>
+impl<const A: Precision, B, C, D> ::core::ops::Mul<B> for Q<A, B, C, D>
 where
     B: ops::Int,
     C: Mode,
@@ -459,7 +509,7 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    type Output = Fragment<A, B, C, D>;
+    type Output = Result<Q<A, B, C, D>>;
 
     #[inline]
     fn mul(self, rhs: B) -> Self::Output {
@@ -468,7 +518,7 @@ where
     }
 }
 
-impl<const A: u8, B, C, D, E> ::core::ops::Div<Q<A, B, D, E>> for Q<A, B, C, E>
+impl<const A: Precision, B, C, D, E> ::core::ops::Div<Result<Q<A, B, D, E>>> for Q<A, B, C, E>
 where
     B: ops::Int,
     C: Mode,
@@ -477,20 +527,43 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    type Output = Fragment<A, B, C, E>;
+    type Output = Result<Q<A, B, C, E>>;
+    
+    #[inline]
+    fn div(self, rhs: Result<Q<A, B, D, E>>) -> Self::Output {
+        match rhs {
+            Ok(rhs) => self * rhs,
+            Err(e) => Err(e)
+        }
+    }
+}
+
+impl<const A: Precision, B, C, D, E> ::core::ops::Div<Q<A, B, D, E>> for Q<A, B, C, E>
+where
+    B: ops::Int,
+    C: Mode,
+    D: Mode,
+    E: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    type Output = Result<Q<A, B, C, E>>;
 
     #[inline]
     fn div(self, rhs: Q<A, B, D, E>) -> Self::Output {
         let x: B = self.n;
         let y: B = rhs.n;
         match E::div::<A, B>(x, y) {
-            Ok(n) => n.into(),
+            Ok(n) => {
+                let n: Self = n.into();
+                Ok(n)
+            },
             Err(e) => Err::<Q<A, B, C, E>, Error>(e).into()
         }
     }
 }
 
-impl<const A: u8, B, C, D> ::core::ops::Div<B> for Q<A, B, C, D>
+impl<const A: Precision, B, C, D> ::core::ops::Div<B> for Q<A, B, C, D>
 where
     B: ops::Int,
     C: Mode,
@@ -498,12 +571,74 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    type Output = Fragment<A, B, C, D>;
+    type Output = Result<Q<A, B, C, D>>;
 
     #[inline]
     fn div(self, rhs: B) -> Self::Output {
         let rhs: Self = rhs.into();
         self / rhs
+    }
+}
+
+impl<const A: Precision, B, C, D, E> ::core::ops::Rem<Q<A, B, D, E>> for Q<A, B, C, E>
+where
+    B: ops::Int,
+    C: Mode,
+    D: Mode,
+    E: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    type Output = Result<Q<A, B, C, E>>;
+
+    #[inline]
+    fn rem(self, rhs: Q<A, B, D, E>) -> Self::Output {
+        let x: B = self.n;
+        let y: B = rhs.n;
+        match E::rem::<A, B>(x, y) {
+            Ok(n) => {
+                let n: Self = n.into();
+                Ok(n)
+            },
+            Err(e) => Err::<Q<A, B, C, E>, Error>(e).into()
+        }
+    }
+}
+
+impl<const A: Precision, B, C, D, E> ::core::ops::Rem<Result<Q<A, B, D, E>>> for Q<A, B, C, E>
+where
+    B: ops::Int,
+    C: Mode,
+    D: Mode,
+    E: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    type Output = Result<Q<A, B, C, E>>;
+
+    #[inline]
+    fn rem(self, rhs: Result<Q<A, B, D, E>>) -> Self::Output {
+        match rhs {
+            Ok(rhs) => self % rhs,
+            Err(e) => Err(e)
+        }
+    }
+}
+
+impl<const A: Precision, B, C, D> ::core::ops::Rem<B> for Q<A, B, C, D>
+where
+    B: ops::Int,
+    C: Mode,
+    D: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    type Output = Result<Q<A, B, C, D>>;
+
+    #[inline]
+    fn rem(self, rhs: B) -> Self::Output {
+        let rhs: Self = rhs.into();
+        self % rhs
     }
 }
 
@@ -903,7 +1038,7 @@ where
     let x: Unit2 = x.into();
     let y: Unit2 = y.into();
     let ok: Unit2 = ok.into();
-    let ret: Unit2 = (x + y).into_result().unwrap();
+    let ret: Unit2 = (x + y).unwrap();
     assert_eq!(ret, ok);
 }
 
@@ -919,7 +1054,7 @@ where
     let x: Unit2 = x.into();
     let y: Unit2 = y.into();
     let ok: Unit2 = ok.into();
-    let ret: Unit2 = (x - y).into_result().unwrap();
+    let ret: Unit2 = (x - y).unwrap();
     assert_eq!(ret, ok);
 }
 
@@ -935,7 +1070,7 @@ where
     let x: Unit2 = x.into();
     let y: Unit2 = y.into();
     let ok: Unit2 = ok.into();
-    let ret: Unit2 = (x * y).into_result().unwrap();
+    let ret: Unit2 = (x * y).unwrap();
     assert_eq!(ret, ok);
 }
 
@@ -951,6 +1086,6 @@ where
     let x: Unit2 = x.into();
     let y: Unit2 = y.into();
     let ok: Unit2 = ok.into();
-    let ret: Unit2 = (x / y).into_result().unwrap();
+    let ret: Unit2 = (x / y).unwrap();
     assert_eq!(ret, ok);
 }

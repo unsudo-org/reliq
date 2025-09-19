@@ -6,8 +6,6 @@ use super::*;
     pub ty
 );
 
-type Q<const A: u8, B, C> = q::Q<A, B, q::UnitMode, C>;
-
 #[repr(transparent)]
 #[derive(Debug)]
 #[derive(Clone)]
@@ -19,18 +17,16 @@ type Q<const A: u8, B, C> = q::Q<A, B, q::UnitMode, C>;
 pub struct Point<const A: u8, const B: usize, C, D = q::DefaultEngine>
 where
     C: ops::Int,
-    C: ops::Prim,
     D: q::Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<C>,
     (): q::Supported<A, C> {
-    pub(crate) dimensions: array::Array<B, Q<A, C, D>>
+    pub(crate) dimensions: array::Array<B, q::Unit<A, C, D>>
 }
 
 impl<const A: u8, const B: usize, C, D> Point<A, B, C, D>
 where
     C: ops::Int,
-    C: ops::Prim,
     D: q::Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<C>,
@@ -39,7 +35,7 @@ where
         B
     }
 
-    pub fn dimension(&self, key: usize) -> Option<&Q<A, C, D>> {
+    pub fn dimension(&self, key: usize) -> Option<&q::Unit<A, C, D>> {
         self.dimensions.get(key)
     }
 }
@@ -47,13 +43,12 @@ where
 impl<const A: u8, const B: usize, C, D> Point<A, B, C, D>
 where
     C: ops::Int,
-    C: ops::Prim,
     C: ops::Signed,
     D: q::Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<C>,
     (): q::Supported<A, C> {
-    pub fn distance_between(self, rhs: Self) -> Result<Q<A, C, D>> {
+    pub fn distance_between(self, rhs: Self) -> Result<q::Unit<A, C, D>> {
         let mut sum: Q<A, C, D> = C::AS_0.into();
         let rhs_iter: array::Iter<_, _> = rhs.dimensions.into_iter();
         for (x_0, x_1) in self.dimensions.into_iter().zip(rhs_iter) {

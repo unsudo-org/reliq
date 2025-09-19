@@ -14,7 +14,6 @@ pub mod q;
 pub mod utf8;
 
 
-fn hello(n: q::Unit2, y: q::Unit2) {
-    let x = n + y - y + n;
-    x.into_result().unwrap();
+fn hello(n: q::Unit2, y: q::Unit2) -> q::Result<()> {
+    ((n + y)? % 2_50)?;
 }
