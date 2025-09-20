@@ -76,13 +76,25 @@ where
             return as_0::<A, B, FactorMode, C>()
         }
         if n > as_0::<A, B, UnitMode, C>() {
-            let n: Unit<A, B, C> = ((n / as_100::<A, B, UnitMode, C>()) + as_1::<A, B, UnitMode, C>()).into_result().unwrap();
+            let n: Unit<A, B, C> = unsafe {
+                (n / as_100::<A, B, UnitMode, C>()).unwrap_unchecked()
+            };
+            let n: Unit<A, B, C> = unsafe {
+                (n + as_1::<A, B, UnitMode, C>()).unwrap_unchecked()
+            };
             let ret: Self = n.into_int().into();
             return ret
         }
-        let min: Unit<A, B, C> = (as_0::<A, B, UnitMode, C>() - as_100::<A, B, UnitMode, C>()).into_result().unwrap();
+        let min: Unit<A, B, C> = unsafe {
+            (as_0::<A, B, UnitMode, C>() - as_100::<A, B, UnitMode, C>()).unwrap_unchecked()
+        };
         let n: Unit<A, B, C> = n.max(min);
-        let n: Unit<A, B, C> = ((n / as_100::<A, B, UnitMode, C>()) + as_1::<A, B, UnitMode, C>()).into_result().unwrap();
+        let n: Unit<A, B, C> = unsafe {
+            (n / as_100::<A, B, UnitMode, C>()).unwrap_unchecked()
+        };
+        let n: Unit<A, B, C> = unsafe {
+            (n + as_1::<A, B, UnitMode, C>()).unwrap_unchecked()
+        };
         let ret: Self = n.into_int().into();
         ret
     }

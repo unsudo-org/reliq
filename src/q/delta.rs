@@ -80,10 +80,21 @@ where
     }
 }
 
+impl<const A: u8, B, C> From<Unit<A, B, C>> for Delta<A, B, C>
+where
+    B: ops::Int,
+    C: Engine,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    fn from(value: Unit<A, B, C>) -> Self {
+        value.n.into()
+    }
+}
+
 impl<const A: u8, B, C> TryFrom<Factor<A, B, C>> for Delta<A, B, C> 
 where
     B: ops::Int,
-    B: ops::Prim,
     B: ops::Signed,
     C: Engine,
     (): SupportedPrecision<A>,

@@ -6,6 +6,8 @@ use super::*;
     pub ty
 );
 
+pub type Dimensions = usize;
+
 #[repr(transparent)]
 #[derive(Debug)]
 #[derive(Clone)]
@@ -14,17 +16,27 @@ use super::*;
 #[derive(Eq)]
 #[derive(::serde::Serialize)]
 #[derive(::serde::Deserialize)]
-pub struct Point<const A: u8, const B: usize, C, D = q::DefaultEngine>
+pub struct Point<
+    const A: u8, 
+    const B: usize, 
+    C, 
+    D = q::DefaultEngine
+>
 where
     C: ops::Int,
     D: q::Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<C>,
     (): q::Supported<A, C> {
-    pub(crate) dimensions: array::Array<B, q::Unit<A, C, D>>
+    dimensions: array::Array<B, q::Unit<A, C, D>>
 }
 
-impl<const A: u8, const B: usize, C, D> Point<A, B, C, D>
+impl<
+    const A: u8, 
+    const B: usize, 
+    C, 
+    D
+> Point<A, B, C, D>
 where
     C: ops::Int,
     D: q::Engine,
@@ -38,6 +50,18 @@ where
     pub fn dimension(&self, key: usize) -> Option<&q::Unit<A, C, D>> {
         self.dimensions.get(key)
     }
+
+    pub fn x(&self) -> Option<&q::Unit<A, B, D>> {
+        self.dimension(0)
+    }
+
+    pub fn y(&self) -> Option<&q::Unit<A, B, C>> {
+        self.dimension(1)
+    }
+
+    pub fn z(&self) -> Option<&q::Unit<A, B, C>> {
+        self.dimension(2)
+    }
 }
 
 impl<const A: u8, const B: usize, C, D> Point<A, B, C, D>
@@ -49,7 +73,7 @@ where
     (): q::SupportedInt<C>,
     (): q::Supported<A, C> {
     pub fn distance_between(self, rhs: Self) -> Result<q::Unit<A, C, D>> {
-        let mut sum: Q<A, C, D> = C::AS_0.into();
+        let mut sum: q::Unit<A, C, D> = C::AS_0.into();
         let rhs_iter: array::Iter<_, _> = rhs.dimensions.into_iter();
         for (x_0, x_1) in self.dimensions.into_iter().zip(rhs_iter) {
             let dn: Q<A, C, D> = (x_0 - x_1)?;
@@ -141,5 +165,32 @@ where
         Self {
             dimensions
         }
+    }
+}
+
+impl<
+    const A: q::Precision,
+    const B: Dimensions,
+    C,
+    D
+> IntoIterator for Point<A, B, C, D>
+where
+    C: ops::Int,
+    C: ops::Prim,
+    D: q::Engine,
+    (): q::SupportedPrecision<A>,
+    (): q::SupportedInt<C>,
+    (): q::Supported<A, C> {
+    type Item = q::Unit<A, C, D>;
+    type IntoIter = array::Iter<B, q::Unit<A, C, D>>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.dimensions.into_iter()
+    }
+}
+
+fn t(coordinate: Point<2, 32, usize>) {
+    for dim in coordinate {
+        
     }
 }

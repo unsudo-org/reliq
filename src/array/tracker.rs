@@ -2,6 +2,8 @@ use super::*;
 
 static mut NEXT_HANDLE: usize = 0;
 
+pub type Trackable<const A: u8, B> = Array<A, Tracker<B>>;
+
 /// # Brief
 /// A wrapper to attach a `Handle` on. 
 /// Enables the `Array` to track specific `T`s and remove them regardless of order.

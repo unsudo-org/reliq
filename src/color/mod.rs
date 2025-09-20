@@ -1,5 +1,14 @@
 use super::*;
 
+::modwire::expose!(
+    pub hex
+    pub hsl
+    pub hsla
+    pub mode
+    pub rgb
+    pub rgba
+);
+
 pub type Result<T> = ::core::result::Result<T, Error>;
 
 #[repr(u8)]
@@ -29,19 +38,6 @@ pub enum Error {
     UnsupportedConversion
 }
 
-pub type Hex = u32;
-pub type Hsl<const A: q::Precision, B, C> = (
-    u16, 
-    q::Unit<A, B, C>, 
-    q::Unit<A, B, C>
-);
-pub type Rgb = (u8, u8, u8);
-pub type Rgba<const A: q::Precision, B, C> = (
-    u8, 
-    u8, 
-    u8, 
-    q::Unit<A, B, C>
-);
 pub type Hsla<const A: q::Precision, B, C> = (
     u16, 
     q::Unit<A, B, C>,
@@ -49,17 +45,42 @@ pub type Hsla<const A: q::Precision, B, C> = (
     q::Unit<A, B, C>
 );
 
-#[repr(u8)]
-#[derive(Debug)]
-#[derive(Clone)]
-#[derive(Copy)]
-#[derive(::strum_macros::EnumCount)]
 #[cfg_attr(feature = "std", derive(::serde::Serialize))]
 #[cfg_attr(feature = "std", derive(::serde::Deserialize))]
-pub enum Color<const A: u8, B, C = q::DefaultEngine> 
+pub struct Color<
+    const A: q::Precision, 
+    B,
+    C,
+    D
+>
+where
+    B: ops::Int,
+    C: Mode,
+    D: q::Engine,
+    (): q::SupportedPrecision<A>,
+    (): q::SupportedInt<B>,
+    (): q::Supported<A, B> {
+    mode: C,
+    m_0: ::core::marker::PhantomData<B>,
+    m_1: ::core::marker::PhantomData<D>
+}
+
+
+
+
+
+
+
+
+pub enum Color<
+    const A: u8, 
+          B, 
+          C = q::DefaultEngine, 
+          D = DefaultEngine> 
 where
     B: ops::Int,
     C: q::Engine,
+    D: Engine<A, B, C>,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
@@ -188,14 +209,14 @@ where
     pub fn interpolate<D, E>(self, rhs: D, t: E) -> Result<Self>
     where
         D: Into<Self>,
-        E: Into<q::Q<A, B, q::UnitMode, C>> {
+        E: Into<q::Unit<A, B, C>> {
         let x: Color<A, B, C> = self.normalize().anyhow();
         let y: Self = rhs.into();
         let y: Color<A, B, C> = y.normalize().anyhow();
         let t: q::Q<A, B, q::UnitMode, C> = t.into();
         let t: q::Q<A, B, q::UnitMode, C> = t.clamp(q::as_0(), q::as_1());
         match (x, y) {
-            (Self::Rgb(r_0, g_0, b_0), Self::Rgb(r_1, g_1, b_1)) => {
+            (Self::Rgb((r_0, g_0, b_0)), Self::Rgb((r_1, g_1, b_1))) => {
                 let lerp: _ = |a: u8, b: u8| -> q::Result<u8> {
                     let a: B = a
                         .try_into()
@@ -218,9 +239,9 @@ where
                 let r: u8 = lerp(r_0, r_1)?;
                 let g: u8 = lerp(g_0, g_1)?;
                 let b: u8 = lerp(b_0, b_1)?;
-                Ok(Self::Rgb(r, g, b))
+                Ok(Self::Rgb((r, g, b)))
             },
-            (Self::Rgba(r_0, g_0, b_0, a_0), Self::Rgba(r_1, g_1, b_1, a_1)) => {
+            (Self::Rgba((r_0, g_0, b_0, a_0)), Self::Rgba((r_1, g_1, b_1, a_1))) => {
                 let lerp: _ = |a: u8, b: u8| -> q::Result<u8> {
                     let a: B = a
                         .try_into()
@@ -248,7 +269,7 @@ where
                 let r: u8 = lerp(r_0, r_1)?;
                 let g: u8 = lerp(g_0, g_1)?;
                 let b: u8 = lerp(b_0, b_1)?;
-                Ok(Self::Rgba(r, g, b, a))
+                Ok(Self::Rgba((r, g, b, a)))
             },
             (Self::Hex(hex_0), Self::Hex(hex_1)) => {
                 let r_0: u8 = ((hex_0 >> 16) & 0xff) as u8;
@@ -263,11 +284,11 @@ where
             },
             (lhs, rhs) => {
                 let lhs: Self = match lhs {
-                    Self::Rgb(r, g, b) => Self::Rgba(r, g, b, q::as_1()),
+                    Self::Rgb((r, g, b)) => Self::Rgba((r, g, b, q::as_1())),
                     o => o
                 };
                 let rhs: Self = match rhs {
-                    Self::Rgb(r, g, b) => Self::Rgba(r, g, b, q::as_1()),
+                    Self::Rgb((r, g, b)) => Self::Rgba((r, g, b, q::as_1())),
                     o => o
                 };
                 let ret: Self = lhs.interpolate(rhs, t)?;
@@ -279,17 +300,23 @@ where
     #[inline]
     pub fn to_hex(self) -> lossy::Lossy<Self> {
         match self.normalize().anyhow() {
-            Self::Rgb(r, g, b) => {
+            Self::Rgb((r, g, b)) => {
                 let ret: u32 = ((r as u32) << 16) | ((g as u32) << 8) | (b as u32);
                 let ret: Self = Self::Hex(ret);
-                ret
+                lossy::Lossy::Exact(ret)
             },
-            Self::Rgba(r, g, b, _) => {
+            Self::Rgba((r, g, b, _)) => {
                 let ret: u32 = ((r as u32) << 16) | ((g as u32) << 8) | (b as u32);
                 let ret: Self = Self::Hex(ret);
-                ret
+                lossy::Lossy::Trunc(ret)
             },
-            Self::Hex(_) => self
+            Self::Hex(_) => lossy::Lossy::Exact(self),
+            Self::Hsl((h, s, l)) => {
+
+            },
+            Self::Hsla((h, s, l, a)) => {
+
+            }
         }
     }
 
@@ -302,6 +329,7 @@ where
                     ((hex >> 8) & 0xFF) as u8,
                     (hex & 0xff) as u8
                 );
+                
                 Self::Rgb(r, g, b)
             },
             Self::Hsl(, , ) => ,
@@ -366,6 +394,18 @@ where
         }
     }
 
+    fn hex_to_hsl(hex: Hex) -> Result<Hsl<A, B, C>> {
+
+    }
+
+    fn hex_to_rgb(hex: Hex) -> Result<Rgb> {
+
+    }
+
+    fn hex_to_rgba(hex: Hex) -> Result<Rgba<A, B, C>> {
+
+    }
+
     fn rgb_to_hsl(rgb: Rgb) -> Result<Hsl<A, B, C>> {
         let (r, g, b) = rgb;
         let n255: B = 255.try_into()?;
@@ -375,13 +415,13 @@ where
             .ok()
             .ok_or(Error::UnsupportedConversion)?;
         let rf: q::Unit<A, B, C> = rf.into();
-        let rf: q::Unit<A, B, C> = (rf / n255).into_result()?;
+        let rf: q::Unit<A, B, C> = (rf / n255)?;
         let gf: B = g
             .try_into()
             .ok()
             .ok_or(Error::UnsupportedConversion)?;
         let gf: q::Unit<A, B, C> = gf.into();
-        let gf: q::Unit<A, B, C> = (gf / n255).into_result()?;
+        let gf: q::Unit<A, B, C> = (gf / n255)?;
         let bf: B = b
             .try_into()
             .ok()
@@ -392,7 +432,7 @@ where
         let min: q::Unit<A, B, C> = rf.min(gf).min(bf);
         let delta: q::Delta<A, B, C> = (max - min)?.into();
         let l: q::Unit<A, B, C> = (max + min)?;
-        let l: q::Unit<A, B, C>  = (l / as_2())?;
+        let l: q::Unit<A, B, C>  = (l / q::as_2())?;
         let s = if delta == 0.0 {
             
         } else {
@@ -404,7 +444,6 @@ where
 impl<const A: u8, B, C> From<(u8, u8, u8)> for Color<A, B, C>
 where
     B: ops::Int,
-    B: ops::Prim,
     C: q::Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,

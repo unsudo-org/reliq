@@ -191,7 +191,7 @@ pub enum Error {
 #[derive(::serde::Serialize)]
 #[derive(::serde::Deserialize)]
 pub struct Q<
-    const A: Precision = 2, 
+    const PRECISION: Precision = 2,
           B = usize, 
           C = UnitMode, 
           D = DefaultEngine>
@@ -199,9 +199,9 @@ where
     B: ops::Int,
     C: Mode,
     D: Engine,
-    (): SupportedPrecision<A>,
+    (): SupportedPrecision<PRECISION>,
     (): SupportedInt<B>,
-    (): Supported<A, B> {
+    (): Supported<PRECISION, B> {
     n: B,
     m_0: ::core::marker::PhantomData<C>,
     m_1: ::core::marker::PhantomData<D>
@@ -353,7 +353,7 @@ where
     }
 }
 
-impl<const A: u8, B, C, D, E> ::core::ops::Add<Q<A, B, D, E>> for Q<A, B, C, E>
+impl<const A: Precision, B, C, D, E> ::core::ops::Add<Q<A, B, D, E>> for Q<A, B, C, E>
 where
     B: ops::Int,
     C: Mode,

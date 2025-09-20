@@ -27,7 +27,7 @@ mode!(
         }
     }
 
-    impl<const A: u8, B, C> From<Unit<A, B, C>> for Ratio<A, B, C>
+    impl<const A: Precision, B, C> From<Unit<A, B, C>> for Ratio<A, B, C>
     where
         B: ops::Int,
         C: Engine,

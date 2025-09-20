@@ -22,7 +22,7 @@ macro_rules! whitelist {
     };
 }
 
-/// `A` is a valid precision.
+/// `T` is a valid precision.
 pub trait SupportedPrecision<const T: u8> {}
 
 /// `T` must be able to support `180`.

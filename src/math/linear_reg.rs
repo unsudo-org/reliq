@@ -12,7 +12,6 @@ pub struct PredictionEngine<
 >
 where
     D: ops::Int,
-    D: ops::Prim,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<D>,
     (): q::Supported<A, D> {
