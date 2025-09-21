@@ -29,11 +29,7 @@ where
     l: q::Unit<A, B, C>
 }
 
-impl<
-    const A: q::Precision,
-    B,
-    C
-> Mode for HslMode<A, B, C>
+impl<const A: q::Precision, B, C> Mode for HslMode<A, B, C>
 where
     B: ops::Int,
     C: q::Engine,
@@ -41,12 +37,7 @@ where
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {}
 
-impl<
-    const A: q::Precision,
-    B,
-    C,
-    D
-> Hsl<A, B, C, D> 
+impl<const A: u8, B, C, D> Hsl<A, B, C, D> 
 where
     B: ops::Int,
     C: q::Engine,
@@ -54,5 +45,15 @@ where
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
-    
+    pub fn h(&self) -> &u16 {
+        &self.mode.h
+    }
+
+    pub fn s(&self) -> &q::Unit<A, B, C> {
+        &self.mode.s
+    }
+
+    pub fn l(&self) -> &q::Unit<A, B, C> {
+        &self.mode.l
+    }
 }

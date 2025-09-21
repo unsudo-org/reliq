@@ -12,7 +12,3 @@ pub mod ops;
 pub mod point;
 pub mod q;
 pub mod utf8;
-
-
-
-
