@@ -217,6 +217,12 @@ where
     (): Supported<A, B> {
 
     #[inline]
+    pub fn abs(self) -> Self {
+        let ret: Self = D::abs(self.n).into();
+        ret
+    }
+
+    #[inline]
     pub fn lerp<E, F>(self, rhs: E, t: F) -> Result<Self> 
     where
         E: Into<Self>,

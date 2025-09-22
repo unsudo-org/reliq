@@ -177,6 +177,17 @@ where
     }
 
     #[inline]
+    fn abs<T>(n: T) -> T 
+    where
+        T: ops::Int,
+        (): SupportedInt<T> {
+        if n < T::AS_0 {
+            return T::AS_0 - n
+        }
+        n
+    }
+
+    #[inline]
     fn to_negative<T>(n: T) -> T
     where
         T: ops::Int,

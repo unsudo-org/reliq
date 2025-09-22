@@ -16,12 +16,7 @@ pub type Dimensions = usize;
 #[derive(Eq)]
 #[derive(::serde::Serialize)]
 #[derive(::serde::Deserialize)]
-pub struct Point<
-    const A: u8, 
-    const B: usize, 
-    C, 
-    D = q::DefaultEngine
->
+pub struct Point<const A: u8, const B: usize, C, D = q::DefaultEngine>
 where
     C: ops::Int,
     D: q::Engine,
@@ -31,12 +26,7 @@ where
     dimensions: array::Array<B, q::Unit<A, C, D>>
 }
 
-impl<
-    const A: u8, 
-    const B: usize, 
-    C, 
-    D
-> Point<A, B, C, D>
+impl<const A: u8, const B: usize, C, D> Point<A, B, C, D>
 where
     C: ops::Int,
     D: q::Engine,
@@ -51,15 +41,15 @@ where
         self.dimensions.get(key)
     }
 
-    pub fn x(&self) -> Option<&q::Unit<A, B, D>> {
+    pub fn x(&self) -> Option<&q::Unit<A, C, D>> {
         self.dimension(0)
     }
 
-    pub fn y(&self) -> Option<&q::Unit<A, B, C>> {
+    pub fn y(&self) -> Option<&q::Unit<A, C, D>> {
         self.dimension(1)
     }
 
-    pub fn z(&self) -> Option<&q::Unit<A, B, C>> {
+    pub fn z(&self) -> Option<&q::Unit<A, C, D>> {
         self.dimension(2)
     }
 }
@@ -73,7 +63,9 @@ where
     (): q::SupportedInt<C>,
     (): q::Supported<A, C> {
     pub fn distance_between(self, rhs: Self) -> Result<q::Unit<A, C, D>> {
-        let mut sum: q::Unit<A, C, D> = C::AS_0.into();
+        let mut sum: q::Unit<A, C, D> = q::r#as::<2, _, u16, _, _, _, _>(0).unwrap();
+        
+
         let rhs_iter: array::Iter<_, _> = rhs.dimensions.into_iter();
         for (x_0, x_1) in self.dimensions.into_iter().zip(rhs_iter) {
             let dn: Q<A, C, D> = (x_0 - x_1)?;

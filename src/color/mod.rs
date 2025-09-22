@@ -69,24 +69,6 @@ where
 
 
 
-pub enum Color<
-    const A: u8, 
-          B, 
-          C = q::DefaultEngine, 
-          D = DefaultEngine> 
-where
-    B: ops::Int,
-    C: q::Engine,
-    D: Engine<A, B, C>,
-    (): q::SupportedPrecision<A>,
-    (): q::SupportedInt<B>,
-    (): q::Supported<A, B> {
-    Hex(Hex),
-    Hsl(Hsl<A, B, C>),
-    Rgb(Rgb),
-    Rgba(Rgba<A, B, C>),
-    Hsla(Hsla<A, B, C>)
-}
 
 impl<const A: u8, B, C> Color<A, B, C>
 where
@@ -96,23 +78,6 @@ where
     (): q::SupportedInt<B>,
     (): q::Supported<A, B>,
     (): q::Supported<1, B> {
-    #[inline]
-    pub fn is_hex(self) -> bool {
-        let ret: Self = self.normalize().anyhow();
-        matches!(ret, Self::Hex(_))
-    }
-
-    #[inline]
-    pub fn is_rgb(self) -> bool {
-        let ret: Self = self.normalize().anyhow();
-        matches!(ret, Self::Rgb((_, _, _)))
-    }
-
-    #[inline]
-    pub fn is_rgba(self) -> bool {
-        let ret: Self = self.normalize().anyhow();
-        matches!(ret, Self::Rgba((_, _, _, _)))
-    }
 
     #[inline]
     pub fn lighten<D>(self, multiplier: D) -> Result<Self> 

@@ -2,26 +2,34 @@ use super::*;
 
 pub type Rgba<const A: q::Precision = 2, B = usize, C = q::DefaultEngine, D = DefaultEngine> = Color<A, B, RgbaMode<A, B, C>, C, D>;
 
-pub struct RgbaMode<const A: q::Precision, B = usize, C = q::DefaultEngine> 
+impl<const A: q::Precision, B, C, D> Rgba<A, B, C, D>
 where
     B: ops::Int,
     C: q::Engine,
+    D: Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
-    r: u8,
-    g: u8,
-    b: u8,
-    a: q::Unit<A, B, C>
-}
+    #[inline]
+    pub fn r(&self) -> &u8 {
+        &self.mode.r
+    }
 
-impl<const A: q::Precision, B, C> Mode for RgbaMode<A, B, C> 
-where
-    B: ops::Int,
-    C: q::Engine,
-    (): q::SupportedPrecision<A>,
-    (): q::SupportedInt<B>,
-    (): q::Supported<A, B> {}
+    #[inline]
+    pub fn g(&self) -> &u8 {
+        &self.mode.g
+    }
+
+    #[inline]
+    pub fn b(&self) -> &u8 {
+        &self.mode.b
+    }
+
+    #[inline]
+    pub fn a(&self) -> &q::Unit<A, B, C> {
+        &self.mode.a
+    }
+}
 
 impl<const A: q::Precision, B, C, D> From<Rgb<A, B, C, D>> for Rgba<A, B, C, D>
 where
@@ -112,3 +120,24 @@ where
         }
     }
 }
+
+pub struct RgbaMode<const A: q::Precision, B = usize, C = q::DefaultEngine> 
+where
+    B: ops::Int,
+    C: q::Engine,
+    (): q::SupportedPrecision<A>,
+    (): q::SupportedInt<B>,
+    (): q::Supported<A, B> {
+    r: u8,
+    g: u8,
+    b: u8,
+    a: q::Unit<A, B, C>
+}
+
+impl<const A: q::Precision, B, C> Mode for RgbaMode<A, B, C> 
+where
+    B: ops::Int,
+    C: q::Engine,
+    (): q::SupportedPrecision<A>,
+    (): q::SupportedInt<B>,
+    (): q::Supported<A, B> {}
