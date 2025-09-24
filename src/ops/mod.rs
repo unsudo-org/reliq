@@ -14,7 +14,6 @@
     pub to_prim_float
     pub to_prim_int
     pub to_prim
-    pub to_sign
     pub trig
     pub unsigned
     pub wrapping
