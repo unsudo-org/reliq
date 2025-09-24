@@ -5,6 +5,8 @@ pub struct DefaultEngine;
 impl Engine for DefaultEngine {}
 
 pub trait Engine {
+    fn interpolate<const A: u8, B, C, D>()
+
     fn hex_to_hsl<const A: u8, B, C, D>(hex: Hex<A, B, C, D>) -> Hsl<A, B, C, D>
     where
         B: ops::Int,

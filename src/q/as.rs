@@ -11,10 +11,11 @@ macro_rules! r#as {
                     D: Engine,
                     (): SupportedPrecision<A>,
                     (): SupportedInt<B>,
-                    (): Supported<A, B> {
+                    (): Supported<A, B>,
+                    (): Supported<0, B> {
                     let ret: B = B::[< AS _ $n >];
                     let ret: B = unsafe {
-                        D::cast::<1, A, _>(ret).unwrap_unchecked().anyhow()
+                        D::cast::<0, A, _>(ret).unwrap_unchecked()
                     };
                     let ret: Q<A, B, C, D> = ret.into();
                     ret
@@ -53,8 +54,14 @@ where
     (): Supported<A, C>,
     (): Supported<B, D> {
     let n: C = n.into();
-    let n: u128 = n.try_into().ok().ok_or(Error::UnsupportedConversion)?;
-    let n: D = n.try_into().ok().ok_or(Error::UnsupportedConversion)?;
+    let n: u128 = n
+        .try_into()
+        .ok()
+        .ok_or(Error::UnsupportedConversion)?;
+    let n: D = n
+        .try_into()
+        .ok()
+        .ok_or(Error::UnsupportedConversion)?;
     let n: Q<B, D, E, F> = n.into();
     Ok(n)
 }

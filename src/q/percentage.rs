@@ -24,7 +24,7 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B>,
-    (): Supported<1, B> {
+    (): Supported<0, B> {
     #[inline]
     pub fn is_gain(self) -> bool {
         self > as_0::<A, B, PercentageMode, C>()
@@ -80,7 +80,7 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B>,
-    (): Supported<1, B> {
+    (): Supported<0, B> {
     type Error = Error;
 
     fn try_from(value: Factor<A, B, C>) -> ::core::result::Result<Self, Self::Error> {

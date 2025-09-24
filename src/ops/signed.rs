@@ -15,4 +15,6 @@ r#impl!(
     i64
     i128
     isize
+    f32
+    f64
 );

@@ -68,7 +68,7 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B>,
-    (): Supported<1, B> {
+    (): Supported<0, B> {
     #[inline]
     fn from(value: Percentage<A, B, C>) -> Self {
         let n: Unit<A, B, C> = value.into();

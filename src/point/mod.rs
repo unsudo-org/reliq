@@ -63,37 +63,34 @@ where
     (): q::SupportedInt<C>,
     (): q::Supported<A, C> {
     pub fn distance_between(self, rhs: Self) -> Result<q::Unit<A, C, D>> {
-        let mut sum: q::Unit<A, C, D> = q::r#as::<2, _, u16, _, _, _, _>(0).unwrap();
-        
-
-        let rhs_iter: array::Iter<_, _> = rhs.dimensions.into_iter();
+        let mut sum: q::Unit<A, C, D> = q::r#as::<2, _, u16, _, _, _, _>(0_u16).unwrap();
+        let rhs_iter: array::Iter<B, q::Unit<A, C, D>> = rhs.dimensions.into_iter();
         for (x_0, x_1) in self.dimensions.into_iter().zip(rhs_iter) {
-            let dn: Q<A, C, D> = (x_0 - x_1)?;
-            let dn: Q<A, C, D> = (dn * dn)?;
-            sum = (sum + dn)?;
+            let dn: q::Unit<A, C, D> = (x_0 - x_1)?;
+            let dn_sq: q::Unit<A, C, D> = (dn * dn)?;
+            sum = (sum + dn_sq)?;
         }
-        let ret: Q<A, C, D> = sum.sqrt()?;
+        let ret: q::Unit<A, C, D> = sum.sqrt()?;
         Ok(ret)
     }
 
-    pub fn nearest<E>(self, set: E) -> Result<Option<(Q<A, C, D>, Self)>> 
+    pub fn nearest<E>(self, points: E) -> Result<Option<(q::Unit<A, C, D>, Point<A, B, C, D>)>> 
     where
-        E: Into<Set<A, B, C, D>> {
-        let set: Set<A, B, C, D> = set.into();
-        let mut best: Option<(Q<A, C, D>, Self)> = None;
-        for candidate in set.points.into_iter() {
-            let distance = self.distance_between(candidate)?;
+        E: Into<array::Array<B, Point<A, B, C, D>>> {
+        let points: array::Array<B, Point<A, B, C, D>> = points.into();
+        let mut best: Option<(q::Unit<A, C, D>, Point<A, B, C, D>)> = None;
+        for point in points.into_iter() {
+            let distance: q::Unit<_, _, _> = self.distance_between(point)?;
             match &mut best {
-                None => best = Some((distance, candidate)),
-                Some((best_dist, best_point)) => {
-                    if distance < *best_dist {
-                        *best_dist = distance;
-                        *best_point = candidate;
+                None => best = Some((distance, point)),
+                Some((best_distance, best_point)) => {
+                    if distance < *best_distance {
+                        *best_distance = distance;
+                        *best_point = point;
                     }
                 }
             }
         }
-
         Ok(best)
     }
 }

@@ -3,6 +3,7 @@
     pub bound
     pub checked
     pub checked2
+    pub from_prim
     pub overflowing
     pub pow
     pub prim
@@ -10,7 +11,10 @@
     pub root
     pub sign
     pub signed
+    pub to_prim_float
+    pub to_prim_int
     pub to_prim
+    pub to_sign
     pub trig
     pub unsigned
     pub wrapping

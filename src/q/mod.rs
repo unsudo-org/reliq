@@ -238,15 +238,14 @@ where
     }
 
     #[inline]
-    pub fn cast<const E: u8>(self) -> Result<lossy::Lossy<Q<E, B, C, D>>> 
+    pub fn cast<const E: u8>(self) -> Result<Q<E, B, C, D>> 
     where
         (): SupportedPrecision<E>,
         (): Supported<E, B> {
         let ret: B = self.n;
-        match D::cast::<A, E, B>(ret)? {
-            lossy::Lossy::Exact(n) => Ok(lossy::Lossy::Exact(n.into())),
-            lossy::Lossy::Trunc(n) => Ok(lossy::Lossy::Trunc(n.into()))
-        }
+        let ret: B = D::cast::<A, E, B>(ret)?;
+        let ret: Q<E, B, C, D> = ret.into();
+        Ok(ret)
     }
 
     #[inline]

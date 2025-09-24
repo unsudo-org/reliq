@@ -212,7 +212,7 @@ where
     }
 
     #[inline]
-    fn cast<const A: Precision, const B: Precision, C>(n: C) -> Result<lossy::Lossy<C>>
+    fn cast<const A: Precision, const B: Precision, C>(n: C) -> Result<C>
     where
         C: ops::Int,
         (): SupportedPrecision<A>,
@@ -223,11 +223,7 @@ where
         let old_scale: C = scale::<A, C>();
         let new_scale: C = scale::<B, C>();
         let n: C = Self::muldiv::<C>(n, new_scale, old_scale)?;
-        if B < A {
-            Ok(lossy::Lossy::Trunc(n))
-        } else {
-            Ok(lossy::Lossy::Exact(n))
-        }
+        Ok(n)
     }
 
     #[inline]
@@ -247,13 +243,10 @@ where
     fn sqrt<const A: Precision, B>(n: B) -> Result<B>
     where
         B: ops::Int,
-        B: ops::Signed,
+        B: ops::Unsigned,
         (): SupportedPrecision<A>,
         (): SupportedInt<B>,
         (): Supported<A, B> {
-        if n < B::AS_0 {
-            return Err(Error::Underflow)
-        }
         if n == B::AS_0 || n == B::AS_1 {
             return Ok(n)
         }

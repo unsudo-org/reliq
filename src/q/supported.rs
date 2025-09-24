@@ -45,14 +45,17 @@ int_whitelist!(
 );
 
 whitelist!(
+    0 u8
     1 u8
     2 u8
 
+    0 u16
     1 u16
     2 u16
     3 u16
     4 u16
 
+    0 u32
     1 u32
     2 u32
     3 u32
@@ -63,6 +66,7 @@ whitelist!(
     8 u32
     9 u32
 
+    0 u64
     1 u64
     2 u64
     3 u64
@@ -83,6 +87,7 @@ whitelist!(
     18 u64
     19 u64
 
+    0 u128
     1 u128
     2 u128
     3 u128
@@ -122,6 +127,7 @@ whitelist!(
     37 u128
 
     // platform-dependent, 32-bit for safety
+    0 usize
     1 usize
     2 usize
     3 usize
@@ -133,12 +139,13 @@ whitelist!(
     9 usize
 
     // i8 does not support `180`.
-
+    0 i16
     1 i16
     2 i16
     3 i16
     4 i16
 
+    0 i32
     1 i32
     2 i32
     3 i32
@@ -149,6 +156,7 @@ whitelist!(
     8 i32
     9 i32
 
+    0 i64
     1 i64
     2 i64
     3 i64
@@ -168,6 +176,7 @@ whitelist!(
     17 i64
     18 i64
 
+    0 i128
     1 i128
     2 i128
     3 i128
@@ -207,6 +216,7 @@ whitelist!(
     37 i128
 
     // platform-dependent, 32-bit for safety
+    0 isize
     1 isize
     2 isize
     3 isize

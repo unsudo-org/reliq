@@ -52,7 +52,7 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B>,
-    (): Supported<1, B> {
+    (): Supported<0, B> {
 
     /// Converts a `Delta` into a `Percentage`, relative to a given base value.
     /// 

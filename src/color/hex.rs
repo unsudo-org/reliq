@@ -1,8 +1,8 @@
 use super::*;
 
-pub type Hex<const A: q::Precision, B = usize, C = q::DefaultEngine, D = DefaultEngine> = Color<A, B, HexMode, C, D>;
+pub type Hex<const A: u8 = 1, B = usize, C = q::DefaultEngine, D = DefaultEngine> = Color<A, B, HexMode, C, D>;
 
-impl<const A: q::Precision, B, C, D> From<Rgb<A, B, C, D>> for Hex<A, B, C, D>
+impl<const A: u8, B, C, D> From<Rgb<A, B, C, D>> for Hex<A, B, C, D>
 where
     B: ops::Int,
     C: q::Engine,

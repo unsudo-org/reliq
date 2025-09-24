@@ -39,16 +39,22 @@ pub enum Error {
     UnsupportedConversion
 }
 
-pub type Hsla<const A: q::Precision, B, C> = (
-    u16, 
-    q::Unit<A, B, C>,
-    q::Unit<A, B, C>,
-    q::Unit<A, B, C>
-);
-
 #[cfg_attr(feature = "std", derive(::serde::Serialize))]
 #[cfg_attr(feature = "std", derive(::serde::Deserialize))]
-pub struct Color<const A: u8, B = usize, C = HexMode, D = q::DefaultEngine, E = DefaultEngine>
+pub struct Color<const A: u8, B = usize, C = HexMode, D = q::DefaultEngine>
+where
+    B: ops::Int,
+    C: Mode,
+    D: q::Engine,
+    (): q::SupportedPrecision<A>,
+    (): q::SupportedInt<B>,
+    (): q::Supported<A, B> {
+    mode: C,
+    m_0: ::core::marker::PhantomData<B>,
+    m_1: ::core::marker::PhantomData<D>
+}
+
+impl<const A: q::Precision, B, C, D, E> Color<A, B, C, D, E>
 where
     B: ops::Int,
     C: Mode,
@@ -57,12 +63,8 @@ where
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
-    mode: C,
-    m_0: ::core::marker::PhantomData<B>,
-    m_1: ::core::marker::PhantomData<D>,
-    m_2: ::core::marker::PhantomData<E>
+    
 }
-
 
 
 

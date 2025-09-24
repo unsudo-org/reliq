@@ -18,11 +18,12 @@ dependencies.thiserror.version = ">=2.0.16,<3.0.0"
 dependencies.strum.version = ">=0.27.2,<1.0.0"
 dependencies.strum.default-features = false
 dependencies.strum_macros.version = ">=0.27.2,<1.0.0"
-dependencies.toga.version = "*"
+dependencies.fastrand.version = "*"
+dependencies.fastrand.optional = true
 dev-dependencies.criterion.version = ">=0.7.0,<1.0.0"
 dev-dependencies.rstest.version = ">=0.26.1,<1.0.0"
-features.default = []
-features.std = []
+features.default = ["std"]
+features.std = ["dep:fastrand"]
 
 [[bench]]
 name = "q"
