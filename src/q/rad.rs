@@ -45,61 +45,135 @@ mode!(
     Rad
 );
 
-impl<const A: u8, B, C> TryFrom<Deg<A, B, C>> for Rad<A, B, C>
+impl<const A: u8, B> TryFrom<Deg<A, B>> for Rad<A, B>
 where
     B: ops::Int,
-    C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
     type Error = Error;
-
-    fn try_from(value: Deg<A, B, C>) -> ::core::result::Result<Self, Self::Error> {
-        value.to_rad()
+    
+    #[inline]
+    fn try_from(value: Deg<A, B>) -> ::core::result::Result<Self, Self::Error> {
+        let n: Deg<_, _> = value;
+        let n: Rad<_, _> = n.to_rad()?;
+        Ok(n)
     }
 }
 
-impl<const A: u8, B, C> Rad<A, B, C>
+impl<const A: u8, B> Rad<A, B>
 where
     B: ops::Int,
-    C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
     #[inline]
-    pub fn tan(self) -> Result<Ratio<A, B, C>> {
-        let ret: B = self.n;
-        let ret: B = C::tan::<A, B>(ret)?;
-        let ret: Unit<_, _, _> = ret.into();
-        let ret: Ratio<_, _, _> = ret.into();
+    pub fn tan(self) -> Result<Ratio<A, B>> {
+        let x: Ratio<_, _> = Self::sin(self)?;
+        let y: Ratio<_, _> = Self::cos(self)?;
+
+    }
+
+    #[inline]
+    pub fn sin(self) -> Result<Ratio<A, B>> {
+        let angle: B = self.n;
+        let n: B = sub(to_rad(deg90()?)?, angle)?;
+        let n: Self = n.into();
+        Self::cos(n)
+    }
+
+    #[inline]
+    pub fn cos(self) -> Result<Ratio<A, B>> {
+        let angle: B = self.n;
+        let scale: B = scale::<A, _>();
+        let pi_0: B = pi::<A, _>();
+        let pi_1: B = pi_0.checked_mul(B::AS_2).ok_or(Error::Overflow)?;
+        let mut n: B = angle % pi_1;
+        if n < B::AS_0 {
+            n = n.checked_add(pi_1).ok_or(Error::Overflow)?;
+        }
+        if n > pi_0 {
+            n = n.checked_sub(pi_1).ok_or(Error::Underflow)?;
+        }
+        let mut ret: B = scale;
+        let mut term: B = scale;
+        let mut sign: bool = true;
+        let mut k: B = B::AS_1;
+        loop {
+            let f: B = (B::AS_2 * k - B::AS_1) * (B::AS_2 * k);
+            term = muldiv(term, n, scale)?;
+            term = muldiv(term, n, scale)?;
+            term = term.checked_div(f).ok_or(Error::DivisionByZero)?;
+            if term == B::AS_0 {
+                break
+            }
+            ret = if sign {
+                ret.checked_sub(term).ok_or(Error::Underflow)?
+            } else {
+                ret.checked_add(term).ok_or(Error::Overflow)?  
+            };
+            sign = !sign;
+            k = k.checked_add(B::AS_1).ok_or(Error::Overflow)?;
+        }
+        let ret: Ratio<A, B> = ret.into();
         Ok(ret)
     }
 
     #[inline]
-    pub fn sin(self) -> Result<Ratio<A, B, C>> {
+    pub fn to_deg(self) -> Result<Deg<A, B>> {
         let ret: B = self.n;
-        let ret: B = C::sin::<A, B>(ret)?;
-        let ret: Unit<_, _, _> = ret.into();
-        let ret: Ratio<_, _, _> = ret.into();
+        let ret: B = to_deg::<A, _>(ret)?;
+        let ret: Deg<_, _> = ret.into();
         Ok(ret)
     }
+}
 
-    #[inline]
-    pub fn cos(self) -> Result<Ratio<A, B, C>> {
-        let ret: B = self.n;
-        let ret: B = C::cos::<A, B>(ret)?;
-        let ret: Unit<_, _, _> = ret.into();
-        let ret: Ratio<_, _, _> = ret.into();
-        Ok(ret)
+pub(super) fn cos<const A: u8, B>(rad_angle: B) -> Result<B>
+where
+    B: ops::Int,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    let scale: B = scale::<A, _>();
+    let pi_0: B = pi::<A, _>();
+    let pi_1: B = pi_0.checked_mul(B::AS_2).ok_or(Error::Overflow)?;
+    let mut n: B = rad_angle % pi_1;
+    if n < B::AS_0 {
+        n = n.checked_add(pi_1).ok_or(Error::Overflow)?;
     }
+    if n > pi_0 {
+        n = n.checked_sub(pi_1).ok_or(Error::Underflow)?;
+    }
+    let mut ret: B = scale;
+    let mut term: B = scale;
+    let mut sign: bool = true;
+    let mut k: B = B::AS_1;
+    loop {
+        let f: B = (B::AS_2 * k - B::AS_1) * (B::AS_2 * k);
+        term = muldiv(term, n, scale)?;
+        term = muldiv(term, n, scale)?;
+        term = term.checked_div(f).ok_or(Error::DivisionByZero)?;
+        if term == B::AS_0 {
+            break
+        }
+        ret = if sign {
+            ret.checked_sub(term).ok_or(Error::Underflow)?
+        } else {
+            ret.checked_add(term).ok_or(Error::Overflow)?  
+        };
+        sign = !sign;
+        k = k.checked_add(B::AS_1).ok_or(Error::Overflow)?;
+    }
+    Ok(ret)
+}
 
-    #[inline]
-    pub fn to_deg(self) -> Result<Deg<A, B, C>> {
-        let ret: B = self.n;
-        let ret: B = C::to_deg::<A, B>(ret)?;
-        let ret: Deg<_, _, _> = ret.into();
-        Ok(ret)
-    }
+pub(super) fn to_deg<const A: u8, B>(rad_angle: B) -> Result<B>
+where
+    B: ops::Int,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    muldiv(rad_angle, as_180() * scale(), pi())
 }
 
 #[cfg(test)]

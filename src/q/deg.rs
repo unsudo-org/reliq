@@ -45,33 +45,32 @@ mode!(
     Deg
 );
 
-impl<const A: u8, B, C> Deg<A, B, C> 
+impl<const A: u8, B> Deg<A, B> 
 where
     B: ops::Int,
-    C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
     #[inline]
-    pub fn tan(self) -> Result<Ratio<A, B, C>> {
+    pub fn tan(self) -> Result<Ratio<A, B>> {
         self.to_rad()?.tan()
     }
 
     #[inline]
-    pub fn sin(self) -> Result<Ratio<A, B, C>> {
+    pub fn sin(self) -> Result<Ratio<A, B>> {
         self.to_rad()?.sin()
     }
 
     #[inline]
-    pub fn cos(self) -> Result<Ratio<A, B, C>> {
+    pub fn cos(self) -> Result<Ratio<A, B>> {
         self.to_rad()?.cos()
     }
 
     #[inline]
-    pub fn to_rad(self) -> Result<Rad<A, B, C>> {
+    pub fn to_rad(self) -> Result<Rad<A, B>> {
         let ret: B = self.n;
-        let ret: B = C::to_rad(ret)?;
-        let ret: Rad<A, B, C> = ret.into();
+        let ret: B = to_rad(ret)?;
+        let ret: Rad<A, B> = ret.into();
         Ok(ret)
     }
 }
@@ -88,6 +87,40 @@ where
     fn try_from(value: Rad<A, B, C>) -> ::core::result::Result<Self, Self::Error> {
         value.to_deg()
     }
+}
+
+#[inline]
+pub(super) fn to_rad<const A: u8, B>(deg_angle: B) -> Result<B>
+where
+    B: ops::Int,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    muldiv(deg_angle, pi(), as_180() * scale())
+}
+
+#[inline]
+pub(super) fn deg90<const A: u8, B>() -> Result<B>
+where
+    B: ops::Int,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    let deg: B = if B::SIGNED {
+        let n: i128 = 90;
+        let n: B = unsafe {
+            n.try_into().unwrap_unchecked()
+        };
+        n
+    } else {
+        let n: u128 = 90;
+        let n: B = unsafe {
+            n.try_into().unwrap_unchecked()
+        };
+        n
+    };
+    let ret: B = deg.checked_mul(scale()).ok_or(Error::Overflow)?;
+    Ok(ret)
 }
 
 #[cfg(test)]

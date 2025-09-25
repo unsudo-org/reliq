@@ -10,32 +10,74 @@ where
     #[inline]
     pub fn round_up(self) -> Self {
         let n: B = self.n;
-        let ret: B = D::round_up(n);
-        let ret: Self = ret.into();
-        ret
+        let scale: B = scale::<A, _>();
+        if n % scale == B::AS_0 {
+            let n: Self = n.into();
+            return n
+        }
+        if n >= B::AS_0 {
+            let n: B = n / scale;
+            let n: B = n + B::AS_1;
+            let n: B = n * scale;
+            let n: Self = n.into();
+            return n
+        }
+        let n: B = n / scale;
+        let n: B = n * scale;
+        let n: Self = n.into();
+        n
     }
 
     #[inline]
     pub fn round_down(self) -> Self {
         let n: B = self.n;
-        let ret: B = D::round_down(n);
-        let ret: Self = ret.into();
-        ret
+        let scale: B = scale::<A, _>();
+        if n % scale == B::AS_0 {
+            let n: Self = n.into();
+            return n
+        }
+        if n >= B::AS_0 {
+            let n: B = n / scale;
+            let n: B = n * scale;
+            let n: Self = n.into();
+            return n
+        }
+        let n: B = n / scale;
+        let n: B = n - B::AS_1;
+        let n: B = n * scale;
+        let n: Self = n.into();
+        n
     }
 
     #[inline]
     pub fn round_towards_zero(self) -> Self {
+        let scale: B = scale::<A, _>();
         let n: B = self.n;
-        let ret: B = D::round_towards_zero(n);
-        let ret: Self = ret.into();
-        ret
+        let n: B = n / scale;
+        let n: B = n * scale;
+        let n: Self = n.into();
+        n
     }
 
     #[inline]
     pub fn round_away_from_zero(self) -> Self {
         let n: B = self.n;
-        let ret: B = D::round_away_from_zero(n);
-        let ret: Self = ret.into();
-        ret
+        let scale: B = scale::<A, _>();
+        if n % scale == B::AS_0 {
+            let n: Self = n.into();
+            return n
+        }
+        if n < B::AS_0 {
+            let n: B = n / scale;
+            let n: B = n * scale;
+            let n: B = n - scale;
+            let n: Self = n.into();
+            return n
+        }
+        let n: B = n / scale;
+        let n: B = n * scale;
+        let n: B = n + scale;
+        let n: Self = n.into();
+        n
     }
 }

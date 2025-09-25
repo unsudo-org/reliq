@@ -65,3 +65,15 @@ where
     let n: Q<B, D, E, F> = n.into();
     Ok(n)
 }
+
+#[inline]
+pub(super) fn as_180<T>() -> T
+where
+    T: ops::Int,
+    (): SupportedInt<T> {
+    let ret: u8 = 180;
+    let ret: T = unsafe {
+        ret.try_into().unwrap_unchecked()
+    };
+    ret
+}
