@@ -1,6 +1,6 @@
 use super::*;
 
-const LOOK_UP: [u128; 37] = [
+const TABLE: [u128; 37] = [
     31,
     314,
     3141,
@@ -60,7 +60,7 @@ where
         | (false, 64, 1..=19)
         | (false, 128, 1..=37) => {
             unsafe {
-                look_up::<A>().try_into().unwrap_unchecked()
+                lookup::<A>().try_into().unwrap_unchecked()
             }
         },
         _ => {
@@ -72,6 +72,6 @@ where
 }
 
 #[inline]
-const fn look_up<const T: u8>() -> u128 {
-    LOOK_UP[(T - 1) as usize]
+const fn lookup<const T: u8>() -> u128 {
+    TABLE[(T - 1) as usize]
 }

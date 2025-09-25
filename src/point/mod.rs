@@ -57,7 +57,7 @@ where
 impl<const A: u8, const B: usize, C, D> Point<A, B, C, D>
 where
     C: ops::Int,
-    C: ops::Signed,
+    C: ops::Unsigned,
     D: q::Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<C>,

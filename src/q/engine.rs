@@ -176,40 +176,7 @@ where
         n
     }
 
-    #[inline]
-    fn abs<T>(n: T) -> T 
-    where
-        T: ops::Int,
-        (): SupportedInt<T> {
-        if n < T::AS_0 {
-            return T::AS_0 - n
-        }
-        n
-    }
 
-    #[inline]
-    fn to_negative<T>(n: T) -> T
-    where
-        T: ops::Int,
-        T: ops::Signed,
-        (): SupportedInt<T> {
-        if n == T::AS_0 {
-            return n
-        }
-        T::AS_0 - n    
-    }
-
-    #[inline]
-    fn to_positive<T>(n: T) -> T
-    where
-        T: ops::Int,
-        T: ops::Signed,
-        (): SupportedInt<T> {
-        if n >= T::AS_0 {
-            return n
-        }
-        T::AS_0 - n    
-    }
 
     #[inline]
     fn cast<const A: Precision, const B: Precision, C>(n: C) -> Result<C>
@@ -236,30 +203,6 @@ where
         let d: B = Self::sub::<B>(y, x)?;
         let s: B = Self::muldiv::<B>(d, t, scale::<A, B>())?;
         let ret: B = Self::add::<B>(x, s)?;
-        Ok(ret)
-    }
-
-    #[inline]
-    fn sqrt<const A: Precision, B>(n: B) -> Result<B>
-    where
-        B: ops::Int,
-        B: ops::Unsigned,
-        (): SupportedPrecision<A>,
-        (): SupportedInt<B>,
-        (): Supported<A, B> {
-        if n == B::AS_0 || n == B::AS_1 {
-            return Ok(n)
-        }
-        let mut ret: B = n.checked_div(B::AS_2).ok_or(Error::DivisionByZero)?;
-        let mut last: B;
-        loop {
-            last = ret;
-            ret = Self::add::<B>(ret, Self::div::<A, B>(n, ret)?)?;
-            ret = Self::div::<A, B>(ret, B::AS_2)?;
-            if ret == last || ret == last.checked_add(B::AS_1).unwrap_or(ret) {
-                break
-            }
-        }
         Ok(ret)
     }
 
@@ -557,3 +500,7 @@ where
     let ret: B = deg.checked_mul(scale()).ok_or(Error::Overflow)?;
     Ok(ret)
 }
+
+
+
+

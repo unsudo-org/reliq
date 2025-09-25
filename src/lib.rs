@@ -11,5 +11,4 @@ pub mod math;
 pub mod ops;
 pub mod point;
 pub mod q;
-pub mod rand;
 pub mod utf8;
