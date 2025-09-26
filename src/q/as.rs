@@ -12,12 +12,12 @@ macro_rules! r#as {
                     (): SupportedInt<B>,
                     (): Supported<A, B>,
                     (): Supported<0, B> {
-                    let ret: B = B::[< AS _ $n >];
-                    let ret: B = unsafe {
-                        D::cast::<0, A, _>(ret).unwrap_unchecked()
+                    let n: B = B::[< AS _ $n >];
+                    let n: B = unsafe {
+                        cast::<0, A, _>(n).unwrap_unchecked()
                     };
-                    let ret: Q<A, B, C, D> = ret.into();
-                    ret
+                    let n: Q<A, B, C> = n.into();
+                    n
                 }
             )*
         );
@@ -39,13 +39,12 @@ r#as!(
 );
 
 #[inline]
-pub fn r#as<const A: u8, const B: u8, C, D, E, F, G>(n: G) -> Result<Q<B, D, E, F>> 
+pub fn r#as<const A: u8, const B: u8, C, D, E, F>(n: F) -> Result<Q<B, D, E>> 
 where
     C: ops::Int,
     D: ops::Int,
     E: Mode,
-    F: Engine,
-    G: Into<C>,
+    F: Into<C>,
     (): SupportedPrecision<A>,
     (): SupportedPrecision<B>,
     (): SupportedInt<C>,
@@ -61,7 +60,7 @@ where
         .try_into()
         .ok()
         .ok_or(Error::UnsupportedConversion)?;
-    let n: Q<B, D, E, F> = n.into();
+    let n: Q<B, D, E> = n.into();
     Ok(n)
 }
 

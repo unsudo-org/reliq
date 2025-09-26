@@ -30,18 +30,25 @@ where
     B: ops::Prim,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
-    (): Supported<A, B> {
+    (): Supported<A, B>,
+    (): Supported<0, B> {
 
+    #[inline]
     pub fn is_increase(&self) -> bool {
-        self.n > B::AS_1
+        let as_1: Self = as_1();
+        self > &as_1
     }
 
+    #[inline]
     pub fn is_decrease(&self) -> bool {
-        self.n < B::AS_1
+        let as_1: Self = as_1();
+        self < &as_1
     }
 
+    #[inline]
     pub fn is_neutral(&self) -> bool {
-        self.n == B::AS_1
+        let as_1: Self = as_1();
+        self == &as_1
     }
 }
 
@@ -53,8 +60,9 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
+    #[inline]
     fn from(value: Unit<A, B>) -> Self {
-        let n: Unit<_, _> = value;
+        let n: Unit<A, B> = value;
         let n: Self = n.into();
         n
     }
@@ -70,59 +78,47 @@ where
     (): Supported<0, B> {
     #[inline]
     fn from(value: Percentage<A, B>) -> Self {
-        let n: Percentage<A, B> = value;
-        let n: Unit<A, B> = n.into();
-        let as_0: Unit<A, B> = as_0();
-        let as_1: Unit<A, B> = as_1();
-        let as_100: Unit<A, B> = as_100();
-        if n == as_0 {
-            let n: B = n.n;
-            let n: Self = Self::from_raw(n);
-            return n
-        }
-        if n > as_0 {
-            let n: Unit<A, B> = unsafe {
-                (n / as_100).unwrap_unchecked()
+        let n: Unit<A, B> = value.into();
+        let one: Unit<A, B> = as_1();
+        let one_hundred: Unit<A, B> = as_100();
+        let n: Unit<A, B> = if B::SIGNED {
+            let min: Unit<A, B> = unsafe {
+                (as_0() - one_hundred).unwrap_unchecked()
             };
-            
-        }
-        let min: Unit<A, B> = unsafe {
-            
+            n.max(min)
+        } else {
+            n
         };
-
-
-        if n == as_0::<A, B, UnitMode>() {
-            return as_0()
-        }
-        if n > as_0() {
-            let n: Unit<A, B> = unsafe {
-                (n / as_100).unwrap_unchecked()
-            };
-            let n: Unit<A, B, C> = unsafe {
-                (n + as_1::<A, B, UnitMode, C>()).unwrap_unchecked()
-            };
-            let ret: Self = n.into_int().into();
-            return ret
-        }
-        let min: Unit<A, B, C> = unsafe {
-            (as_0::<A, B, UnitMode, C>() - as_100::<A, B, UnitMode, C>()).unwrap_unchecked()
+        let n: Unit<A, B> = unsafe {
+            (n / one_hundred).unwrap_unchecked()
         };
-        let n: Unit<A, B, C> = n.max(min);
-        let n: Unit<A, B, C> = unsafe {
-            (n / as_100::<A, B, UnitMode, C>()).unwrap_unchecked()
+        let n: Unit<A, B> = unsafe {
+            (n + one).unwrap_unchecked()
         };
-        let n: Unit<A, B, C> = unsafe {
-            (n + as_1::<A, B, UnitMode, C>()).unwrap_unchecked()
-        };
-        let ret: Self = n.into_int().into();
-        ret
+        let n: Self = Self::from_raw(n.n);
+        n
     }
 }
 
-#[test]
-fn test_percentage_to_factor() {
-    let n: Percentage2<usize> = 25_00.into();
-    let n: Factor2 = n.into();
-    let ok: Factor2 = 1_25.into();
-    assert_eq!(n, ok);
+#[cfg(test)]
+#[allow(clippy::inconsistent_digit_grouping)]
+mod test {
+    use super::*;
+
+    #[::rstest::rstest]
+    #[case(25_00, 1_25)]
+    #[case(0_00, 1_00)]
+    #[case(-25_00, 0_75)]
+    #[case(-100_00, 0_00)]
+    #[case(-200_00, 0_00)]
+    #[case(450_00, 3_50)]
+    fn percentage_to_factor<A, B>(#[case] percentage: A, #[case] ok: B) 
+    where
+        A: Into<Percentage2<isize>>,
+        B: Into<Factor2<isize>> {
+        let n: Percentage2<isize> = percentage.into();
+        let n: Factor2<isize> = n.into();
+        let ok: Factor2<isize> = ok.into();
+        assert_eq!(n, ok);
+    }
 }

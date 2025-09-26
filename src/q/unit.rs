@@ -12,7 +12,6 @@ mode!(
 impl<const A: u8, B> Unit<A, B>
 where
     B: ops::Int,
-    C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
@@ -52,38 +51,35 @@ where
     }
 }
 
-impl<const A: u8, B, C> From<Factor<A, B, C>> for Unit<A, B, C>
+impl<const A: u8, B> From<Factor<A, B>> for Unit<A, B>
 where
     B: ops::Int,
-    C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    fn from(value: Factor<A, B, C>) -> Self {
+    fn from(value: Factor<A, B>) -> Self {
         value.n.into()
     }
 }
 
-impl<const A: u8, B, C> From<Ratio<A, B, C>> for Unit<A, B, C>
+impl<const A: u8, B> From<Ratio<A, B>> for Unit<A, B>
 where
     B: ops::Int,
-    C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    fn from(value: Ratio<A, B, C>) -> Self {
+    fn from(value: Ratio<A, B>) -> Self {
         value.n.into()
     }
 }
 
-impl<const A: u8, B, C> From<Delta<A, B, C>> for Unit<A, B, C>
+impl<const A: u8, B> From<Delta<A, B>> for Unit<A, B>
 where
     B: ops::Int,
-    C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    fn from(value: Delta<A, B, C>) -> Self {
+    fn from(value: Delta<A, B>) -> Self {
         value.n.into()
     }
 }

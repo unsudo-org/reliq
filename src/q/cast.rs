@@ -20,3 +20,18 @@ where
         Ok(n)
     }
 }
+
+#[inline]
+pub(super) fn cast<const A: u8, const B: u8, C>(n: C) -> Result<C>
+where
+    C: ops::Int,
+    (): SupportedPrecision<A>,
+    (): SupportedPrecision<B>,
+    (): SupportedInt<C>,
+    (): Supported<A, C>,
+    (): Supported<B, C> {
+    let old_scale: C = scale::<A, _>();
+    let new_scale: C = scale::<B, _>();
+    let n: C = muldiv(n, new_scale, old_scale)?;
+    Ok(n)
+}

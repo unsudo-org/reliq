@@ -44,11 +44,9 @@ mode!(
     Delta
 );
 
-impl<const A: u8, B, C> Delta<A, B, C>
+impl<const A: u8, B> Delta<A, B>
 where
     B: ops::Int,
-    B: ops::Signed,
-    C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B>,
@@ -67,6 +65,7 @@ where
     /// - The base can not be 0.
     pub fn into_percentage<D>(self, base: D) -> Result<Percentage<A, B, C>> 
     where
+        B: ops::Signed,
         D: Into<Unit<A, B, C>> {
         let base: Unit<A, B, C> = base.into();
         if base.n == B::AS_0 {
