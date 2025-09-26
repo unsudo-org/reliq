@@ -41,6 +41,8 @@ const TABLE: [u128; 38] = [
     10u128.pow(38)
 ];
 
+
+#[inline]
 pub(super) fn scale<const A: u8, B>() -> B 
 where 
     B: ops::Int,
@@ -60,7 +62,7 @@ where
         | (false, 64, 1..=19)
         | (false, 128, 1..=37) => {
             unsafe {
-                lookup::<A>().try_into().unwrap_unchecked()
+                look_up::<A>().try_into().unwrap_unchecked()
             }
         },
         _ => {
@@ -69,8 +71,8 @@ where
             }
         }
     }
-}
+}  
 
-const fn lookup<const T: u8>() -> u128 {
+const fn look_up<const T: u8>() -> u128 {
     TABLE[(T - 1) as usize]
 }

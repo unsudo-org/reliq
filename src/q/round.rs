@@ -12,19 +12,19 @@ where
         let n: B = self.n;
         let scale: B = scale::<A, _>();
         if n % scale == B::AS_0 {
-            let n: Self = n.into();
+            let n: Self = Self::from_raw(n);
             return n
         }
         if n >= B::AS_0 {
             let n: B = n / scale;
             let n: B = n + B::AS_1;
             let n: B = n * scale;
-            let n: Self = n.into();
+            let n: Self = Self::from_raw(n);
             return n
         }
         let n: B = n / scale;
         let n: B = n * scale;
-        let n: Self = n.into();
+        let n: Self = Self::from_raw(n);
         n
     }
 
@@ -33,19 +33,19 @@ where
         let n: B = self.n;
         let scale: B = scale::<A, _>();
         if n % scale == B::AS_0 {
-            let n: Self = n.into();
+            let n: Self = Self::from_raw(n);
             return n
         }
         if n >= B::AS_0 {
             let n: B = n / scale;
             let n: B = n * scale;
-            let n: Self = n.into();
+            let n: Self = Self::from_raw(n);
             return n
         }
         let n: B = n / scale;
         let n: B = n - B::AS_1;
         let n: B = n * scale;
-        let n: Self = n.into();
+        let n: Self = Self::from_raw(n);
         n
     }
 
@@ -55,7 +55,10 @@ where
         let n: B = self.n;
         let n: B = n / scale;
         let n: B = n * scale;
-        let n: Self = n.into();
+        let n: Self = Self {
+            n,
+            m_0: ::core::marker::PhantomData
+        };
         n
     }
 
@@ -64,20 +67,20 @@ where
         let n: B = self.n;
         let scale: B = scale::<A, _>();
         if n % scale == B::AS_0 {
-            let n: Self = n.into();
+            let n: Self = Self::from_raw(n);
             return n
         }
         if n < B::AS_0 {
             let n: B = n / scale;
             let n: B = n * scale;
             let n: B = n - scale;
-            let n: Self = n.into();
+            let n: Self = Self::from_raw(n);
             return n
         }
         let n: B = n / scale;
         let n: B = n * scale;
         let n: B = n + scale;
-        let n: Self = n.into();
+        let n: Self = Self::from_raw(n);
         n
     }
 }

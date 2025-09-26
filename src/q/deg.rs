@@ -75,16 +75,15 @@ where
     }
 }
 
-impl<const A: u8, B, C> TryFrom<Rad<A, B, C>> for Deg<A, B, C>
+impl<const A: u8, B> TryFrom<Rad<A, B>> for Deg<A, B>
 where
     B: ops::Int,
-    C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
     type Error = Error;
 
-    fn try_from(value: Rad<A, B, C>) -> ::core::result::Result<Self, Self::Error> {
+    fn try_from(value: Rad<A, B>) -> ::core::result::Result<Self, Self::Error> {
         value.to_deg()
     }
 }
@@ -100,7 +99,7 @@ where
 }
 
 #[inline]
-pub(super) fn deg90<const A: u8, B>() -> Result<B>
+pub(super) fn deg_as_90<const A: u8, B>() -> Result<B>
 where
     B: ops::Int,
     (): SupportedPrecision<A>,

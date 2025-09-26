@@ -391,79 +391,79 @@ where
 }
 
 #[cfg(test)]
-#[::rstest::rstest]
-#[case(1_00, 1_00, 2_00)]
-fn test_add<A, B, C>(#[case] x: A, #[case] y: B, #[case] ok: C) 
-where
-    A: Into<Unit2>,
-    B: Into<Unit2>,
-    C: Into<Unit2> {
-    let x: Unit2 = x.into();
-    let y: Unit2 = y.into();
-    let ok: Unit2 = ok.into();
-    let ret: Unit2 = (x + y).unwrap();
-    assert_eq!(ret, ok);
-}
+mod test {
+    use super::*;
 
-#[cfg(test)]
-#[::rstest::rstest]
-#[case(1_00, 1_00, 0_00)]
-#[case(2_00, 1_00, 1_00)]
-fn test_sub<A, B, C>(#[case] x: A, #[case] y: B, #[case] ok: C) 
-where
-    A: Into<Unit2>,
-    B: Into<Unit2>,
-    C: Into<Unit2> {
-    let x: Unit2 = x.into();
-    let y: Unit2 = y.into();
-    let ok: Unit2 = ok.into();
-    let ret: Unit2 = (x - y).unwrap();
-    assert_eq!(ret, ok);
-}
+    #[::rstest::rstest]
+    #[case(1_00, 1_00, 2_00)]
+    fn add<A, B, C>(#[case] x: A, #[case] y: B, #[case] ok: C) 
+    where
+        A: Into<Unit2>,
+        B: Into<Unit2>,
+        C: Into<Unit2> {
+        let x: Unit2 = x.into();
+        let y: Unit2 = y.into();
+        let ok: Unit2 = ok.into();
+        let ret: Unit2 = (x + y).unwrap();
+        assert_eq!(ret, ok);
+    }
 
-#[cfg(test)]
-#[::rstest::rstest]
-#[case(1_00, 1_00, 1_00)]
-#[case(0_50, 0_25, 0_12)]
-fn test_mul<A, B, C>(#[case] x: A, #[case] y: B, #[case] ok: C) 
-where
-    A: Into<Unit2>,
-    B: Into<Unit2>,
-    C: Into<Unit2> {
-    let x: Unit2 = x.into();
-    let y: Unit2 = y.into();
-    let ok: Unit2 = ok.into();
-    let ret: Unit2 = (x * y).unwrap();
-    assert_eq!(ret, ok);
-}
+    #[::rstest::rstest]
+    #[case(1_00, 1_00, 0_00)]
+    #[case(2_00, 1_00, 1_00)]
+    fn sub<A, B, C>(#[case] x: A, #[case] y: B, #[case] ok: C) 
+    where
+        A: Into<Unit2>,
+        B: Into<Unit2>,
+        C: Into<Unit2> {
+        let x: Unit2 = x.into();
+        let y: Unit2 = y.into();
+        let ok: Unit2 = ok.into();
+        let ret: Unit2 = (x - y).unwrap();
+        assert_eq!(ret, ok);
+    }
 
-#[cfg(test)]
-#[::rstest::rstest]
-#[case(1_00, 1_00, 1_00)]
-#[case(1_00, 0_50, 2_00)]
-fn test_div<A, B, C>(#[case] x: A, #[case] y: B, #[case] ok: C) 
-where
-    A: Into<Unit2>,
-    B: Into<Unit2>,
-    C: Into<Unit2> {
-    let x: Unit2 = x.into();
-    let y: Unit2 = y.into();
-    let ok: Unit2 = ok.into();
-    let ret: Unit2 = (x / y).unwrap();
-    assert_eq!(ret, ok);
-}
+    #[::rstest::rstest]
+    #[case(1_00, 1_00, 1_00)]
+    #[case(0_50, 0_25, 0_12)]
+    fn mul<A, B, C>(#[case] x: A, #[case] y: B, #[case] ok: C) 
+    where
+        A: Into<Unit2>,
+        B: Into<Unit2>,
+        C: Into<Unit2> {
+        let x: Unit2 = x.into();
+        let y: Unit2 = y.into();
+        let ok: Unit2 = ok.into();
+        let ret: Unit2 = (x * y).unwrap();
+        assert_eq!(ret, ok);
+    }
 
-#[cfg(test)]
-#[::rstest::rstest]
-#[case(1_00, 1_00, 1_00)]
-fn test_rem<A, B, C>(#[case] x: A, #[case] y: B, #[case] ok: C)
-where
-    A: Into<Unit2>,
-    B: Into<Unit2>,
-    C: Into<Unit2> {
-    let x: Unit2 = x.into();
-    let y: Unit2 = y.into();
-    let ok: Unit2 = ok.into();
-    let ret: Unit2 = (x % y).unwrap();
-    assert_eq!(ret, ok);
+    #[::rstest::rstest]
+    #[case(1_00, 1_00, 1_00)]
+    #[case(1_00, 0_50, 2_00)]
+    fn div<A, B, C>(#[case] x: A, #[case] y: B, #[case] ok: C) 
+    where
+        A: Into<Unit2>,
+        B: Into<Unit2>,
+        C: Into<Unit2> {
+        let x: Unit2 = x.into();
+        let y: Unit2 = y.into();
+        let ok: Unit2 = ok.into();
+        let ret: Unit2 = (x / y).unwrap();
+        assert_eq!(ret, ok);
+    }
+
+    #[::rstest::rstest]
+    #[case(1_00, 1_00, 1_00)]
+    fn rem<A, B, C>(#[case] x: A, #[case] y: B, #[case] ok: C)
+    where
+        A: Into<Unit2>,
+        B: Into<Unit2>,
+        C: Into<Unit2> {
+        let x: Unit2 = x.into();
+        let y: Unit2 = y.into();
+        let ok: Unit2 = ok.into();
+        let ret: Unit2 = (x % y).unwrap();
+        assert_eq!(ret, ok);
+    }
 }

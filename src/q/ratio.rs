@@ -12,33 +12,35 @@ mode!(
     Ratio
 );
 
-impl<const A: u8, B, C> Ratio<A, B, C> 
+impl<const A: u8, B> Ratio<A, B> 
 where
     B: ops::Int,
-    C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
+    pub fn nominator(self) -> Unit<A, B> {
+
+    }
+
+    pub fn denominator(self) -> Unit<A, B> {
+
+    }
+
     #[inline]
     pub fn invert(self) -> Result<Self> {
         let ret: B = B::AS_1;
-        let ret: Self = C::div(ret, self.n)?.into();
+        let ret: Self = div(ret, self.n)?.into();
         Ok(ret)
     }
 }
 
-impl<const A: Precision, B, C> From<Unit<A, B, C>> for Ratio<A, B, C>
+impl<const A: u8, B> From<Unit<A, B>> for Ratio<A, B>
 where
     B: ops::Int,
-    C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    fn from(value: Unit<A, B, C>) -> Self {
-        Self {
-            n: value.n,
-            m_0: ::core::marker::PhantomData,
-            m_1: ::core::marker::PhantomData
-        }
+    fn from(value: Unit<A, B>) -> Self {
+        Self::from_raw(value.n)
     }
 }

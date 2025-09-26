@@ -178,17 +178,19 @@ where
     m_0: ::core::marker::PhantomData<C>
 }
 
-impl<const A: Precision, B, C, D> Q<A, B, C, D>
+impl<const A: u8, B, C> Q<A, B, C>
 where
     B: ops::Int,
     C: Mode,
-    D: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-
-
-
+    pub fn from_raw(n: B) -> Self {
+        Self {
+            n,
+            m_0: ::core::marker::PhantomData
+        }
+    }
 
 
 

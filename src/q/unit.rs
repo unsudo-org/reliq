@@ -9,7 +9,7 @@ mode!(
     Unit
 );
 
-impl<const A: u8, B, C> Unit<A, B, C>
+impl<const A: u8, B> Unit<A, B>
 where
     B: ops::Int,
     C: Engine,
@@ -19,38 +19,35 @@ where
 
 }
 
-impl<const A: u8, B, C> From<Deg<A, B, C>> for Unit<A, B, C>
+impl<const A: u8, B> From<Deg<A, B>> for Unit<A, B>
 where
     B: ops::Int,
-    C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    fn from(value: Deg<A, B, C>) -> Self {
+    fn from(value: Deg<A, B>) -> Self {
         value.n.into()
     }
 }
 
-impl<const A: u8, B, C> From<Rad<A, B, C>> for Unit<A, B, C>
+impl<const A: u8, B> From<Rad<A, B>> for Unit<A, B>
 where
     B: ops::Int,
-    C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    fn from(value: Rad<A, B, C>) -> Self {
+    fn from(value: Rad<A, B>) -> Self {
         value.n.into()
     }
 }
 
-impl<const A: u8, B, C> From<Percentage<A, B, C>> for Unit<A, B, C>
+impl<const A: u8, B> From<Percentage<A, B>> for Unit<A, B>
 where
     B: ops::Int,
-    C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    fn from(value: Percentage<A, B, C>) -> Self {
+    fn from(value: Percentage<A, B>) -> Self {
         value.n.into()
     }
 }

@@ -24,11 +24,10 @@ mode!(
     Factor
 );
 
-impl<const A: u8, B, C> Factor<A, B, C>
+impl<const A: u8, B> Factor<A, B>
 where
     B: ops::Int,
     B: ops::Prim,
-    C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
@@ -46,38 +45,58 @@ where
     }
 }
 
-impl<const A: u8, B, C> From<Unit<A, B, C>> for Factor<A, B, C>
+impl<const A: u8, B> From<Unit<A, B>> for Factor<A, B>
 where
     B: ops::Int,
     B: ops::Prim,
     B: ops::Unsigned,
-    C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    fn from(value: Unit<A, B, C>) -> Self {
-        value.n.into()
+    fn from(value: Unit<A, B>) -> Self {
+        let n: Unit<_, _> = value;
+        let n: Self = n.into();
+        n
     }
 }
 
-impl<const A: u8, B, C> From<Percentage<A, B, C>> for Factor<A, B, C>
+impl<const A: u8, B> From<Percentage<A, B>> for Factor<A, B>
 where
     B: ops::Int,
     B: ops::Prim,
-    C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B>,
     (): Supported<0, B> {
     #[inline]
-    fn from(value: Percentage<A, B, C>) -> Self {
-        let n: Unit<A, B, C> = value.into();
-        if n == as_0::<A, B, UnitMode, C>() {
-            return as_0::<A, B, FactorMode, C>()
+    fn from(value: Percentage<A, B>) -> Self {
+        let n: Percentage<A, B> = value;
+        let n: Unit<A, B> = n.into();
+        let as_0: Unit<A, B> = as_0();
+        let as_1: Unit<A, B> = as_1();
+        let as_100: Unit<A, B> = as_100();
+        if n == as_0 {
+            let n: B = n.n;
+            let n: Self = Self::from_raw(n);
+            return n
         }
-        if n > as_0::<A, B, UnitMode, C>() {
-            let n: Unit<A, B, C> = unsafe {
-                (n / as_100::<A, B, UnitMode, C>()).unwrap_unchecked()
+        if n > as_0 {
+            let n: Unit<A, B> = unsafe {
+                (n / as_100).unwrap_unchecked()
+            };
+            
+        }
+        let min: Unit<A, B> = unsafe {
+            
+        };
+
+
+        if n == as_0::<A, B, UnitMode>() {
+            return as_0()
+        }
+        if n > as_0() {
+            let n: Unit<A, B> = unsafe {
+                (n / as_100).unwrap_unchecked()
             };
             let n: Unit<A, B, C> = unsafe {
                 (n + as_1::<A, B, UnitMode, C>()).unwrap_unchecked()

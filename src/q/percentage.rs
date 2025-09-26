@@ -17,89 +17,108 @@ mode!(
     Percentage
 );
 
-impl<const A: u8, B, C> Percentage<A, B, C>
+impl<const A: u8, B> Percentage<A, B>
 where
     B: ops::Int,
-    C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B>,
     (): Supported<0, B> {
     #[inline]
     pub fn is_gain(self) -> bool {
-        self > as_0::<A, B, PercentageMode, C>()
+        let as_0: Percentage<A, B> = as_0();
+        self > as_0
     }
 
     #[inline]
     pub fn is_loss(self) -> bool {
-        self < as_0::<A, B, PercentageMode, C>()
+        let as_0: Percentage<A, B> = as_0();
+        self < as_0
     }
 
     #[inline]
     pub fn is_neutral(self) -> bool {
-        self == as_0::<A, B, PercentageMode, C>()
+        let as_0: Percentage<A, B> = as_0();
+        self == as_0
     }
 
     #[inline]
-    pub fn of<D>(self, n: D) -> Result<Unit<A, B, C>> 
+    pub fn of<C>(self, n: C) -> Result<Unit<A, B>> 
     where
-        D: Into<Unit<A, B, C>> {
-        let percentage: Unit<_, _, _> = self.into();
+        C: Into<Unit<A, B>> {
+        let percentage: Unit<A, B> = self.into();
+        let as_100: Unit<A, B> = as_100();
         if B::SIGNED {
-            let min: Unit<A, B, C> = (as_100::<A, B, UnitMode, C>() * as_2::<A, B, UnitMode, C>())?;
-            let min: Unit<A, B, C> = (as_100::<A, B, UnitMode, C>() - min)?;
-            let percentage: Unit<A, B, C> = percentage.max(min);
-            let n: Unit<A, B, C> = n.into();
-            let n: Unit<A, B, C> = (n / as_100::<A, B, UnitMode, C>())?;
-            let n: Unit<A, B, C> = (n * percentage)?;
+            let as_2: Unit<A, B> = as_2();
+            let min: Unit<A, B> = (as_100 * as_2)?;
+            let min: Unit<A, B> = (as_100 - min)?;
+            let percentage: Unit<A, B> = percentage.max(min);
+            let n: Unit<A, B> = n.into();
+            let n: Unit<A, B> = (n / as_100)?;
+            let n: Unit<A, B> = (n * percentage)?;
             return Ok(n)
         }
-        let n: Unit<A, B, C> = n.into();
-        let n: Unit<A, B, C> = (n / as_100::<A, B, UnitMode, C>())?;
-        let n: Unit<A, B, C> = (n * percentage)?;
+        let n: Unit<A, B> = n.into();
+        let n: Unit<A, B> = (n / as_100)?;
+        let n: Unit<A, B> = (n * percentage)?;
         Ok(n)
     }
 }
 
-impl<const A: u8, B, C> From<Unit<A, B, C>> for Percentage<A, B, C> 
+impl<const A: u8, B> From<Unit<A, B>> for Percentage<A, B> 
 where
     B: ops::Int,
-    C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    fn from(value: Unit<A, B, C>) -> Self {
-        value.n.into()
+    fn from(value: Unit<A, B>) -> Self {
+        Self {
+            n: value.n,
+            m_0: ::core::marker::PhantomData
+        }
     }
 }
 
-impl<const A: u8, B, C> TryFrom<Factor<A, B, C>> for Percentage<A, B, C>
+impl<const A: u8, B> TryFrom<Factor<A, B>> for Percentage<A, B>
 where
     B: ops::Int,
-    C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B>,
     (): Supported<0, B> {
     type Error = Error;
 
-    fn try_from(value: Factor<A, B, C>) -> ::core::result::Result<Self, Self::Error> {
-        let n: Unit<A, B, C> = value.into();
-        if (n < as_1::<A, B, UnitMode, C>() && !B::SIGNED) || n < as_0::<A, B, UnitMode, C>() {
+    #[inline]
+    fn try_from(value: Factor<A, B>) -> ::core::result::Result<Self, Self::Error> {
+        let n: Factor<A, B> = value;
+        let n: B = n.n;
+        let n: Unit<A, B> = Q {
+            n,
+            m_0: ::core::marker::PhantomData
+        };
+        let as_0: Unit<A, B> = as_0();
+        let as_1: Unit<A, B> = as_1();
+        let as_100: Unit<A, B> = as_100();
+        if (n < as_1 && !B::SIGNED) || n < as_0 {
             return Err(Error::Underflow)
         }
-        if n == as_1::<A, B, UnitMode, C>() {
-            return Ok(as_0())
+        if n == as_1 {
+            let n: Percentage<A, B> = as_0.into();
+            return Ok(n)
         }
-        if n > as_1::<A, B, UnitMode, C>() {
-            let n: Unit<A, B, C> = (n - as_1::<A, B, UnitMode, C>())?;
-            let n: Unit<A, B, C> = (n * as_100::<A, B, UnitMode, C>())?;
-            let ret: Self = n.into();
-            return Ok(ret)
+        if n > as_1 {
+            let n: Unit<A, B> = (n - as_1)?;
+            let n: Unit<A, B> = (n * as_100)?;
+            let n: Self = n.into();
+            return Ok(n)
         }
-        let n: Unit<A, B, C> = (n - as_1::<A, B, UnitMode, C>())?;
-        let n: Unit<A, B, C> = (n * as_100::<A, B, UnitMode, C>())?;
-        let ret: Self = n.into();
-        Ok(ret)
+        let n: Unit<A, B> = (n - as_1)?;
+        let n: Unit<A, B> = (n * as_100)?;
+        let n: B = n.n;
+        let n: Self = Self {
+            n,
+            m_0: ::core::marker::PhantomData
+        };
+        Ok(n)
     }
 }

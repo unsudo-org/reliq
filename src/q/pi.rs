@@ -60,7 +60,7 @@ where
         | (false, 64, 1..=19)
         | (false, 128, 1..=37) => {
             unsafe {
-                lookup::<A>().try_into().unwrap_unchecked()
+                look_up::<A>().try_into().unwrap_unchecked()
             }
         },
         _ => {
@@ -72,6 +72,6 @@ where
 }
 
 #[inline]
-const fn lookup<const T: u8>() -> u128 {
+const fn look_up<const T: u8>() -> u128 {
     TABLE[(T - 1) as usize]
 }

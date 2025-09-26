@@ -1,6 +1,6 @@
 use super::*;
 
-impl<const A: Precision, B, C> Q<A, B, C>
+impl<const A: u8, B, C> Q<A, B, C>
 where
     B: ops::Int,
     C: Mode,
