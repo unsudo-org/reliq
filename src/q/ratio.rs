@@ -18,14 +18,6 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    pub fn nominator(self) -> Unit<A, B> {
-
-    }
-
-    pub fn denominator(self) -> Unit<A, B> {
-
-    }
-
     #[inline]
     pub fn invert(self) -> Result<Self> {
         let ret: B = B::AS_1;

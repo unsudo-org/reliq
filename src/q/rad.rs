@@ -69,11 +69,8 @@ where
     (): Supported<A, B> {
     #[inline]
     pub fn tan(self) -> Result<Ratio<A, B>> {
-        let x: Ratio<_, _> = Self::sin(self)?;
-        let x: B = x.n;
-        let y: Ratio<_, _> = Self::cos(self)?;
-        let y: B = y.n;
-        let n: B = div(x, y)?;
+        let n: B = self.n;
+        let n: B = tan::<A, _>(n)?;
         let n: Ratio<_, _> = n.into();
         Ok(n)
     }

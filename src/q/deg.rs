@@ -123,40 +123,42 @@ where
 }
 
 #[cfg(test)]
-#[::rstest::rstest]
-#[case(25_00, 0_46)]
-fn tan<A, B>(#[case] angle: A, #[case] ok: B) 
-where
-    A: Into<Deg2>,
-    B: Into<Unit2> {
-    let angle: Deg2 = angle.into();
-    let ok: Unit2 = ok.into();
-    let ret: Ratio2 = angle.tan().unwrap();
-    assert_eq!(ret, ok);
-}
+mod test {
+    use super::*;
+    
+    #[::rstest::rstest]
+    #[case(25_00, 0_46)]
+    fn tan<A, B>(#[case] angle: A, #[case] ok: B) 
+    where
+        A: Into<Deg2>,
+        B: Into<Unit2> {
+        let angle: Deg2 = angle.into();
+        let ok: Unit2 = ok.into();
+        let ret: Ratio2 = angle.tan().unwrap();
+        assert_eq!(ret, ok);
+    }
 
-#[cfg(test)]
-#[::rstest::rstest]
-#[case(25_00, 0_42)]
-fn sin<A, B>(#[case] angle: A, #[case] ok: B) 
-where
-    A: Into<Deg2>,
-    B: Into<Unit2> {
-    let angle: Deg2 = angle.into();
-    let ok: Unit2 = ok.into();
-    let ret: Ratio2 = angle.sin().unwrap();
-    assert_eq!(ret, ok);
-}
+    #[::rstest::rstest]
+    #[case(25_00, 0_42)]
+    fn sin<A, B>(#[case] angle: A, #[case] ok: B) 
+    where
+        A: Into<Deg2>,
+        B: Into<Unit2> {
+        let angle: Deg2 = angle.into();
+        let ok: Unit2 = ok.into();
+        let ret: Ratio2 = angle.sin().unwrap();
+        assert_eq!(ret, ok);
+    }
 
-#[cfg(test)]
-#[::rstest::rstest]
-#[case(1_00, 1_00)]
-fn cos<A, B>(#[case] angle: A, #[case] ok: B) 
-where
-    A: Into<Deg2>,
-    B: Into<Unit2> {
-    let angle: Deg2 = angle.into();
-    let ok: Unit2 = ok.into();
-    let ret: Ratio2 = angle.cos().unwrap();
-    assert_eq!(ret, ok);
+    #[::rstest::rstest]
+    #[case(1_00, 1_00)]
+    fn cos<A, B>(#[case] angle: A, #[case] ok: B) 
+    where
+        A: Into<Deg2>,
+        B: Into<Unit2> {
+        let angle: Deg2 = angle.into();
+        let ok: Unit2 = ok.into();
+        let ret: Ratio2 = angle.cos().unwrap();
+        assert_eq!(ret, ok);
+    }
 }

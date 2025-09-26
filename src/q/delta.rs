@@ -63,45 +63,43 @@ where
     /// # Safety
     /// 
     /// - The base can not be 0.
-    pub fn into_percentage<D>(self, base: D) -> Result<Percentage<A, B, C>> 
+    pub fn into_percentage<D>(self, base: D) -> Result<Percentage<A, B>> 
     where
         B: ops::Signed,
-        D: Into<Unit<A, B, C>> {
-        let base: Unit<A, B, C> = base.into();
+        D: Into<Unit<A, B>> {
+        let base: Unit<A, B> = base.into();
         if base.n == B::AS_0 {
             return Err(Error::DivisionByZero)
         }
-        let ret: Unit<A, B, C> = self.into();
-        let ret: Unit<A, B, C> = (ret * as_100::<A, B, UnitMode, C>())?;
-        let ret: Unit<A, B, C> = (ret / base)?;
-        let ret: Percentage<A, B, C> = ret.into();
+        let ret: Unit<A, B> = self.into();
+        let ret: Unit<A, B> = (ret * as_100::<_, _, UnitMode>())?;
+        let ret: Unit<A, B> = (ret / base)?;
+        let ret: Percentage<A, B> = ret.into();
         Ok(ret)
     }
 }
 
-impl<const A: u8, B, C> From<Unit<A, B, C>> for Delta<A, B, C>
+impl<const A: u8, B> From<Unit<A, B>> for Delta<A, B>
 where
     B: ops::Int,
-    C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    fn from(value: Unit<A, B, C>) -> Self {
+    fn from(value: Unit<A, B>) -> Self {
         value.n.into()
     }
 }
 
-impl<const A: u8, B, C> TryFrom<Factor<A, B, C>> for Delta<A, B, C> 
+impl<const A: u8, B> TryFrom<Factor<A, B>> for Delta<A, B> 
 where
     B: ops::Int,
     B: ops::Signed,
-    C: Engine,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
     type Error = Error;
 
-    fn try_from(value: Factor<A, B, C>) -> ::core::result::Result<Self, Self::Error> {
+    fn try_from(value: Factor<A, B>) -> ::core::result::Result<Self, Self::Error> {
         let ret: Self = value.n.checked_sub(B::AS_1).ok_or(Error::Underflow)?.into();
         Ok(ret)
     }
