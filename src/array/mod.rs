@@ -291,31 +291,6 @@ where
     }
 }
 
-impl<const A: u8, const B: usize, C, D> From<point::Set<A, B, C, D>> for Array<B, point::Point<A, B, C, D>>
-where
-    C: ops::Int,
-    C: ops::Prim,
-    D: q::Engine,
-    (): q::SupportedPrecision<A>,
-    (): q::SupportedInt<C>,
-    (): q::Supported<A, C> {
-    fn from(value: point::Set<A, B, C, D>) -> Self {
-        value.points
-    }
-}
-
-impl<const A: u8, const B: usize, C, D> From<point::Point<A, B, C, D>> for Array<B, q::Q<A, C, q::UnitMode, D>>
-where
-    C: ops::Int,
-    C: ops::Prim,
-    D: q::Engine,
-    (): q::SupportedPrecision<A>,
-    (): q::SupportedInt<C>,
-    (): q::Supported<A, C> {
-    fn from(value: point::Point<A, B, C, D>) -> Self {
-        value.dimensions
-    }
-}
 
 #[cfg(feature = "std")]
 impl<const A: usize, B, C> TryFrom<Vec<C>> for Array<A, B>

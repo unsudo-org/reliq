@@ -2,7 +2,6 @@ use super::*;
 
 ::modwire::expose!(
     pub error
-    pub set
     pub ty
 );
 
@@ -151,29 +150,18 @@ where
     }
 }
 
-impl<
-    const A: q::Precision,
-    const B: Dimensions,
-    C,
-    D
-> IntoIterator for Point<A, B, C, D>
+impl<const A: u8, const B: usize, C> IntoIterator for Point<A, B, C>
 where
     C: ops::Int,
-    C: ops::Prim,
-    D: q::Engine,
     (): q::SupportedPrecision<A>,
+    (): q::SupportedPrecision<B>,
     (): q::SupportedInt<C>,
-    (): q::Supported<A, C> {
-    type Item = q::Unit<A, C, D>;
-    type IntoIter = array::Iter<B, q::Unit<A, C, D>>;
+    (): q::Supported<A, C>,
+    (): q::Supported<B, C> {
+    type Item = q::Unit<A, C>;
+    type IntoIter = array::Iter<B, q::Unit<A, C>>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.dimensions.into_iter()
-    }
-}
-
-fn t(coordinate: Point<2, 32, usize>) {
-    for dim in coordinate {
-        
     }
 }
