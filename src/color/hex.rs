@@ -6,6 +6,7 @@ pub struct HexMode {
 
 impl Mode for HexMode {}
 
+
 pub type Hex<const A: u8 = 1, B = usize> = Color<A, B, HexMode>;
 
 impl<const A: u8, B> From<Rgb<A, B>> for Hex<A, B>
@@ -25,7 +26,7 @@ where
             mode: HexMode {
                 code
             },
-            n: ::core::marker::PhantomData
+            m_0: ::core::marker::PhantomData
         }
     }
 }
@@ -47,7 +48,7 @@ where
             mode: HexMode {
                 code
             },
-            n: ::core::marker::PhantomData
+            m_0: ::core::marker::PhantomData
         }
     }
 }
@@ -66,7 +67,7 @@ where
             mode: HexMode {
                 code
             },
-            n: ::core::marker::PhantomData
+            m_0: ::core::marker::PhantomData
         }
     }
 }
@@ -85,7 +86,7 @@ where
             mode: HexMode {
                 code
             },
-            n: ::core::marker::PhantomData
+            m_0: ::core::marker::PhantomData
         }
     }
 }
@@ -104,97 +105,14 @@ where
             mode: HexMode {
                 code
             },
-            n: ::core::marker::PhantomData
+            m_0: ::core::marker::PhantomData
         }
     }
 }
 
-impl<const A: u8, B> TryFrom<Hsl<A, B>> for Hex<A, B>
+impl<const A: u8, B> ::core::ops::Deref for Hex<A, B>
 where
     B: ops::Int,
-    (): q::SupportedPrecision<A>,
-    (): q::SupportedInt<B>,
-    (): q::Supported<A, B> {
-    type Error = Error;
-
-    #[inline]
-    fn try_from(value: Hsl<A, B>) -> Result<Self> {
-        use ops::ToPrim;
-        let as_0: q::Unit<A, B, C> = q::as_0::<A, B, _, C>();
-        let as_1: q::Unit<A, B, C> = q::as_1::<A, B, _, C>();
-        let as_2: q::Unit<A, B, C> = q::as_2::<A, B, _, C>();
-        #[allow(clippy::inconsistent_digit_grouping)]
-        let as_255: q::Unit<A, B, C> = q::r#as::<1, _, u16, _, _, _, _>(255_0_u16)?;
-        let hsl: Hsl<A, B, C, D> = value;
-        let h: u16 = *hsl.h();
-        let h: u128 = h.into();
-        let h: u128 = h.clamp(B::MIN_AS_U128, B::MAX_AS_U128);
-        let h: u128 = h * 10;
-        let h: q::Unit<A, B, C> = q::r#as::<1, _, u128, _, _, _, _>(h)?;
-        let s: q::Unit<A, B, C> = *hsl.s();
-        let l: q::Unit<A, B, C> = *hsl.l();
-        let c: q::Unit<A, B, C> = (as_2 * l)?;
-        let c: q::Unit<A, B, C> = (c - as_1)?;
-        let c: q::Unit<A, B, C> = c.abs();
-        let c: q::Unit<A, B, C> = (as_1 - c)?;
-        let c: q::Unit<A, B, C> = (c * s)?;
-        let x: q::Unit<A, B, C> = (h % as_2)?;
-        let x: q::Unit<A, B, C> = (x - as_1)?;
-        let x: q::Unit<A, B, C> = x.abs();
-        let x: q::Unit<A, B, C> = (as_1 - x)?;
-        let x: q::Unit<A, B, C> = (c * x)?;
-        let hsec: u32 = h.round_down().to_u32()?;
-        let (r, g, b) = match hsec {
-            0 => (c, x, as_0),
-            1 => (x, c, as_0),
-            2 => (as_0, c, x),
-            3 => (as_0, x, c),
-            4 => (x, as_0, c),
-            _ => (c, as_0, x)
-        };
-        let m: q::Unit<A, B, C> = (c / as_2)?;
-        let m: q::Unit<A, B, C> = (l - m)?;
-        let r: q::Unit<A, B, C> = (r + m)?;
-        let r: q::Unit<A, B, C> = (r * as_255)?;
-        let g: q::Unit<A, B, C> = (g + m)?;
-        let g: q::Unit<A, B, C> = (g * as_255)?;
-        let b: q::Unit<A, B, C> = (b + m)?;
-        let b: q::Unit<A, B, C> = (b * as_255)?;
-        let r: u8 = r.to_u8()?;
-        let g: u8 = g.to_u8()?;
-        let b: u8 = b.to_u8()?;
-        let code: u32 = ((r as u32) << 16) | ((g as u32) << 8) | (b as u32);
-        Ok(Self {
-            mode: HexMode {
-                code
-            },
-            n: ::core::marker::PhantomData,
-            m_1: ::core::marker::PhantomData,
-            m_2: ::core::marker::PhantomData
-        })
-    }
-}
-
-impl<const A: u8, B, C, D> TryFrom<Hsla<A, B, C, D>> for Hex<A, B, C, D>
-where
-    B: ops::Int,
-    C: q::Engine,
-    D: Engine,
-    (): q::SupportedPrecision<A>,
-    (): q::SupportedInt<B>,
-    (): q::Supported<A, B> {
-    type Error = Error;
-
-    fn try_from(value: Hsla<A, B, C, D>) -> Result<Self> {
-        
-    }
-}
-
-impl<const A: q::Precision, B, C, D> ::core::ops::Deref for Hex<A, B, C, D>
-where
-    B: ops::Int,
-    C: q::Engine,
-    D: Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {

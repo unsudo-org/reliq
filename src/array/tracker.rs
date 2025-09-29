@@ -108,9 +108,3 @@ where
         None
     }
 }
-
-
-fn hello_world(mut counts: Array<2, Tracker<u8>>) {
-    let age = counts.push_tracked(48).unwrap();
-    counts.remove_handle(age).unwrap();
-}

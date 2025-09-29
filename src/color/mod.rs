@@ -1,7 +1,6 @@
 use super::*;
 
 ::modwire::expose!(
-    pub engine
     pub hex
     pub hsl
     pub hsla
@@ -49,7 +48,7 @@ where
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
     mode: C,
-    n: ::core::marker::PhantomData<B>,
+    m_0: ::core::marker::PhantomData<B>,
 }
 
 
