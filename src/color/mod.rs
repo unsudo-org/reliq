@@ -41,60 +41,43 @@ pub enum Error {
 
 #[cfg_attr(feature = "std", derive(::serde::Serialize))]
 #[cfg_attr(feature = "std", derive(::serde::Deserialize))]
-pub struct Color<const A: u8, B = usize, C = HexMode, D = q::DefaultEngine>
+pub struct Color<const A: u8, B = usize, C = HexMode>
 where
     B: ops::Int,
     C: Mode,
-    D: q::Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
     mode: C,
-    m_0: ::core::marker::PhantomData<B>,
-    m_1: ::core::marker::PhantomData<D>
-}
-
-impl<const A: q::Precision, B, C, D, E> Color<A, B, C, D, E>
-where
-    B: ops::Int,
-    C: Mode,
-    D: q::Engine,
-    E: Engine,
-    (): q::SupportedPrecision<A>,
-    (): q::SupportedInt<B>,
-    (): q::Supported<A, B> {
-    
+    n: ::core::marker::PhantomData<B>,
 }
 
 
 
 
 
-
-
-impl<const A: u8, B, C> Color<A, B, C>
+impl<const A: u8, B> Color<A, B>
 where
     B: ops::Int,
-    C: q::Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B>,
     (): q::Supported<1, B> {
 
     #[inline]
-    pub fn lighten<D>(self, multiplier: D) -> Result<Self> 
+    pub fn lighten<C>(self, multiplier: C) -> Result<Self> 
     where
-        D: Into<q::Unit<A, B, C>> {
-        let multiplier: q::Unit<A, B, C> = multiplier.into();
-        self.interpolate::<(u8, u8, u8), q::Unit<A, B, C>>((255, 255, 255), multiplier)
+        C: Into<q::Unit<A, B>> {
+        let multiplier: q::Unit<A, B> = multiplier.into();
+        self.interpolate::<(u8, u8, u8), q::Unit<A, B>>((255, 255, 255), multiplier)
     }
 
     #[inline]
     pub fn darken<D>(self, multiplier: D) -> Result<Self> 
     where
-        D: Into<q::Unit<A, B, C>> {
-        let multiplier: q::Q<A, B, q::UnitMode, C> = multiplier.into();
-        self.interpolate::<(u8, u8, u8), q::Q<A, B, q::UnitMode, C>>((0, 0, 0), multiplier)
+        D: Into<q::Unit<A, B>> {
+        let multiplier: q::Unit<A, B> = multiplier.into();
+        self.interpolate::<(u8, u8, u8), q::Unit<A, B>>((0, 0, 0), multiplier)
     }
 
     #[inline]

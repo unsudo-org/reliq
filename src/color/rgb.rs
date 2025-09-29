@@ -1,6 +1,6 @@
 use super::*;
 
-pub type Rgb<const A: q::Precision, B = usize, C = q::DefaultEngine, D = DefaultEngine> = Color<A, B, RgbMode, C, D>;
+pub type Rgb<const A: u8, B = usize> = Color<A, B, RgbMode>;
 
 #[derive(Debug)]
 #[derive(Clone)]
@@ -12,34 +12,32 @@ pub struct RgbMode {
 
 impl Mode for RgbMode {}
 
-impl<const A: q::Precision, B, C, D> Rgb<A, B, C, D>
+impl<const A: u8, B> Rgb<A, B>
 where
     B: ops::Int,
-    C: q::Engine,
-    D: Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
     #[inline]
-    pub fn r(&self) -> &u8 {
-        &self.mode.r
+    pub fn r(&self) -> u8 {
+        self.mode.r
     }
 
     #[inline]
-    pub fn g(&self) -> &u8 {
-        &self.mode.g
+    pub fn g(&self) -> u8 {
+        self.mode.g
     }
 
     #[inline]
-    pub fn b(&self) -> &u8 {
-        &self.mode.b
+    pub fn b(&self) -> u8 {
+        self.mode.b
     }
 
     #[inline]
-    pub fn interpolate<E, F>(self, rhs: E, t: F) -> Result<Self>
+    pub fn interpolate<C, D>(self, rhs: C, t: D) -> Result<Self>
     where
-        E: Into<Self>,
-        F: Into<q::Unit<A, B, C>> {
+        C: Into<Self>,
+        D: Into<q::Unit<A, B>> {
         use ops::ToPrim as _;
         let rhs: Self = rhs.into();
         let t: q::Unit<A, B, C> = t.into();
@@ -61,7 +59,7 @@ where
                 g,
                 b
             },
-            m_0: ::core::marker::PhantomData,
+            n: ::core::marker::PhantomData,
             m_1: ::core::marker::PhantomData,
             m_2: ::core::marker::PhantomData
         })
@@ -88,7 +86,7 @@ where
                 g,
                 b
             },
-            m_0: ::core::marker::PhantomData,
+            n: ::core::marker::PhantomData,
             m_1: ::core::marker::PhantomData,
             m_2: ::core::marker::PhantomData
         }

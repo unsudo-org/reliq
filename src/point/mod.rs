@@ -154,10 +154,8 @@ impl<const A: u8, const B: usize, C> IntoIterator for Point<A, B, C>
 where
     C: ops::Int,
     (): q::SupportedPrecision<A>,
-    (): q::SupportedPrecision<B>,
     (): q::SupportedInt<C>,
-    (): q::Supported<A, C>,
-    (): q::Supported<B, C> {
+    (): q::Supported<A, C> {
     type Item = q::Unit<A, C>;
     type IntoIter = array::Iter<B, q::Unit<A, C>>;
 

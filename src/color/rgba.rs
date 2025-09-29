@@ -53,7 +53,7 @@ where
                 b,
                 a
             },
-            m_0: ::core::marker::PhantomData,
+            n: ::core::marker::PhantomData,
             m_1: ::core::marker::PhantomData,
             m_2: ::core::marker::PhantomData
         }
@@ -85,7 +85,7 @@ where
                 b,
                 a
             },
-            m_0: ::core::marker::PhantomData,
+            n: ::core::marker::PhantomData,
             m_1: ::core::marker::PhantomData,
             m_2: ::core::marker::PhantomData
         }
@@ -114,7 +114,7 @@ where
                 b,
                 a
             },
-            m_0: ::core::marker::PhantomData,
+            n: ::core::marker::PhantomData,
             m_1: ::core::marker::PhantomData,
             m_2: ::core::marker::PhantomData
         }

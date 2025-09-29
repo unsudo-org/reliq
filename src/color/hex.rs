@@ -1,18 +1,22 @@
 use super::*;
 
-pub type Hex<const A: u8 = 1, B = usize, C = q::DefaultEngine, D = DefaultEngine> = Color<A, B, HexMode, C, D>;
+pub struct HexMode {
+    code: u32
+}
 
-impl<const A: u8, B, C, D> From<Rgb<A, B, C, D>> for Hex<A, B, C, D>
+impl Mode for HexMode {}
+
+pub type Hex<const A: u8 = 1, B = usize> = Color<A, B, HexMode>;
+
+impl<const A: u8, B> From<Rgb<A, B>> for Hex<A, B>
 where
     B: ops::Int,
-    C: q::Engine,
-    D: Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
     #[inline]
-    fn from(value: Rgb<A, B, C, D>) -> Self {
-        let rgb: Rgb<A, B, C, D> = value;
+    fn from(value: Rgb<A, B>) -> Self {
+        let rgb: Rgb<A, B> = value;
         let r: u8 = *rgb.r();
         let g: u8 = *rgb.g();
         let b: u8 = *rgb.b();
@@ -21,24 +25,20 @@ where
             mode: HexMode {
                 code
             },
-            m_0: ::core::marker::PhantomData,
-            m_1: ::core::marker::PhantomData,
-            m_2: ::core::marker::PhantomData
+            n: ::core::marker::PhantomData
         }
     }
 }
 
-impl<const A: q::Precision, B, C, D> From<Rgba<A, B, C, D>> for Hex<A, B, C, D>
+impl<const A: u8, B> From<Rgba<A, B>> for Hex<A, B>
 where
     B: ops::Int,
-    C: q::Engine,
-    D: Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
     #[inline]
-    fn from(value: Rgba<A, B, C, D>) -> Self {
-        let rgba: Rgba<A, B, C, D> = value;
+    fn from(value: Rgba<A, B>) -> Self {
+        let rgba: Rgba<A, B> = value;
         let r: u8 = *rgba.r();
         let g: u8 = *rgba.g();
         let b: u8 = *rgba.b();
@@ -47,18 +47,14 @@ where
             mode: HexMode {
                 code
             },
-            m_0: ::core::marker::PhantomData,
-            m_1: ::core::marker::PhantomData,
-            m_2: ::core::marker::PhantomData
+            n: ::core::marker::PhantomData
         }
     }
 }
 
-impl<const A: q::Precision, B, C, D> From<u8> for Hex<A, B, C, D>
+impl<const A: u8, B> From<u8> for Hex<A, B>
 where
     B: ops::Int,
-    C: q::Engine,
-    D: Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
@@ -70,18 +66,14 @@ where
             mode: HexMode {
                 code
             },
-            m_0: ::core::marker::PhantomData,
-            m_1: ::core::marker::PhantomData,
-            m_2: ::core::marker::PhantomData
+            n: ::core::marker::PhantomData
         }
     }
 }
 
-impl<const A: q::Precision, B, C, D> From<u16> for Hex<A, B, C, D>
+impl<const A: u8, B> From<u16> for Hex<A, B>
 where
     B: ops::Int,
-    C: q::Engine,
-    D: Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
@@ -93,18 +85,14 @@ where
             mode: HexMode {
                 code
             },
-            m_0: ::core::marker::PhantomData,
-            m_1: ::core::marker::PhantomData,
-            m_2: ::core::marker::PhantomData
+            n: ::core::marker::PhantomData
         }
     }
 }
 
-impl<const A: q::Precision, B, C, D> From<u32> for Hex<A, B, C, D>
+impl<const A: u8, B> From<u32> for Hex<A, B>
 where
     B: ops::Int,
-    C: q::Engine,
-    D: Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
@@ -116,25 +104,21 @@ where
             mode: HexMode {
                 code
             },
-            m_0: ::core::marker::PhantomData,
-            m_1: ::core::marker::PhantomData,
-            m_2: ::core::marker::PhantomData
+            n: ::core::marker::PhantomData
         }
     }
 }
 
-impl<const A: u8, B, C, D> TryFrom<Hsl<A, B, C, D>> for Hex<A, B, C, D>
+impl<const A: u8, B> TryFrom<Hsl<A, B>> for Hex<A, B>
 where
     B: ops::Int,
-    C: q::Engine,
-    D: Engine,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
     type Error = Error;
 
     #[inline]
-    fn try_from(value: Hsl<A, B, C, D>) -> Result<Self> {
+    fn try_from(value: Hsl<A, B>) -> Result<Self> {
         use ops::ToPrim;
         let as_0: q::Unit<A, B, C> = q::as_0::<A, B, _, C>();
         let as_1: q::Unit<A, B, C> = q::as_1::<A, B, _, C>();
@@ -184,7 +168,7 @@ where
             mode: HexMode {
                 code
             },
-            m_0: ::core::marker::PhantomData,
+            n: ::core::marker::PhantomData,
             m_1: ::core::marker::PhantomData,
             m_2: ::core::marker::PhantomData
         })
@@ -221,9 +205,3 @@ where
         &self.mode.code
     }
 }
-
-pub struct HexMode {
-    code: u32
-}
-
-impl Mode for HexMode {}

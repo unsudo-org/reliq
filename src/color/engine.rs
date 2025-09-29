@@ -39,7 +39,7 @@ pub trait Engine {
                 l,
                 a
             },
-            m_0: ::core::marker::PhantomData,
+            n: ::core::marker::PhantomData,
             m_1: ::core::marker::PhantomData,
             m_2: ::core::marker::PhantomData
         }
@@ -63,7 +63,7 @@ pub trait Engine {
                 g,
                 b
             },
-            m_0: ::core::marker::PhantomData,
+            n: ::core::marker::PhantomData,
             m_1: ::core::marker::PhantomData,
             m_2: ::core::marker::PhantomData
         }
@@ -90,7 +90,7 @@ pub trait Engine {
                 b,
                 a
             },
-            m_0: ::core::marker::PhantomData,
+            n: ::core::marker::PhantomData,
             m_1: ::core::marker::PhantomData,
             m_2: ::core::marker::PhantomData
         }
