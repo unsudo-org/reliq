@@ -31,7 +31,7 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B>,
-    (): Supported<0, B> {
+    (): Supported<1, B> {
 
     #[inline]
     pub fn is_increase(&self) -> bool {
@@ -75,7 +75,7 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B>,
-    (): Supported<0, B> {
+    (): Supported<1, B> {
     #[inline]
     fn from(value: Percentage<A, B>) -> Self {
         let n: Unit<A, B> = value.into();

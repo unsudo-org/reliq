@@ -18,9 +18,9 @@ where
     #[inline]
     fn from(value: Rgb<A, B>) -> Self {
         let rgb: Rgb<A, B> = value;
-        let r: u8 = *rgb.r();
-        let g: u8 = *rgb.g();
-        let b: u8 = *rgb.b();
+        let r: u8 = rgb.r();
+        let g: u8 = rgb.g();
+        let b: u8 = rgb.b();
         let code: u32 = ((r as u32) << 16) | ((g as u32) << 8) | (b as u32);
         Self {
             mode: HexMode {

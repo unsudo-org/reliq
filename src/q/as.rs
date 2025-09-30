@@ -11,10 +11,10 @@ macro_rules! r#as {
                     (): SupportedPrecision<A>,
                     (): SupportedInt<B>,
                     (): Supported<A, B>,
-                    (): Supported<0, B> {
-                    let n: B = B::[< AS _ $n >];
+                    (): Supported<1, B> {
+                    let n: B = B::[< AS _ $n >] * B::AS_10;
                     let n: B = unsafe {
-                        cast::<0, A, _>(n).unwrap_unchecked()
+                        cast::<1, A, _>(n).unwrap_unchecked()
                     };
                     let n: Q<A, B, C> = n.into();
                     n

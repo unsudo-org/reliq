@@ -23,7 +23,7 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B>,
-    (): Supported<0, B> {
+    (): Supported<1, B> {
     #[inline]
     pub fn is_gain(self) -> bool {
         let as_0: Percentage<A, B> = as_0();
@@ -85,7 +85,7 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B>,
-    (): Supported<0, B> {
+    (): Supported<1, B> {
     type Error = Error;
 
     #[inline]
