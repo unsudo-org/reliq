@@ -21,17 +21,24 @@ where
         }
     }
 
-    pub fn with_item(mut self, item: B) -> Self {
+    #[inline]
+    pub fn push<C>(mut self, item: C) -> Self 
+    where
+        C: Into<B> {
+        let item: B = item.into();
         if let Some(Err(_)) = self.outcome {
             return self
         }
-        if let Err(e) = self.content.push(item) {
-            self.outcome = Some(Err(e));
+        if self.content.len >= A {
+            self.outcome = Some(Err(Error::Overflow))
         }
+        self.content.buf[self.content.len].write(item);
+        self.content.len += 1;
         self
     }
 
-    pub fn build(self) -> Result<Array<A, B>> {
+    #[inline]
+    pub fn finish(self) -> Result<Array<A, B>> {
         if let Some(Err(e)) = self.outcome {
             return Err(e)
         }

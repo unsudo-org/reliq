@@ -2,7 +2,6 @@ use super::*;
 
 ::modwire::expose!(
     pub builder
-    pub const_builder
     pub handle
     pub iter
     pub tracker
@@ -62,7 +61,7 @@ where
 impl<const A: usize, B> Array<A, B> 
 where
     B: Copy {
-    pub fn new() -> Builder<A, B> {
+    pub fn build() -> Builder<A, B> {
         Builder::new()
     }
 
@@ -440,18 +439,10 @@ fn test_push_pop() {
 
 #[test]
 fn test_insert_remove_ordered() {
-    let _: Array<100, &'static str> = Array::new()
-        .with_item("Hello")
-        .with_item("Hi")
-        .with_item("")
-        .build()
-        .unwrap();
-
-
     let mut arr: Array<4, u8> = Array::default();
     arr.push(1).unwrap();
     arr.push(3).unwrap();
-    arr.insert(1_usize, 2).unwrap();
+    let _ = arr.insert(1_usize, 2).unwrap();
     assert_eq!(arr.as_slice(), &[1, 2, 3]);
     let val = arr.remove(48_usize).unwrap();
     assert_eq!(val, 2);

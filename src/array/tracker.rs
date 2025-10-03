@@ -2,9 +2,13 @@ use super::*;
 
 static mut NEXT_HANDLE: usize = 0;
 
-pub type Trackable<const A: u8, B> = Array<A, Tracker<B>>;
+/// ```rs
+/// fn hello_world(counts: Tray<u128>) {
+///     
+/// }
+/// ```
+pub type Tray<const A: u8, B> = Array<A, Tracker<B>>;
 
-/// # Brief
 /// A wrapper to attach a `Handle` on. 
 /// Enables the `Array` to track specific `T`s and remove them regardless of order.
 #[derive(Debug)]
@@ -98,11 +102,9 @@ where
         C: Into<Handle> {
         let handle = handle.into();
         for k in 0..self.len() {
-            if let Some(tracker) = self.get(k) {
-                if tracker.0 == *handle {
-                    let removed = self.remove_unsorted(k)?;
-                    return Some(removed.1)
-                }
+            if let Some(tracker) = self.get(k) && tracker.0 == *handle {
+                let removed = self.remove_unsorted(k)?;
+                return Some(removed.1)
             }
         }
         None

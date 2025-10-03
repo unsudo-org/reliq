@@ -439,17 +439,17 @@ mod test {
     }
 
     #[::rstest::rstest]
-    #[case(1_00, 1_00, 1_00)]
-    #[case(1_00, 0_50, 2_00)]
+    #[case(1_00_u128, 1_00_u128, 1_00_u128)]
+    #[case(1_00_u128, 0_50_u128, 2_00_u128)]
     fn div<A, B, C>(#[case] x: A, #[case] y: B, #[case] ok: C) 
     where
-        A: Into<Unit2>,
-        B: Into<Unit2>,
-        C: Into<Unit2> {
-        let x: Unit2 = x.into();
-        let y: Unit2 = y.into();
-        let ok: Unit2 = ok.into();
-        let ret: Unit2 = (x / y).unwrap();
+        A: Into<Unit2<u128>>,
+        B: Into<Unit2<u128>>,
+        C: Into<Unit2<u128>> {
+        let x: Unit2<u128> = x.into();
+        let y: Unit2<u128> = y.into();
+        let ok: Unit2<u128> = ok.into();
+        let ret: Unit2<u128> = (x / y).unwrap();
         assert_eq!(ret, ok);
     }
 

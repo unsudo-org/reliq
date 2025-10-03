@@ -54,13 +54,14 @@ where
     B: ops::Int,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
-    (): q::Supported<A, B> {
+    (): q::Supported<A, B>,
+    (): q::Supported<1, B> {
     #[inline]
     fn from(value: Rgb<A, B>) -> Self {
         let rgb: Rgb<A, B> = value;
-        let r: u8 = *rgb.r();
-        let g: u8 = *rgb.g();
-        let b: u8 = *rgb.b();
+        let r: u8 = rgb.r();
+        let g: u8 = rgb.g();
+        let b: u8 = rgb.b();
         let a: q::Q<A, B> = B::AS_1.into();
         Self {
             mode: RgbaMode {

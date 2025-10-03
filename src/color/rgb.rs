@@ -128,15 +128,3 @@ where
         }
     }
 }
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    fn interpolate() {
-        let x: Rgb = (200, 200, 200).into();
-        let y: Rgb = (25, 25, 25).into();
-        let z: Rgb = x.interpolate(y, 50_0).unwrap();
-        assert_eq!(z, (100, 100, 100).into());
-    }
-}

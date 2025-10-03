@@ -58,25 +58,25 @@ where
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<C>,
     (): q::Supported<A, C> {
-    pub fn distance_between(self, rhs: Self) -> Result<q::Unit<A, C>> {
-        let mut sum: q::Unit<A, C> = q::r#as::<2, _, u16, _, _, _>(0_u16).unwrap();
+    pub fn distance_between(self, rhs: Self) -> Result<q::Q<A, C>> {
+        let mut sum: q::Q<A, C> = q::r#as::<2, _, u16, _, _, _>(0_u16).unwrap();
         let rhs_iter: array::Iter<B, q::Unit<A, C>> = rhs.dimensions.into_iter();
         for (x_0, x_1) in self.dimensions.into_iter().zip(rhs_iter) {
-            let dn: q::Unit<A, C> = (x_0 - x_1)?;
-            let dn_sq: q::Unit<A, C> = (dn * dn)?;
+            let dn: q::Q<A, C> = (x_0 - x_1)?;
+            let dn_sq: q::Q<A, C> = (dn * dn)?;
             sum = (sum + dn_sq)?;
         }
-        let ret: q::Unit<A, C> = sum.sqrt()?;
+        let ret: q::Q<A, C> = sum.sqrt()?;
         Ok(ret)
     }
 
-    pub fn nearest<E>(self, points: E) -> Result<Option<(q::Unit<A, C>, Point<A, B, C>)>> 
+    pub fn nearest<E>(self, points: E) -> Result<Option<(q::Q<A, C>, Point<A, B, C>)>> 
     where
         E: Into<array::Array<B, Point<A, B, C>>> {
         let points: array::Array<B, Point<A, B, C>> = points.into();
-        let mut best: Option<(q::Unit<A, C>, Point<A, B, C>)> = None;
+        let mut best: Option<(q::Q<A, C>, Point<A, B, C>)> = None;
         for point in points.into_iter() {
-            let distance: q::Unit<A, B> = self.distance_between(point)?;
+            let distance: q::Q<A, C> = self.distance_between(point)?;
             match &mut best {
                 None => best = Some((distance, point)),
                 Some((best_distance, best_point)) => {

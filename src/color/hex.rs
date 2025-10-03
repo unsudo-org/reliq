@@ -9,12 +9,50 @@ impl Mode for HexMode {}
 
 pub type Hex<const A: u8 = 1, B = usize> = Color<A, B, HexMode>;
 
+impl<const A: u8, B> Hex<A, B> 
+where
+    B: ops::Int,
+    (): q::SupportedPrecision<A>,
+    (): q::SupportedInt<B>,
+    (): q::Supported<A, B>,
+    (): q::Supported<1, B> {
+    #[inline]
+    pub fn lighten<C>(self, percentage: C) -> Result<Self>
+    where
+        C: Into<q::Percentage<A, B>> {
+        let percentage: q::Percentage<A, B> = percentage.into();
+        self.interpolate::<(u8, u8, u8), _>((255, 255, 255), percentage)
+    }
+
+    #[inline]
+    pub fn darken<C>(self, percentage: C) -> Result<Self>
+    where
+        C: Into<q::Percentage<A, B>> {
+        let percentage: q::Percentage<A, B> = percentage.into();
+        self.interpolate::<(u8, u8, u8), _>((0, 0, 0), percentage)
+    }
+
+    #[inline]
+    pub fn interpolate<C, D>(self, rhs: C, percentage: D) -> Result<Self>
+    where
+        C: Into<Self>,
+        D: Into<q::Percentage<A, B>> {
+        let rhs: Self = rhs.into();
+        let percentage: q::Percentage<A, B> = percentage.into();
+        let rgb: Rgb<A, B> = self.into();
+        let rgb: Rgb<A, B> = rgb.interpolate(rhs, percentage)?;
+        let ret: Self = rgb.into();
+        Ok(ret)
+    }
+}
+
 impl<const A: u8, B> From<Rgb<A, B>> for Hex<A, B>
 where
     B: ops::Int,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
-    (): q::Supported<A, B> {
+    (): q::Supported<A, B>,
+    (): q::Supported<1, B> {
     #[inline]
     fn from(value: Rgb<A, B>) -> Self {
         let rgb: Rgb<A, B> = value;
@@ -50,6 +88,21 @@ where
             },
             m_0: ::core::marker::PhantomData
         }
+    }
+}
+
+impl<const A: u8, B> From<(u8, u8, u8)> for Hex<A, B> 
+where
+    B: ops::Int,
+    (): q::SupportedPrecision<A>,
+    (): q::SupportedInt<B>,
+    (): q::Supported<A, B>,
+    (): q::Supported<1, B> {
+    #[inline]
+    fn from(value: (u8, u8, u8)) -> Self {
+        let rgb: Rgb<A, B> = value.into();
+        let ret: Self = rgb.into();
+        ret
     }
 }
 
