@@ -1,5 +1,8 @@
 use super::*;
 
+#[derive(Debug)]
+#[derive(Clone)]
+#[derive(Copy)]
 pub struct HslaMode<const A: u8 = 1, B = usize>
 where
     B: ops::Int,

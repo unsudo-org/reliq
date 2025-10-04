@@ -147,22 +147,3 @@ where
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> 
     {}
-
-impl<const A: u8, B> HslExt<A, B> for Hex<A, B>
-where
-    B: ops::Int,
-    (): q::SupportedPrecision<A>,
-    (): q::SupportedInt<B>,
-    (): q::Supported<A, B> {
-    fn h(self) -> q::Q<A, B> {
-        
-    }
-
-    fn s(self) -> q::Q<A, B> {
-        
-    }
-
-    fn l(self) -> q::Q<A, B> {
-        
-    }
-}
