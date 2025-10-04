@@ -29,23 +29,23 @@ where
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
     #[inline]
-    pub fn r(&self) -> &u8 {
-        &self.mode.r
+    pub fn r(&self) -> u8 {
+        self.mode.r
     }
 
     #[inline]
-    pub fn g(&self) -> &u8 {
-        &self.mode.g
+    pub fn g(&self) -> u8 {
+        self.mode.g
     }
 
     #[inline]
-    pub fn b(&self) -> &u8 {
-        &self.mode.b
+    pub fn b(&self) -> u8 {
+        self.mode.b
     }
 
     #[inline]
-    pub fn a(&self) -> &q::Q<A, B> {
-        &self.mode.a
+    pub fn a(&self) -> q::Q<A, B> {
+        self.mode.a
     }
 }
 
@@ -81,7 +81,15 @@ where
     C: Into<q::Q<A, B>>,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
-    (): q::Supported<A, B> {
+    (): q::Supported<A, B>,
+    (): q::Supported<1, B> {
+    
+    /// # Warning
+    /// If alpha is less than `0` or greater than `1`,
+    /// it will be clamped.
+    /// 
+    /// # Error
+    /// `AlphaTruncation`
     #[inline]
     fn from(value: (u8, u8, u8, C)) -> Self {
         let (
@@ -90,7 +98,10 @@ where
             b,
             a
         ) = value;
+        let min: q::Q<A, B> = q::as_0();
+        let max: q::Q<A, B> = q::as_1();
         let a: q::Q<A, B> = a.into();
+        let a: q::Q<A, B> = a.clamp(min, max);
         Self {
             mode: RgbaMode {
                 r,

@@ -128,3 +128,34 @@ where
         }
     }
 }
+
+impl<const A: u8, B> TryFrom<Rgba<A, B>> for Rgb<A, B>
+where
+    B: ops::Int,
+    (): q::SupportedPrecision<A>,
+    (): q::SupportedInt<B>,
+    (): q::Supported<A, B>,
+    (): q::Supported<1, B> {
+    type Error = Error;
+
+    #[inline]
+    fn try_from(value: Rgba<A, B>) -> ::core::result::Result<Self, Self::Error> {
+        let r: u8 = value.r();
+        let g: u8 = value.g();
+        let b: u8 = value.b();
+        let a: q::Q<A, B> = value.a();
+        let as_1: q::Q<A, B> = q::as_1();
+        if a != as_1 {
+            return Err(Error::AlphaTruncation)
+        }
+        let ret: Self = Self {
+            mode: RgbMode {
+                r,
+                g,
+                b
+            },
+            m_0: ::core::marker::PhantomData
+        };
+        Ok(ret)
+    }
+}

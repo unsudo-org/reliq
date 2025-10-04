@@ -6,10 +6,10 @@ where
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
-    h: u16,
-    s: q::Q<A, B>,
-    l: q::Q<A, B>,
-    a: q::Q<A, B>
+    pub(super) h: u16,
+    pub(super) s: q::Q<A, B>,
+    pub(super) l: q::Q<A, B>,
+    pub(super) a: q::Q<A, B>
 }
 
 impl<const A: u8, B> Mode for HslaMode<A, B>
@@ -29,22 +29,22 @@ where
     (): q::SupportedInt<B>,
     (): q::Supported<A, B>  {
     #[inline]
-    pub fn h(&self) -> &u16 {
-        &self.mode.h
+    pub fn h(&self) -> u16 {
+        self.mode.h
     }
 
     #[inline]
-    pub fn s(&self) -> &q::Q<A, B> {
-        &self.mode.s
+    pub fn s(&self) -> q::Q<A, B> {
+        self.mode.s
     }
 
     #[inline]
-    pub fn l(&self) -> &q::Q<A, B> {
-        &self.mode.l
+    pub fn l(&self) -> q::Q<A, B> {
+        self.mode.l
     }
 
     #[inline]
-    pub fn a(&self) -> &q::Q<A, B> {
-        &self.mode.a
+    pub fn a(&self) -> q::Q<A, B> {
+        self.mode.a
     }
 }
