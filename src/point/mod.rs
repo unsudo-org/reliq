@@ -10,7 +10,6 @@ pub type Dimensions = usize;
 #[repr(transparent)]
 #[derive(Debug)]
 #[derive(Clone)]
-#[derive(Copy)]
 #[derive(PartialEq)]
 #[derive(Eq)]
 #[derive(::serde::Serialize)]
@@ -58,10 +57,10 @@ where
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<C>,
     (): q::Supported<A, C> {
-    pub fn distance_between(self, rhs: Self) -> Result<q::Q<A, C>> {
+    pub fn distance_between(&mut self, rhs: Self) -> Result<q::Q<A, C>> {
         let mut sum: q::Q<A, C> = q::r#as::<2, _, u16, _, _, _>(0_u16).unwrap();
         let rhs_iter: array::Iter<B, q::Unit<A, C>> = rhs.dimensions.into_iter();
-        for (x_0, x_1) in self.dimensions.into_iter().zip(rhs_iter) {
+        for (x_0, x_1) in self.dimensions.to_owned().into_iter().zip(rhs_iter) {
             let dn: q::Q<A, C> = (x_0 - x_1)?;
             let dn_sq: q::Q<A, C> = (dn * dn)?;
             sum = (sum + dn_sq)?;
@@ -70,13 +69,16 @@ where
         Ok(ret)
     }
 
-    pub fn nearest<E>(self, points: E) -> Result<Option<(q::Q<A, C>, Point<A, B, C>)>> 
+    pub fn nearest<E>(&mut self, points: E) -> Result<Option<(q::Q<A, C>, Point<A, B, C>)>> 
     where
         E: Into<array::Array<B, Point<A, B, C>>> {
         let points: array::Array<B, Point<A, B, C>> = points.into();
         let mut best: Option<(q::Q<A, C>, Point<A, B, C>)> = None;
         for point in points.into_iter() {
-            let distance: q::Q<A, C> = self.distance_between(point)?;
+            let point: Point<A, B, C> = point.to_owned();
+            let distance: q::Q<A, C> = self.distance_between({
+                point.to_owned()
+            })?;
             match &mut best {
                 None => best = Some((distance, point)),
                 Some((best_distance, best_point)) => {

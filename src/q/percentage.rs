@@ -63,6 +63,13 @@ where
         let n: Unit<A, B> = (n * percentage)?;
         Ok(n)
     }
+
+    #[inline]
+    pub fn apply<C>(self, rhs: C) -> Result<Q<A, B>> 
+    where
+        C: Into<Q<A, B>> {
+        
+    }
 }
 
 impl<const A: u8, B> From<Unit<A, B>> for Percentage<A, B> 
@@ -87,7 +94,7 @@ where
     (): Supported<A, B>,
     (): Supported<1, B> {
     type Error = Error;
-
+    
     #[inline]
     fn try_from(value: Factor<A, B>) -> ::core::result::Result<Self, Self::Error> {
         let n: Factor<A, B> = value;
@@ -121,4 +128,9 @@ where
         };
         Ok(n)
     }
+}
+
+
+mod hello_world {
+    
 }

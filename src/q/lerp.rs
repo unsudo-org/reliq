@@ -1,5 +1,5 @@
 use super::*;
-
+// iijdijdj idj di dhd @dev
 impl<const A: u8, B, C> Q<A, B, C>
 where
     B: ops::Int,

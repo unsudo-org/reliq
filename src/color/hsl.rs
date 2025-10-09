@@ -197,22 +197,10 @@ where
     }
 }
 
-impl<const A: u8, B> CommonExt for Hsl<A, B> 
+impl<const A: u8, B> CommonExt<A, B> for Hsl<A, B> 
 where
     B: ops::Int,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
-    (): q::Supported<A, B>,
-    (): q::Supported<1, B> {
-    fn interpolate<C, D>(self, rhs: C, percentage: D) -> Result<Self> 
-    where
-        C: Into<Self>,
-        D: Into<q::Percentage<A, B>> {
-        let rhs: Self = rhs.into();
-        let percentage: q::Percentage<A, B> = percentage.into();
-        let rgb: Rgb<A, B> = self.into();
-        let rgb: Rgb<A, B> = rgb.interpolate(rhs, percentage)?;
-        let ret: Self = rgb.into();
-        Ok(ret)
-    }
-}
+    (): q::Supported<A, B>
+    {}

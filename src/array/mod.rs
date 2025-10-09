@@ -7,27 +7,6 @@ use super::*;
     pub tracker
 );
 
-#[macro_export]
-macro_rules! array {
-    ($($data:expr),* $(,)?) => {{
-        let mut arr = Array::<{count!($($data),*)}, _>::default();
-        $(
-            arr.push($data).expect("Exceeded fixed capacity.");
-        )*
-        arr
-    }};
-}
-
-#[allow(unused_macros)]
-macro_rules! count {
-    () => {
-        0
-    };
-    ($head:expr $(,$tail:expr)*) => {
-        1 + count!($($tail),*)
-    };
-}
-
 pub type Result<T> = ::core::result::Result<T, Error>;
 
 #[repr(u8)]
@@ -48,19 +27,12 @@ pub enum Error {
 }
 
 #[derive(Debug)]
-#[derive(Clone)]
-#[derive(Copy)]
-pub struct Array<const A: usize, B>
-where
-    B: Clone,
-    B: Copy {
+pub struct Array<const A: usize, B> {
     pub(super) buf: [::core::mem::MaybeUninit<B>; A],
     pub(super) len: usize
 }
 
-impl<const A: usize, B> Array<A, B> 
-where
-    B: Copy {
+impl<const A: usize, B> Array<A, B> {
     pub fn build() -> Builder<A, B> {
         Builder::new()
     }
@@ -186,6 +158,8 @@ where
     #[inline]
     pub fn insert_unsorted<C, D>(&mut self, key: C, item: D) -> Option<Result<()>> 
     where
+        B: Clone,
+        B: Copy,
         C: Into<usize>,
         D: Into<B> {
         let key: usize = key.into();
@@ -208,9 +182,11 @@ where
         Some(Ok(()))
     }
 
-    /// Swap the the item with
     #[inline]
-    pub fn remove_unsorted(&mut self, key: usize) -> Option<B> {
+    pub fn remove_unsorted(&mut self, key: usize) -> Option<B> 
+    where
+        B: Clone,
+        B: Copy {
         if key >= self.len {
             return None
         }
@@ -227,6 +203,8 @@ where
     #[inline]
     pub fn insert<C, D>(&mut self, key: C, item: D) -> Option<Result<()>> 
     where
+        B: Clone,
+        B: Copy,
         C: Into<usize>,
         D: Into<B> {
         let key: usize = key.into();
@@ -248,6 +226,8 @@ where
     #[inline]
     pub fn remove<C>(&mut self, key: C) -> Option<B> 
     where
+        B: Clone,
+        B: Copy,
         C: Into<usize> {
         let key: usize = key.into();
         if self.len == 0 || self.len <= key {
@@ -264,9 +244,7 @@ where
     }
 }
 
-impl<const A: usize, B> Default for Array<A, B>
-where
-    B: Copy {
+impl<const A: usize, B> Default for Array<A, B> {
     #[inline]
     fn default() -> Self {
         Self {
@@ -280,7 +258,6 @@ where
 
 impl<const A: usize, B, C> From<[C; A]> for Array<A, B>
 where
-    B: Copy,
     C: Into<B> {
     fn from(value: [C; A]) -> Self {
         let value: [B; A] = value.map(|item| {
@@ -294,7 +271,6 @@ where
 #[cfg(feature = "std")]
 impl<const A: usize, B, C> TryFrom<Vec<C>> for Array<A, B>
 where
-    B: Copy,
     C: Into<B> {
     type Error = Error;
 
@@ -310,12 +286,10 @@ where
 
 impl<const A: usize, B> Eq for Array<A, B>
 where
-    B: Copy,
     B: PartialEq {}
 
 impl<const A: usize, B> PartialEq for Array<A, B>
 where
-    B: Copy,
     B: PartialEq {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
@@ -323,9 +297,23 @@ where
     }
 }
 
-impl<const A: usize, B> FromIterator<B> for Array<A, B>
+impl<const A: usize, B> Clone for Array<A, B> 
 where
-    B: Copy {
+    B: Clone {
+    fn clone(&self) -> Self {
+        let mut new: Array<A, B> = Self::default();
+        for key in 0..self.len {
+            let item = unsafe {
+                self.buf[key].assume_init_ref().to_owned()
+            };
+            new.buf[key].write(item);
+        }
+        new.len = self.len;
+        new
+    }
+}
+
+impl<const A: usize, B> FromIterator<B> for Array<A, B> {
     fn from_iter<T: IntoIterator<Item = B>>(iter: T) -> Self {
         let mut arr: Self = Self::default();
         for item in iter {
@@ -337,9 +325,7 @@ where
     }
 }
 
-impl<const A: usize, B> IntoIterator for Array<A, B>
-where
-    B: Copy {
+impl<const A: usize, B> IntoIterator for Array<A, B> {
     type Item = B;
     type IntoIter = Iter<A, B>;
 
@@ -354,7 +340,6 @@ where
 
 impl<const A: usize, B> ::core::hash::Hash for Array<A, B> 
 where
-    B: Copy,
     B: ::core::hash::Hash {
     fn hash<H: ::core::hash::Hasher>(&self, state: &mut H) {
         for byte in self.as_slice() {
@@ -365,7 +350,6 @@ where
 
 impl<const A: usize, B> ::serde::Serialize for Array<A, B>
 where
-    B: Copy,
     B: ::serde::Serialize {
     fn serialize<S>(&self, serializer: S) -> ::core::result::Result<S::Ok, S::Error>
     where
@@ -462,14 +446,4 @@ fn test_swap_insert_remove_unordered() {
     let val = arr.remove_unsorted(1).unwrap();
     assert!(val == 15 || val == 20);
     assert_eq!(arr.len(), 3);
-}
-
-#[test]
-fn test_iter() {
-    let mut arr: Array<3, u8> = Array::default();
-    arr.push(1).unwrap();
-    arr.push(2).unwrap();
-    arr.push(3).unwrap();
-    let collected: Array<3, u8> = arr.into_iter().collect();
-    assert_eq!(collected, array!(1, 2, 3));
 }

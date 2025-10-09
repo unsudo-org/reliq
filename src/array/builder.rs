@@ -1,19 +1,12 @@
 use super::*;
 
 #[derive(Debug)]
-#[derive(Clone)]
-pub struct Builder<const A: usize, B>
-where
-    B: Clone,
-    B: Copy {
+pub struct Builder<const A: usize, B> {
     content: Array<A, B>,
     outcome: Option<Result<()>>
 }
 
-impl<const A: usize, B> Builder<A, B> 
-where
-    B: Clone,
-    B: Copy {
+impl<const A: usize, B> Builder<A, B> {
     pub(super) fn new() -> Self {
         Self {
             content: Array::default(),

@@ -247,4 +247,3 @@ fn test() {
     let s_ok: Utf8<32> = "Hello World".try_into().unwrap();
     assert_eq!(s, s_ok);
 }
-
