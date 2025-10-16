@@ -2,7 +2,6 @@ use super::*;
 
 ::modwire::expose!(
     pub builder
-    pub handle
     pub iter
     pub tracker
 );

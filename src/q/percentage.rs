@@ -63,13 +63,6 @@ where
         let n: Unit<A, B> = (n * percentage)?;
         Ok(n)
     }
-
-    #[inline]
-    pub fn apply<C>(self, rhs: C) -> Result<Q<A, B>> 
-    where
-        C: Into<Q<A, B>> {
-        
-    }
 }
 
 impl<const A: u8, B> From<Unit<A, B>> for Percentage<A, B> 

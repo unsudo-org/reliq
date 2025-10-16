@@ -111,6 +111,19 @@ where
     }
 }
 
+impl<const A: u8, B> TryFrom<Hsl<A, B>> for Hsla<A, B>
+where
+    B: ops::Int,
+    (): q::SupportedPrecision<A>,
+    (): q::SupportedInt<B>,
+    (): q::Supported<A, B> {
+    type Error = Error;
+
+    fn try_from(value: Hsl<A, B>) -> ::core::result::Result<Self, Self::Error> {
+        
+    }
+}
+
 impl<const A: u8, B> CommonExt<A, B> for Hsla<A, B> 
 where
     B: ops::Int,

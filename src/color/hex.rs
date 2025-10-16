@@ -147,7 +147,61 @@ where
     type Error = Error;
 
     fn try_from(value: Hsla<A, B>) -> ::core::result::Result<Self, Self::Error> {
+        let n: _ = |x: u32| -> Result<q::Q<A, B>> {
+            Ok(q::r#as::<1, _, u32, _, _, u32>(x)?)
+        };      
+        let h: u16 = value.h();
+        let h: B = h.try_into().ok().ok_or(Error::UnsupportedConversion)?;
+        let h: q::Q<A, B> = h.into();
+        let s: q::Q<A, B> = value.s();
+        let l: q::Q<A, B> = value.l();
+        let a: q::Q<A, B> = value.a();
+        if a != 0.into() {
+            return Err(Error::AlphaTruncation)
+        }
+        let (r, g, b) = {
+            let h: q::Q<A, B> = (h % n(360_0)?)?;
+            let h: q::Q<A, B> = (h / n(360_0)?)?;
+            let q: q::Q<A, B> = if l < n(0_5)? {
+                (l * (n(1_0)? + s)?)?
+            } else {
+                let ret: q::Q<A, B> = (l * s)?;
+                let ret: q::Q<A, B> = ((l + s)? - ret)?;
+                ret
+            };
+            let p: q::Q<A, B> = n(2_0)?;
+            let p: q::Q<A, B> = (p * l)?;
+            let p: q::Q<A, B> = (p - q)?;
         
+            let hue_to_rgb = |
+                p: q::Q<A, B>,
+                q: q::Q<A, B>,
+                mut t: q::Q<A, B>
+            | -> Result<q::Q<A, B>> {
+                if t < n(0_0)? {
+                    t = (t + n(1_0)?)?;
+                }
+                if t > n(1_0)? {
+                    t = (t - n(1_0)?)?;
+                }
+                if t < (n(1_0)? / n(6_0)?)? {
+                    return p + (q - p) * 6.0 * t
+                }
+                if t < (n(1_0)? / n(2_0)?)? {
+                    return q
+                }
+                if t < (n(2_0)? / n(3_0)?)? {
+                    return p + (q - p) * (2.0 / 3.0 - t) * 6.0 
+                }
+                Ok(p)
+            };
+            let r: q::Q<A, B> = hue_to_rgb(p, q, (h + (n(1_0)? / n(3_0)?)?)?)?;
+            let r: u32 = r.try_into().ok().ok_or(Error::UnsupportedConversion)?;
+            let g: q::Q<A, B> = hue_to_rgb(p, q, h)?;
+            let b: q::Q<A, B> = hue_to_rgb(p, q, (h - (n(1_0)? / n(3_0)?)?)?)?;
+            
+        };
+        Ok(())
     }
 }
 

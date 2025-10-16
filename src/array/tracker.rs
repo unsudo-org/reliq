@@ -2,12 +2,30 @@ use super::*;
 
 static mut NEXT_HANDLE: usize = 0;
 
-/// ```rs
-/// fn hello_world(counts: Tray<u128>) {
-///     
-/// }
-/// ```
-pub type Tray<const A: u8, B> = Array<A, Tracker<B>>;
+#[repr(transparent)]
+#[derive(Debug)]
+#[derive(Clone)]
+#[derive(Copy)]
+#[derive(PartialEq)]
+#[derive(Eq)]
+pub struct Handle(usize);
+
+impl<T> From<T> for Handle 
+where
+    T: Into<usize> {
+    fn from(value: T) -> Self {
+        let value: usize = value.into();
+        Self(value)
+    }
+}
+
+impl ::core::ops::Deref for Handle {
+    type Target = usize;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
 /// A wrapper to attach a `Handle` on. 
 /// Enables the `Array` to track specific `T`s and remove them regardless of order.
@@ -43,7 +61,14 @@ impl<T> ::core::ops::DerefMut for Tracker<T> {
     }
 }
 
-impl<const A: usize, B> Array<A, Tracker<B>> 
+/// ```rs
+/// fn hello_world(counts: Tray<u128>) {
+///     
+/// }
+/// ```
+pub type Tray<const A: u8, B> = Array<A, Tracker<B>>;
+
+impl<const A: usize, B> Tray<A, B> 
 where
     B: Copy {
     pub fn get_handle<C>(&self, handle: C) -> Option<&Tracker<B>> 
@@ -87,7 +112,7 @@ where
     pub fn push_tracked<C>(&mut self, item: C) -> Result<Handle>
     where
         C: Into<B> {
-        let key = unsafe {
+        let key: usize = unsafe {
             NEXT_HANDLE += 1;
             NEXT_HANDLE
         };
@@ -109,4 +134,8 @@ where
         }
         None
     }
+}
+
+impl<const A: usize, B> Tray<A, B> {
+    
 }

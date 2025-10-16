@@ -1,25 +1,27 @@
-package.name = "reliq"
-package.description = "A portable library of primitive-like constructs."
-package.version = "1.0.0"
-package.edition = "2024"
-package.license = "Apache-2.0"
-package.readme = "readme.md"
-package.publish = true
-package.keywords = ["arithmetic", "math", "portable"]
-dependencies.modwire.version = ">=0.1.0,<1.0.0"
-dependencies.paste.version = ">=1.0.15,<2.0.0"
-dependencies.serde.version = ">=1.0.219,<2.0.0"
-dependencies.serde.features = ["derive"]
-dependencies.thiserror.version = ">=2.0.16,<3.0.0"
-dependencies.strum.version = ">=0.27.2,<1.0.0"
-dependencies.strum.default-features = false
-dependencies.strum_macros.version = ">=0.27.2,<1.0.0"
-dependencies.fastrand.version = "*"
-dependencies.fastrand.optional = true
-dev-dependencies.criterion.version = ">=0.7.0,<1.0.0"
-dev-dependencies.rstest.version = ">=0.26.1,<1.0.0"
-features.default = ["std"]
-features.std = ["dep:fastrand"]
+[package]
+name = "reliq"
+description = "A portable library of primitive-like constructs."
+edition = "2024"
+license = "Apache-2.0"
+publish = true
+keywords = ["arithmetic", "math", "portable"]
+version = "0.1.0"
+
+[dependencies]
+modwire = { version = ">=0.1.0,<1.0.0" }
+paste = { version = ">=1.0.0,<2.0.0" }
+serde = { version = ">=1.0.0,<2.0.0", features = ["derive"] }
+thiserror = { version = ">=2.0.0,<3.0.0" }
+strum = { version = ">=0.1.0,<1.0.0", default-features = false }
+strum_macros = { version = ">=0.1.0,<1.0.0" }
+
+[dev-dependencies]
+criterion = { version = ">=0.1.0,<1.0.0" }
+rstest = { version = ">=0.1.0,<1.0.0" }
+
+[features]
+default = ["std"]
+std = []
 
 [[bench]]
 name = "q"
