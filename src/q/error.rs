@@ -10,24 +10,28 @@ pub type Result<T> = ::core::result::Result<T, Error>;
 #[derive(PartialOrd)]
 #[derive(Ord)]
 #[derive(Hash)]
-#[derive(::strum_macros::EnumCount)]
-#[derive(::strum_macros::EnumIs)]
 #[derive(::thiserror::Error)]
 #[derive(::serde::Serialize)]
 #[derive(::serde::Deserialize)]
 pub enum Error {
-    #[error("{0}")]
-    OpsError(#[from] ops::Error),
-    #[error("Overflow.")]
+    #[error(transparent)]
+    Ops(#[from] ops::Error),
+
+    #[error("overflow")]
     Overflow,
-    #[error("Underflow.")]
+    
+    #[error("underflow")]
     Underflow,
-    #[error("Division by zero.")]
+
+    #[error("division by zero")]
     DivisionByZero,
-    #[error("Modulo by zero.")]
+
+    #[error("modulo by zero")]
     ModuloByZero,
-    #[error("Unsupported conversion.")]
+
+    #[error("unsupported conversion")]
     UnsupportedConversion,
-    #[error("")]
+
+    #[error("out of bounds")]
     OutOfBounds
 }

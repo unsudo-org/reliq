@@ -21,7 +21,9 @@ where
     }
 }
 
-impl<const A: u8, B> From<Rgba<A, B>> for Hex<A, B>
+pub type LossyHex<const A: u8, B> = lossy::Lossy<Hex<A, B>>;
+
+impl<const A: u8, B> From<lossy::Lossy<Rgba<A, B>>> for LossyHex<A, B>
 where
     B: ops::Int,
     (): q::SupportedPrecision<A>,
@@ -34,12 +36,14 @@ where
         let g: u8 = rgba.g();
         let b: u8 = rgba.b();
         let code: u32 = ((r as u32) << 16) | ((g as u32) << 8) | (b as u32);
-        Self {
+        let ret: Hex<A, B> = Color {
             mode: HexMode {
                 code
             },
             m_0: ::core::marker::PhantomData
-        }
+        };
+        let ret: lossy::Lossy<Color<A, B>> = lossy::Lossy::Trunc(ret);
+        ret
     }
 }
 
@@ -232,7 +236,7 @@ where
     }
 }
 
-impl<const A: u8, B> CommonExt<A, B> for Hex<A, B>
+impl<const A: u8, B> CommonAlphaExt<A, B> for Hex<A, B>
 where
     B: ops::Int,
     (): q::SupportedPrecision<A>,

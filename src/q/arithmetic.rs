@@ -7,7 +7,6 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    #[inline]
     fn abs(self) -> Self {
         let n: B = self.n;
         if n < B::AS_0 {
@@ -329,6 +328,82 @@ where
                 m_0: ::core::marker::PhantomData
             }
         })
+    }
+}
+
+impl<const A: u8, B, C> ops::OverflowingAdd for Q<A, B, C> 
+where
+    B: ops::Int,
+    C: Mode,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    fn overflowing_add(self, rhs: Self) -> (Self, bool) {
+        let lhs: B = self.n;
+        let rhs: Self = rhs.into();
+        let rhs: B = rhs.n;
+        let (n, success) = lhs.overflowing_add(rhs);
+        let ret: Self = n.into();
+        let ret: (Self, bool) = (ret, success);
+        ret
+    }
+}
+
+impl<const A: u8, B, C> ops::OverflowingSub for Q<A, B, C> 
+where
+    B: ops::Int,
+    C: Mode,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    fn overflowing_sub(self, rhs: Self) -> (Self, bool) {
+        let lhs: B = self.n;
+        let rhs: Self = rhs.into();
+        let rhs: B = rhs.n;
+        let (n, success) = lhs.overflowing_sub(rhs);
+        let ret: Self = n.into();
+        let ret: (Self, bool) = (ret, success);
+        ret
+    }
+}
+
+impl<const A: u8, B, C> ops::OverflowingMul for Q<A, B, C> 
+where
+    B: ops::Int,
+    C: Mode,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    fn overflowing_mul(self, rhs: Self) -> (Self, bool) {
+        let lhs: Self = self;
+        let rhs: Self = rhs.into();
+        if let Ok(n) = lhs * rhs {
+            (n, true)
+        } else {
+            let ret: B = B::AS_0.into();
+            let ret: Self = ret.into();
+            (ret, false)
+        }
+    }
+}
+
+impl<const A: u8, B, C> ops::OverflowingDiv for Q<A, B, C> 
+where
+    B: ops::Int,
+    C: Mode,
+    (): SupportedPrecision<A>,
+    (): SupportedInt<B>,
+    (): Supported<A, B> {
+    fn overflowing_div(self, rhs: Self) -> (Self, bool) {
+        let lhs: Self = self;
+        let rhs: Self = rhs.into();
+        if let Ok(n) = lhs / rhs {
+            (n, true)
+        } else {
+            let ret: B = B::AS_0.into();
+            let ret: Self = ret.into();
+            (ret, false)
+        }
     }
 }
 

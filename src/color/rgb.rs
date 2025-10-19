@@ -10,8 +10,7 @@ pub struct RgbMode {
 
 impl Mode for RgbMode {}
 
-
-pub type Rgb<const A: u8 = 1, B = usize> = Color<A, B, RgbMode>;
+pub type Rgb<const A: u8, B> = Color<A, B, RgbMode>;
 
 impl<const A: u8, B> Rgb<A, B>
 where
@@ -92,17 +91,16 @@ where
     }
 }
 
-impl<const A: u8, B> TryFrom<Rgba<A, B>> for Rgb<A, B>
+pub type LossyRgb<const A: u8, B> = lossy::Lossy<Rgb<A, B>>;
+
+impl<const A: u8, B> From<Rgba<A, B>> for LossyRgb<A, B>
 where
     B: ops::Int,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B>,
     (): q::Supported<1, B> {
-    type Error = Error;
-
-    #[inline]
-    fn try_from(value: Rgba<A, B>) -> ::core::result::Result<Self, Self::Error> {
+    fn from(value: Rgba<A, B>) -> Self {
         let r: u8 = value.r();
         let g: u8 = value.g();
         let b: u8 = value.b();
@@ -123,7 +121,7 @@ where
     }
 }
 
-impl<const A: u8, B> CommonExt<A, B> for Rgb<A, B>
+impl<const A: u8, B> CommonAlphaExt<A, B> for Rgb<A, B>
 where
     B: ops::Int,
     (): q::SupportedPrecision<A>,

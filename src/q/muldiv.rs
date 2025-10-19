@@ -1,7 +1,10 @@
 use super::*;
 
-#[inline]
-pub(super) fn muldiv<T>(x: T, y: T, z: T) -> Result<T> 
+pub(super) fn muldiv<T>(
+    x: T, 
+    y: T, 
+    z: T
+) -> Result<T> 
 where 
     T: ops::Int,
     (): SupportedInt<T> {
@@ -34,7 +37,6 @@ where
     }
 }
 
-#[inline]
 fn wide_mul<T>(x: T, y: T) -> Result<(T, T)>
 where 
     T: ops::Int,
@@ -46,7 +48,6 @@ where
     }
 }
 
-#[inline]
 fn signed_wide_mul<T>(x: T, y: T) -> Result<(T, T)> 
 where 
     T: ops::Int,
@@ -84,7 +85,6 @@ where
     Ok((lo, hi))
 }
 
-#[inline]
 fn unsigned_wide_mul<T>(x: T, y: T) -> Result<(T, T)> 
 where 
     T: ops::Int,
@@ -140,8 +140,11 @@ where
     Ok((a, b))
 }
 
-#[inline]
-fn fold<T>(x: T, y: T, z: T) -> Result<T> 
+fn fold<T>(
+    x: T, 
+    y: T, 
+    z: T
+) -> Result<T> 
 where 
     T: ops::Int,
     (): SupportedInt<T> {
@@ -152,8 +155,11 @@ where
     }
 }
 
-#[inline]
-fn signed_fold<T>(x: T, y: T, z: T) -> Result<T> 
+fn signed_fold<T>(
+    x: T, 
+    y: T, 
+    z: T
+) -> Result<T> 
 where 
     T: ops::Int,
     (): SupportedInt<T> {
@@ -177,8 +183,11 @@ where
     Ok(n)
 }
 
-#[inline]
-fn unsigned_fold<T>(x: T, y: T, z: T) -> Result<T> 
+fn unsigned_fold<T>(
+    x: T, 
+    y: T, 
+    z: T
+) -> Result<T> 
 where 
     T: ops::Int,
     (): SupportedInt<T> {

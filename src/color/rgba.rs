@@ -49,32 +49,6 @@ where
     }
 }
 
-impl<const A: u8, B> From<Rgb<A, B>> for Rgba<A, B>
-where
-    B: ops::Int,
-    (): q::SupportedPrecision<A>,
-    (): q::SupportedInt<B>,
-    (): q::Supported<A, B>,
-    (): q::Supported<1, B> {
-    #[inline]
-    fn from(value: Rgb<A, B>) -> Self {
-        let rgb: Rgb<A, B> = value;
-        let r: u8 = rgb.r();
-        let g: u8 = rgb.g();
-        let b: u8 = rgb.b();
-        let a: q::Q<A, B> = B::AS_1.into();
-        Self {
-            mode: RgbaMode {
-                r,
-                g,
-                b,
-                a
-            },
-            m_0: ::core::marker::PhantomData
-        }
-    }
-}
-
 impl<const A: u8, B, C> From<(u8, u8, u8, C)> for Rgba<A, B>
 where
     B: ops::Int,
@@ -140,7 +114,46 @@ where
     }
 }
 
-impl<const A: u8, B> CommonExt<A, B> for Rgba<A, B>
+impl<const A: u8, B> From<Hex<A, B>> for Rgba<A, B>
+where
+    B: ops::Int,
+    (): q::SupportedPrecision<A>,
+    (): q::SupportedInt<B>,
+    (): q::Supported<A, B>,
+    (): q::Supported<1, B> {
+    #[inline]
+    fn from(value: Hex<A, B>) -> Self {
+        
+    }
+}
+
+impl<const A: u8, B> From<Rgb<A, B>> for Rgba<A, B>
+where
+    B: ops::Int,
+    (): q::SupportedPrecision<A>,
+    (): q::SupportedInt<B>,
+    (): q::Supported<A, B>,
+    (): q::Supported<1, B> {
+    #[inline]
+    fn from(value: Rgb<A, B>) -> Self {
+        let rgb: Rgb<A, B> = value;
+        let r: u8 = rgb.r();
+        let g: u8 = rgb.g();
+        let b: u8 = rgb.b();
+        let a: q::Q<A, B> = B::AS_1.into();
+        Self {
+            mode: RgbaMode {
+                r,
+                g,
+                b,
+                a
+            },
+            m_0: ::core::marker::PhantomData
+        }
+    }
+}
+
+impl<const A: u8, B> CommonAlphaExt<A, B> for Rgba<A, B>
 where
     B: ops::Int,
     (): q::SupportedPrecision<A>,

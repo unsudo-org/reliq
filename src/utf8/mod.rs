@@ -10,17 +10,17 @@ pub type Result<T> = ::core::result::Result<T, Error>;
 #[derive(PartialOrd)]
 #[derive(Ord)]
 #[derive(Hash)]
-#[derive(::strum_macros::EnumCount)]
-#[derive(::strum_macros::EnumIs)]
 #[derive(::thiserror::Error)]
 #[derive(::serde::Serialize)]
 #[derive(::serde::Deserialize)]
 pub enum Error {
-    #[error("Overflow.")]
+    #[error("overflow")]
     Overflow,
-    #[error("Invalid sequence.")]
+
+    #[error("invalid sequence")]
     InvalidSequence,
-    #[error("Empty.")]
+
+    #[error("empty")]
     Empty
 }
 

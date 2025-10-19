@@ -39,7 +39,14 @@ r#as!(
 );
 
 #[inline]
-pub fn r#as<const A: u8, const B: u8, C, D, E, F>(n: F) -> Result<Q<B, D, E>> 
+pub fn r#as<
+    const A: u8, 
+    const B: u8, 
+    C, 
+    D, 
+    E, 
+    F
+>(n: F) -> Result<Q<B, D, E>> 
 where
     C: ops::Int,
     D: ops::Int,

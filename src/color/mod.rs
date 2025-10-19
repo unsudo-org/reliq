@@ -9,14 +9,28 @@ use super::*;
     pub rgba
 );
 
-#[allow(clippy::inconsistent_digit_grouping)]
-pub trait CommonExt<const A: u8, B> 
+pub trait CommonExt<const A: u8, B>
 where
     Self: Sized,
     Self: Clone,
     Self: Copy,
-    Self: TryFrom<Hsla<A, B>, Error = Error>,
-    Self: TryInto<Hsla<A, B>, Error = Error>,
+    Self: Into<Hsl<A, B>>,
+    Self: From<Hsl<A, B>>,
+    B: ops::Int,
+    (): q::SupportedPrecision<A>,
+    (): q::SupportedInt<B>,
+    (): q::Supported<A, B> {
+    
+}
+
+#[allow(clippy::inconsistent_digit_grouping)]
+pub trait CommonAlphaExt<const A: u8, B> 
+where
+    Self: Sized,
+    Self: Clone,
+    Self: Copy,
+    Self: Into<Hsla<A, B>>,
+    Self: From<Hsla<A, B>>,
     B: ops::Int,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
@@ -27,7 +41,7 @@ where
         let n: _ = |x: u32| -> Result<q::Q<A, B>> {
             Ok(q::r#as::<1, _, u32, _, _, u32>(x)?)
         };      
-        let hsla: Hsla<A, B> = self.try_into()?;
+        let hsla: Hsla<A, B> = self.into();
         let h: u16 = hsla.h();
         let h: B = h.try_into().ok().ok_or(Error::UnsupportedConversion)?;
         let h: q::Q<A, B> = h.into();
@@ -38,7 +52,7 @@ where
         let l: q::Q<A, B> = hsla.l();
         let a: q::Q<A, B> = hsla.a();
         let ret: Hsla<A, B> = Hsla::new(h, s, l, a);
-        let ret: Self = ret.try_into()?;
+        let ret: Self = ret.into();
         Ok(ret)
     }
     
@@ -48,7 +62,7 @@ where
         let n: _ = |x: u32| -> Result<q::Q<A, B>> {
             Ok(q::r#as::<1, _, u32, _, _, u32>(x)?)
         };
-        let hsla: Hsla<A, B> = self.try_into()?;
+        let hsla: Hsla<A, B> = self.into();
         let h: u16 = hsla.h();
         let h: B = h.try_into().ok().ok_or(Error::UnsupportedConversion)?;
         let h: q::Q<A, B> = h.into();
@@ -65,9 +79,9 @@ where
         let l: q::Q<A, B> = hsla.l();
         let a: q::Q<A, B> = hsla.a();
         let ret: [Self; 3] = [
-            Hsla::new(h_0, s, l, a).try_into()?,
-            Hsla::new(h_1, s, l, a).try_into()?,
-            Hsla::new(h_2, s, l, a).try_into()?
+            Hsla::new(h_0, s, l, a).into(),
+            Hsla::new(h_1, s, l, a).into(),
+            Hsla::new(h_2, s, l, a).into()
         ];
         Ok(ret)
     }
