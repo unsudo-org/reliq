@@ -9,39 +9,24 @@ use super::*;
     pub rgba
 );
 
-pub trait CommonExt<const A: u8, B>
-where
-    Self: Sized,
-    Self: Clone,
-    Self: Copy,
-    Self: Into<Hsl<A, B>>,
-    Self: From<Hsl<A, B>>,
-    B: ops::Int,
-    (): q::SupportedPrecision<A>,
-    (): q::SupportedInt<B>,
-    (): q::Supported<A, B> {
-    
-}
-
 #[allow(clippy::inconsistent_digit_grouping)]
-pub trait CommonAlphaExt<const A: u8, B> 
+pub trait CommonExt<const A: u8, B> 
 where
     Self: Sized,
     Self: Clone,
     Self: Copy,
-    Self: Into<Hsla<A, B>>,
-    Self: From<Hsla<A, B>>,
+    Self: TryFrom<Hsla<A, B>>,
+    Self: TryInto<Hsla<A, B>>,
     B: ops::Int,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
-    #[inline]
     fn complement(self) -> Result<Self> {
         use ops::ToPrim as _;
         let n: _ = |x: u32| -> Result<q::Q<A, B>> {
             Ok(q::r#as::<1, _, u32, _, _, u32>(x)?)
         };      
-        let hsla: Hsla<A, B> = self.into();
+        let hsla: Hsla<A, B> = self.try_into().ok().ok_or(Error::UnsupportedConversion)?;
         let h: u16 = hsla.h();
         let h: B = h.try_into().ok().ok_or(Error::UnsupportedConversion)?;
         let h: q::Q<A, B> = h.into();
@@ -52,17 +37,16 @@ where
         let l: q::Q<A, B> = hsla.l();
         let a: q::Q<A, B> = hsla.a();
         let ret: Hsla<A, B> = Hsla::new(h, s, l, a);
-        let ret: Self = ret.into();
+        let ret: Self = ret.try_into().ok().ok_or(Error::UnsupportedConversion)?;
         Ok(ret)
     }
-    
-    #[inline]
+
     fn triadic(self) -> Result<[Self; 3]> {
         use ops::ToPrim as _;
         let n: _ = |x: u32| -> Result<q::Q<A, B>> {
             Ok(q::r#as::<1, _, u32, _, _, u32>(x)?)
         };
-        let hsla: Hsla<A, B> = self.into();
+        let hsla: Hsla<A, B> = self.try_into().ok().ok_or(Error::UnsupportedConversion)?;
         let h: u16 = hsla.h();
         let h: B = h.try_into().ok().ok_or(Error::UnsupportedConversion)?;
         let h: q::Q<A, B> = h.into();
@@ -79,9 +63,9 @@ where
         let l: q::Q<A, B> = hsla.l();
         let a: q::Q<A, B> = hsla.a();
         let ret: [Self; 3] = [
-            Hsla::new(h_0, s, l, a).into(),
-            Hsla::new(h_1, s, l, a).into(),
-            Hsla::new(h_2, s, l, a).into()
+            Hsla::new(h_0, s, l, a).try_into().ok().ok_or(Error::UnsupportedConversion)?,
+            Hsla::new(h_1, s, l, a).try_into().ok().ok_or(Error::UnsupportedConversion)?,
+            Hsla::new(h_2, s, l, a).try_into().ok().ok_or(Error::UnsupportedConversion)?
         ];
         Ok(ret)
     }
@@ -92,7 +76,7 @@ where
         let n: _ = |x: u32| -> Result<q::Q<A, B>> {
             Ok(q::r#as::<1, _, u32, _, _, u32>(x)?)
         };
-        let hsla: Hsla<A, B> = self.try_into()?;
+        let hsla: Hsla<A, B> = self.try_into().ok().ok_or(Error::UnsupportedConversion)?;
         let h: u16 = hsla.h();
         let h: B = h.try_into().ok().ok_or(Error::UnsupportedConversion)?;
         let h: q::Q<A, B> = h.into();
@@ -107,7 +91,7 @@ where
             let h: q::Q<A, B> = (h % n(360_0)?)?;
             let h: u16 = h.to_u16()?;
             let ret: Hsla<A, B> = Hsla::new(h, s, l, a);
-            let ret: Self = ret.try_into()?;
+            let ret: Self = ret.try_into().ok().ok_or(Error::UnsupportedConversion)?;
             Ok(ret)
         };
         let ret: [Self; 4] = [
@@ -125,7 +109,7 @@ where
         let n: _ = |x: u32| -> Result<q::Q<A, B>> {
             Ok(q::r#as::<1, _, u32, _, _, u32>(x)?)
         };
-        let hsla: Hsla<A, B> = self.try_into()?;
+        let hsla: Hsla<A, B> = self.try_into().ok().ok_or(Error::UnsupportedConversion)?;
         let h: u16 = hsla.h();
         let h: B = h.try_into().ok().ok_or(Error::UnsupportedConversion)?;
         let h: q::Q<A, B> = h.into();
@@ -138,7 +122,7 @@ where
             let h: q::Q<A, B> = (h % n(3600)?)?;
             let h: u16 = h.to_u16()?;
             let ret: Hsla<A, B> = Hsla::new(h, s, l, a);
-            let ret: Self = ret.try_into()?;
+            let ret: Self = ret.try_into().ok().ok_or(Error::UnsupportedConversion)?;
             Ok(ret)
         };
         let ret: [Self; 12] = [
@@ -158,7 +142,6 @@ where
         Ok(ret)
     }
 
-    #[inline]
     fn monochromatic<const C: usize>(self) -> Result<array::Array<C, Self>> {
         if C == 0 {
             let ret: array::Array<C, Self> = array::Array::build().finish().unwrap();
@@ -167,7 +150,7 @@ where
         let n: _ = |x: u32| -> Result<q::Q<A, B>> {
             Ok(q::r#as::<1, _, u32, _, _, u32>(x)?)
         };
-        let hsla: Hsla<A, B> = self.try_into()?;
+        let hsla: Hsla<A, B> = self.try_into().ok().ok_or(Error::UnsupportedConversion)?;
         let h: u16 = hsla.h();
         let s: q::Q<A, B> = hsla.s();
         let a: q::Q<A, B> = hsla.a();
@@ -189,20 +172,19 @@ where
             let ratio: q::Q<A, B> = (key / steps)?;
             let l: q::Q<A, B> = (range * ratio)?;
             let l: q::Q<A, B> = (l_start + l)?;
-            let color: Self = Hsla::new(h, s, l, a).try_into()?;
+            let color: Self = Hsla::new(h, s, l, a).try_into().ok().ok_or(Error::UnsupportedConversion)?;
             ret.push(color).unwrap();
         }
         Ok(ret)
     }
 
-    #[inline]
     fn saturate<C>(self, pct: C) -> Result<Self>
     where
         C: Into<q::Percentage<A, B>> {
         let n: _ = |x: u32| -> Result<q::Q<A, B>> {
             Ok(q::r#as::<1, _, u32, _, _, u32>(x)?)
         };
-        let hsla: Hsla<A, B> = self.try_into()?;
+        let hsla: Hsla<A, B> = self.try_into().ok().ok_or(Error::UnsupportedConversion)?;
         let pct: q::Percentage<A, B> = pct.into();
         let pct: q::Q<A, B> = pct.into();
         let h: u16 = hsla.h();
@@ -215,18 +197,17 @@ where
         };
         let l: q::Q<A, B> = hsla.l();
         let a: q::Q<A, B> = hsla.a();
-        let ret: Self = Hsla::new(h, s, l, a).try_into()?;
+        let ret: Self = Hsla::new(h, s, l, a).try_into().ok().ok_or(Error::UnsupportedConversion)?;
         Ok(ret)
     }
 
-    #[inline]
     fn desaturate<C>(self, pct: C) -> Result<Self>
     where
         C: Into<q::Percentage<A, B>> {
         let n: _ = |x: u32| -> Result<q::Q<A, B>> {
             Ok(q::r#as::<1, _, u32, _, _, u32>(x)?)
         };
-        let hsla: Hsla<A, B> = self.try_into()?;
+        let hsla: Hsla<A, B> = self.try_into().ok().ok_or(Error::UnsupportedConversion)?;
         let pct: q::Percentage<A, B> = pct.into();
         let pct: q::Q<A, B> = pct.into();
         let h: u16 = hsla.h();
@@ -239,18 +220,17 @@ where
         };
         let l: q::Q<A, B> = hsla.l();
         let a: q::Q<A, B> = hsla.a();
-        let ret: Self = Hsla::new(h, s, l, a).try_into()?;
+        let ret: Self = Hsla::new(h, s, l, a).try_into().ok().ok_or(Error::UnsupportedConversion)?;
         Ok(ret)
     }
 
-    #[inline]
     fn lighten<C>(self, pct: C) -> Result<Self>
     where
         C: Into<q::Percentage<A, B>> {
         let n: _ = |x: u32| -> Result<q::Q<A, B>> {
             Ok(q::r#as::<1, _, u32, _, _, u32>(x)?)
         };
-        let hsla: Hsla<A, B> = self.try_into()?;
+        let hsla: Hsla<A, B> = self.try_into().ok().ok_or(Error::UnsupportedConversion)?;
         let pct: q::Percentage<A, B> = pct.into();
         let pct: q::Q<A, B> = pct.into();
         let h: u16 = hsla.h();
@@ -264,18 +244,17 @@ where
         };
         let a: q::Q<A, B> = hsla.a();
         let ret: Hsla<A, B> = Hsla::new(h, s, l, a);
-        let ret: Self = ret.try_into()?;
+        let ret: Self = ret.try_into().ok().ok_or(Error::UnsupportedConversion)?;
         Ok(ret)
     }
 
-    #[inline]
     fn darken<C>(self, pct: C) -> Result<Self>
     where
         C: Into<q::Percentage<A, B>> {
         let n: _ = |x: u32| -> Result<q::Q<A, B>> {
             Ok(q::r#as::<1, _, u32, _, _, u32>(x)?)
         };
-        let hsla: Hsla<A, B> = self.try_into()?;
+        let hsla: Hsla<A, B> = self.try_into().ok().ok_or(Error::UnsupportedConversion)?;
         let pct: q::Percentage<A, B> = pct.into();
         let pct: q::Q<A, B> = pct.into();
         let h: u16 = hsla.h();
@@ -289,11 +268,10 @@ where
         };
         let a: q::Q<A, B> = hsla.a();
         let ret: Hsla<A, B> = Hsla::new(h, s, l, a);
-        let ret: Self = ret.try_into()?;
+        let ret: Self = ret.try_into().ok().ok_or(Error::UnsupportedConversion)?;
         Ok(ret)
     }
 
-    #[inline]
     fn interpolate<C, D>(self, rhs: C, pct: D) -> Result<Self>
     where
         C: Into<Self>,
@@ -302,9 +280,9 @@ where
         let n: _ = |x: u32| -> Result<q::Q<A, B>> {
             Ok(q::r#as::<1, _, u32, _, _, u32>(x)?)
         };
-        let lhs: Hsla<A, B> = self.try_into()?;
+        let lhs: Hsla<A, B> = self.try_into().ok().ok_or(Error::UnsupportedConversion)?;
         let rhs: Self = rhs.into();
-        let rhs: Hsla<A, B> = rhs.try_into()?;
+        let rhs: Hsla<A, B> = rhs.try_into().ok().ok_or(Error::UnsupportedConversion)?;
         let pct: q::Percentage<A, B> = pct.into();
         let pct: q::Q<A, B> = pct.into();
         let h_rhs: u16 = rhs.h();
@@ -354,7 +332,7 @@ where
         let a_lhs: q::Q<A, B> = lhs.a();
         let a: q::Q<A, B> = lerp(a_lhs, a_rhs)?;
         let ret: Hsla<A, B> = Hsla::new(h, s, l, a);
-        let ret: Self = ret.try_into()?;
+        let ret: Self = ret.try_into().ok().ok_or(Error::UnsupportedConversion)?;
         Ok(ret)
     }
 }

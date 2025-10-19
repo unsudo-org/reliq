@@ -153,7 +153,7 @@ where
     }
 }
 
-impl<const A: u8, B> CommonAlphaExt<A, B> for Rgba<A, B>
+impl<const A: u8, B> CommonExt<A, B> for Rgba<A, B>
 where
     B: ops::Int,
     (): q::SupportedPrecision<A>,
