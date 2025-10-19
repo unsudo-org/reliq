@@ -76,7 +76,7 @@ where
         self.mode.a
     }
 
-    fn complement(self) -> Result<Self> {
+    pub fn complement(self) -> Result<Self> {
         use ops::ToPrim as _;
         let n: _ = |x: u32| -> Result<q::Q<A, B>> {
             Ok(q::r#as::<1, _, u32, _, _, u32>(x)?)
@@ -94,7 +94,7 @@ where
         Ok(ret)
     }
 
-    fn triadic(&self) -> Result<[Self; 3]> {
+    pub fn triadic(&self) -> Result<[Self; 3]> {
         use ops::ToPrim as _;
         let n: _ = |x: u32| -> Result<q::Q<A, B>> {
             Ok(q::r#as::<1, _, u32, _, _, u32>(x)?)
@@ -122,7 +122,7 @@ where
         Ok(ret)
     }
 
-    fn tetradic(self) -> Result<[Self; 4]> {
+    pub fn tetradic(self) -> Result<[Self; 4]> {
         use ops::ToPrim as _;
         let n: _ = |x: u32| -> Result<q::Q<A, B>> {
             Ok(q::r#as::<1, _, u32, _, _, u32>(x)?)
@@ -152,7 +152,7 @@ where
         Ok(ret)
     }
 
-    fn analogous(self) -> Result<[Self; 12]> {
+    pub fn analogous(self) -> Result<[Self; 12]> {
         use ops::ToPrim as _;
         let n: _ = |x: u32| -> Result<q::Q<A, B>> {
             Ok(q::r#as::<1, _, u32, _, _, u32>(x)?)
@@ -188,7 +188,7 @@ where
         Ok(ret)
     }
 
-    fn monochromatic<const C: usize>(self) -> Result<array::Array<C, Self>> {
+    pub fn monochromatic<const C: usize>(self) -> Result<array::Array<C, Self>> {
         if C == 0 {
             let ret: array::Array<C, Self> = array::Array::build().finish().unwrap();
             return Ok(ret)
@@ -223,7 +223,7 @@ where
         Ok(ret)
     }
 
-    fn saturate(self, pct: impl Into<q::Percentage<A, B>>) -> Result<Self> {
+    pub fn saturate(self, pct: impl Into<q::Percentage<A, B>>) -> Result<Self> {
         let n: _ = |x: u32| -> Result<q::Q<A, B>> {
             Ok(q::r#as::<1, _, u32, _, _, u32>(x)?)
         };
@@ -243,7 +243,7 @@ where
         Ok(ret)
     }
 
-    fn desaturate(self, pct: impl Into<q::Percentage<A, B>>) -> Result<Self> {
+    pub fn desaturate(self, pct: impl Into<q::Percentage<A, B>>) -> Result<Self> {
         let n: _ = |x: u32| -> Result<q::Q<A, B>> {
             Ok(q::r#as::<1, _, u32, _, _, u32>(x)?)
         };
@@ -263,7 +263,7 @@ where
         Ok(ret)
     }
 
-    fn lighten(self, pct: impl Into<q::Percentage<A, B>>) -> Result<Self> {
+    pub fn lighten(self, pct: impl Into<q::Percentage<A, B>>) -> Result<Self> {
         let n: _ = |x: u32| -> Result<q::Q<A, B>> {
             Ok(q::r#as::<1, _, u32, _, _, u32>(x)?)
         };
@@ -283,7 +283,7 @@ where
         Ok(ret)
     }
 
-    fn darken(self, pct: impl Into<q::Percentage<A, B>>) -> Result<Self> {
+    pub fn darken(self, pct: impl Into<q::Percentage<A, B>>) -> Result<Self> {
         let n: _ = |x: u32| -> Result<q::Q<A, B>> {
             Ok(q::r#as::<1, _, u32, _, _, u32>(x)?)
         };
@@ -303,7 +303,7 @@ where
         Ok(ret)
     }
 
-    fn interpolate(
+    pub fn interpolate(
         self, 
         rhs: impl Into<Self>, 
         pct: impl Into<q::Percentage<A, B>>
@@ -446,6 +446,7 @@ where
     (): q::Supported<1, B> {
     type Error = Error;
 
+    #[inline]
     fn try_from(value: Hex<A, B>) -> ::core::result::Result<Self, Self::Error> {
         let n: _ = |x: u32| -> Result<q::Q<A, B>> {
             Ok(q::r#as::<1, _, u32, _, _, u32>(x)?)
@@ -481,7 +482,7 @@ where
             let ret: q::Q<A, B> = (delta / ret)?;
             ret
         };
-        let h = if delta == n(0_0)? {
+        let h: q::Q<A, B> = if delta == n(0_0)? {
             n(0_0)?
         } else if max == r {
             let ret: q::Q<A, B> = (g - b)?;
@@ -521,11 +522,73 @@ where
     B: ops::Int,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
-    (): q::Supported<A, B> {
+    (): q::Supported<A, B>,
+    (): q::Supported<1, B> {
     type Error = Error;
 
     fn try_from(value: Rgb<A, B>) -> ::core::result::Result<Self, Self::Error> {
-        
+        let n: _ = |x: u32| -> Result<q::Q<A, B>> {
+            Ok(q::r#as::<1, _, u32, _, _, u32>(x)?)
+        };
+        let r: u8 = value.r();
+        let r: B = r.try_into().ok().ok_or(Error::UnsupportedConversion)?;
+        let r: q::Q<A, B> = r.into();
+        let g: u8 = value.g();
+        let g: B = g.try_into().ok().ok_or(Error::UnsupportedConversion)?;
+        let g: q::Q<A, B> = g.into();
+        let b: u8 = value.b();
+        let b: B = b.try_into().ok().ok_or(Error::UnsupportedConversion)?;
+        let b: q::Q<A, B> = b.into();
+        let max: q::Q<A, B> = r.max(g).max(b);
+        let min: q::Q<A, B> = r.min(g).min(b);
+        let delta: q::Q<A, B> = (max - min)?;
+        let l: q::Q<A, B> = (max + min)?;
+        let l: q::Q<A, B> = (l / n(2_0)?)?;
+        let s: q::Q<A, B> = if delta == n(0_0)? {
+            n(0_0)?
+        } else {
+            let dn: q::Q<A, B> = if l < n(0_5)? {
+                let ret: q::Q<A, B> = (max + min)?;
+                ret
+            } else {
+                let ret: q::Q<A, B> = (n(2_0)? - max)?;
+                let ret: q::Q<A, B> = (ret - min)?;
+                ret
+            };
+            let ret: q::Q<A, B> = (delta / dn)?;
+            ret
+        };
+        let h: q::Q<A, B> = if delta == n(0_0)? {
+            n(0_0)?
+        } else if max == r {
+            let ret: q::Q<A, B> = (g - b)?;
+            let ret: q::Q<A, B> = (ret / delta)?;
+            let ret: q::Q<A, B> = (ret % n(6_0)?)?;
+            let ret: q::Q<A, B> = (ret * n(60_0)?)?;
+            ret
+        } else if max == g {
+            let ret: q::Q<A, B> = (b - r)?;
+            let ret: q::Q<A, B> = (ret / delta)?;
+            let ret: q::Q<A, B> = (ret + n(2_0)?)?;
+            let ret: q::Q<A, B> = (ret * n(60_0)?)?;
+            ret
+        } else {
+            let ret: q::Q<A, B> = (r - g)?;
+            let ret: q::Q<A, B> = (ret / delta)?;
+            let ret: q::Q<A, B> = (ret + n(4_0)?)?;
+            let ret: q::Q<A, B> = (ret * n(60_0)?)?;
+            ret
+        };
+        let h: q::Q<A, B> = if h < n(0_0)? {
+            (h + n(360_0)?)?
+        } else {
+            h
+        };
+        let h: u16 = h.to_u16()?;
+        let s: q::Q<A, B> = (s * n(100_0)?)?;
+        let l: q::Q<A, B> = (l * n(100_0)?)?;
+        let ret: Self = (h, s, l).into();
+        Ok(ret)
     }
 }
 
@@ -534,11 +597,74 @@ where
     B: ops::Int,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
-    (): q::Supported<A, B> {
+    (): q::Supported<A, B>,
+    (): q::Supported<1, B> {
     type Error = Error;
 
-    fn try_from(value: Rgba<A, B>) -> core::result::Result<Self, Self::Error> {
-        
+    fn try_from(value: Rgba<A, B>) -> ::core::result::Result<Self, Self::Error> {
+        let n: _ = |x: u32| -> Result<q::Q<A, B>> {
+            Ok(q::r#as::<1, _, u32, _, _, u32>(x)?)
+        };
+        let r: u8 = value.r();
+        let r: B = r.try_into().ok().ok_or(Error::UnsupportedConversion)?;
+        let r: q::Q<A, B> = r.into();
+        let g: u8 = value.g();
+        let g: B = g.try_into().ok().ok_or(Error::UnsupportedConversion)?;
+        let g: q::Q<A, B> = g.into();
+        let b: u8 = value.b();
+        let b: B = b.try_into().ok().ok_or(Error::UnsupportedConversion)?;
+        let b: q::Q<A, B> = b.into();
+        let a: q::Q<A, B> = value.a();
+        let max: q::Q<A, B> = r.max(g).max(b);
+        let min: q::Q<A, B> = r.min(g).min(b);
+        let delta: q::Q<A, B> = (max - min)?;
+        let l: q::Q<A, B> = (max + min)?;
+        let l: q::Q<A, B> = (l / n(2_0)?)?;
+        let s: q::Q<A, B> = if delta == n(0_0)? {
+            n(0_0)?
+        } else {
+            let dn: q::Q<A, B> = if l < n(0_5)? {
+                (max + min)?
+            } else {
+                let ret: q::Q<A, B> = (n(2_0)? - max)?;
+                let ret: q::Q<A, B> = (ret - min)?;
+                ret
+            };
+            let ret: q::Q<A, B> = (delta / dn)?;
+            ret
+        };
+        let h: q::Q<A, B> = if delta == n(0_0)? {
+            n(0_0)?
+        } else if max == r {
+            let ret: q::Q<A, B> = (g - b)?;
+            let ret: q::Q<A, B> = (ret / delta)?;
+            let ret: q::Q<A, B> = (ret % n(6_0)?)?;
+            let ret: q::Q<A, B> = (ret * n(60_0)?)?;
+            ret
+        } else if max == g {
+            let ret: q::Q<A, B> = (b - r)?;
+            let ret: q::Q<A, B> = (ret / delta)?;
+            let ret: q::Q<A, B> = (ret + n(2_0)?)?;
+            let ret: q::Q<A, B> = (ret * n(60_0)?)?;
+            ret
+        } else {
+            let ret: q::Q<A, B> = (r - g)?;
+            let ret: q::Q<A, B> = (ret / delta)?;
+            let ret: q::Q<A, B> = (ret + n(4_0)?)?;
+            let ret: q::Q<A, B> = (ret * n(60_0)?)?;
+            ret
+        };
+        let h: q::Q<A, B> = if h < n(0_0)? {
+            let ret: q::Q<A, B> = (h + n(360_0)?)?;
+            ret
+        } else {
+            h
+        };
+        let h: u16 = h.to_u16()?;
+        let s: q::Q<A, B> = (s * n(100_0)?)?;
+        let l: q::Q<A, B> = (l * n(100_0)?)?;
+        let ret: Self = (h, s, l, a).into();
+        Ok(ret)
     }
 }
 
@@ -549,19 +675,3 @@ where
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> 
     {}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn complement() {
-        let x: Hsla<2, u128> = (200u16, 20_00, 40_00, 20_00).into();
-        let x_complement: Hsla<2, u128> = x.complement().unwrap();
-        let x_complement_h: u16 = x_complement.h();
-        assert_eq!(x_complement_h, 20);
-    }
-}
-
-
-

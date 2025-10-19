@@ -17,8 +17,7 @@ where
     B: ops::Int,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
-    (): q::Supported<A, B>,
-    (): q::Supported<1, B> {
+    (): q::Supported<A, B> {
     #[inline]
     pub fn r(&self) -> u8 {
         self.mode.r
