@@ -12,9 +12,6 @@ use super::*;
 #[allow(clippy::inconsistent_digit_grouping)]
 pub trait CommonExt<const A: u8, B> 
 where
-    Self: Sized,
-    Self: Clone,
-    Self: Copy,
     Self: TryFrom<Hsla<A, B>>,
     Self: TryInto<Hsla<A, B>>,
     B: ops::Int,
@@ -70,7 +67,6 @@ where
         Ok(ret)
     }
 
-    #[inline]
     fn tetradic(self) -> Result<[Self; 4]> {
         use ops::ToPrim as _;
         let n: _ = |x: u32| -> Result<q::Q<A, B>> {
@@ -103,7 +99,6 @@ where
         Ok(ret)
     }
 
-    #[inline]
     fn analogous(self) -> Result<[Self; 12]> {
         use ops::ToPrim as _;
         let n: _ = |x: u32| -> Result<q::Q<A, B>> {
