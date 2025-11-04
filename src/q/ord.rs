@@ -1,12 +1,8 @@
 use super::*;
 
-impl<const A: u8, B, C> Ord for Q<A, B, C>
+impl<const A: u8, B> Ord for Q<A, B>
 where
-    B: ops::Int,
-    C: Mode,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
+    B: ops::Int {
     #[inline]
     fn clamp(self, min: Self, max: Self) -> Self
     where
@@ -44,8 +40,8 @@ where
 
     #[inline]
     fn cmp(&self, other: &Self) -> ::core::cmp::Ordering {
-        let x: B = self.n;
-        let y: B = other.n;
+        let x: B = self.0;
+        let y: B = other.0;
         if x > y {
             ::core::cmp::Ordering::Greater
         } else if x < y {
@@ -56,48 +52,42 @@ where
     }
 }
 
-impl<const A: u8, B, C, D> PartialOrd<Q<A, B, C>> for Q<A, B, D>
+impl<const A: u8, B> PartialOrd<Q<A, B>> for Q<A, B>
 where
-    B: ops::Int,
-    C: Mode,
-    D: Mode,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
-    
+    B: ops::Int {
     #[inline]
-    fn ge(&self, other: &Q<A, B, C>) -> bool {
-        let x: B = self.n;
-        let y: B = other.n;
+    fn ge(&self, other: &Q<A, B>) -> bool {
+        let x: B = self.0;
+        let y: B = other.0;
         x >= y
     }
 
     #[inline]
-    fn le(&self, other: &Q<A, B, C>) -> bool {
-        let x: B = self.n;
-        let y: B = other.n;
+    fn le(&self, other: &Q<A, B>) -> bool {
+        let x: B = self.0;
+        let y: B = other.0;
         x <= y
     }
 
     #[inline]
-    fn gt(&self, other: &Q<A, B, C>) -> bool {
-        let x: B = self.n;
-        let y: B = other.n;
+    fn gt(&self, other: &Q<A, B>) -> bool {
+        let x: B = self.0;
+        let y: B = other.0;
         x > y
     }
 
     #[inline]
-    fn lt(&self, other: &Q<A, B, C>) -> bool {
-        let x: B = self.n;
-        let y: B = other.n;
+    fn lt(&self, other: &Q<A, B>) -> bool {
+        let x: B = self.0;
+        let y: B = other.0;
         x < y
     }
     
     #[allow(clippy::non_canonical_partial_ord_impl)]
     #[inline]
-    fn partial_cmp(&self, other: &Q<A, B, C>) -> Option<core::cmp::Ordering> {
-        let x: B = self.n;
-        let y: B = other.n;
+    fn partial_cmp(&self, other: &Q<A, B>) -> Option<::core::cmp::Ordering> {
+        let x: B = self.0;
+        let y: B = other.0;
         let ret: ::core::cmp::Ordering = x.cmp(&y);
         Some(ret)
     }

@@ -1,22 +1,16 @@
 use super::*;
 
-impl<const A: u8, B, C> Q<A, B, C>
-where
-    B: ops::Int,
-    C: Mode,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
+impl<const A: u8, B> Q<A, B> {
     #[inline]
     pub fn sqrt(self) -> Result<Self> 
     where
-        B: ops::Unsigned {
-        let n: B = self.n;
+        B: ops::Int,
+        (): SupportedPrecision<A>,
+        (): SupportedInt<B>,
+        (): Supported<A, B> {
+        let n: B = self.0;
         if n == B::AS_0 || n == B::AS_1 {
-            let ret: Self = Self {
-                n,
-                mode: ::core::marker::PhantomData
-            };
+            let ret: Self = n.into();
             return Ok(ret)
         }
         let mut ret: B = n.checked_div(B::AS_2).ok_or(Error::DivisionByZero)?;
@@ -30,10 +24,7 @@ where
             }
         }
         let n: B = ret;
-        let ret: Self = Self {
-            n,
-            mode: ::core::marker::PhantomData
-        };
+        let ret: Self = n.into();
         Ok(ret)
     }
 }

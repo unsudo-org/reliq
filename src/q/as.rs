@@ -4,10 +4,9 @@ macro_rules! r#as {
     ($($n:literal)*) => {
         ::paste::paste!(
             $(
-                pub fn [< as _ $n >]<const A: u8, B, C>() -> Q<A, B, C>
+                pub fn [< as _ $n >]<const A: u8, B>() -> Q<A, B>
                 where
                     B: ops::Int,
-                    C: Mode,
                     (): SupportedPrecision<A>,
                     (): SupportedInt<B>,
                     (): Supported<A, B>,
@@ -16,7 +15,7 @@ macro_rules! r#as {
                     let n: B = unsafe {
                         cast::<1, A, _>(n).unwrap_unchecked()
                     };
-                    let n: Q<A, B, C> = n.into();
+                    let n: Q<A, B> = n.into();
                     n
                 }
             )*
@@ -39,35 +38,19 @@ r#as!(
 );
 
 #[inline]
-pub fn r#as<
-    const A: u8, 
-    const B: u8, 
-    C, 
-    D, 
-    E, 
-    F
->(n: F) -> Result<Q<B, D, E>> 
+pub fn r#as<const A: u8, const B: u8, C>(n: C) -> Result<Q<B, C>> 
 where
-    C: ops::Int,
-    D: ops::Int,
-    E: Mode,
-    F: Into<C>,
-    (): SupportedPrecision<A>,
-    (): SupportedPrecision<B>,
-    (): SupportedInt<C>,
-    (): SupportedInt<D>,
-    (): Supported<A, C>,
-    (): Supported<B, D> {
+    C: ops::Int {
     let n: C = n.into();
     let n: u128 = n
         .try_into()
         .ok()
         .ok_or(Error::UnsupportedConversion)?;
-    let n: D = n
+    let n: C = n
         .try_into()
         .ok()
         .ok_or(Error::UnsupportedConversion)?;
-    let n: Q<B, D, E> = n.into();
+    let n: Q<B, C> = n.into();
     Ok(n)
 }
 

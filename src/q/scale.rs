@@ -41,9 +41,8 @@ const TABLE: [u128; 38] = [
     10u128.pow(38)
 ];
 
-
 #[inline]
-pub(super) fn scale<const A: u8, B>() -> B 
+pub(super) fn scale<const A: Precision, B>() -> B 
 where 
     B: ops::Int,
     (): SupportedPrecision<A>,
@@ -73,6 +72,6 @@ where
     }
 }  
 
-const fn look_up<const T: u8>() -> u128 {
+const fn look_up<const T: Precision>() -> u128 {
     TABLE[(T - 1) as usize]
 }

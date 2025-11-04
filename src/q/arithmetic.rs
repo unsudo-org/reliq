@@ -3,6 +3,7 @@ use super::*;
 impl<const A: u8, B> Q<A, B> 
 where
     B: ops::Int {
+    #[inline]
     fn abs(self) -> Self {
         let n: B = self.0;
         if n < B::AS_0 {
@@ -27,18 +28,13 @@ where
     }
 }
 
-impl<const A: u8, B, C, D> ::core::ops::Add<Result<Q<A, B, C>>> for Q<A, B, D>
+impl<const A: u8, B> ::core::ops::Add<Result<Q<A, B>>> for Q<A, B>
 where
-    B: ops::Int,
-    C: Mode,
-    D: Mode,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
+    B: ops::Int {
     type Output = Result<Self>;
 
     #[inline]
-    fn add(self, rhs: Result<Q<A, B, C>>) -> Self::Output {
+    fn add(self, rhs: Result<Q<A, B>>) -> Self::Output {
         match rhs {
             Ok(rhs) => self + rhs,
             Err(e) => Err(e)
@@ -46,61 +42,41 @@ where
     }
 }
 
-impl<const A: u8, B, C, D> ::core::ops::Add<Q<A, B, C>> for Q<A, B, D>
+impl<const A: u8, B> ::core::ops::Add<Q<A, B>> for Q<A, B>
 where
-    B: ops::Int,
-    C: Mode,
-    D: Mode,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
+    B: ops::Int {
     type Output = Result<Self>;
 
     #[inline]
-    fn add(self, rhs: Q<A, B, C>) -> Self::Output {
-        let x: B = self.n;
-        let y: B = rhs.n;
+    fn add(self, rhs: Q<A, B>) -> Self::Output {
+        let x: B = self.0;
+        let y: B = rhs.0;
         add(x, y).map(|n| {
-            Self {
-                n,
-                mode: ::core::marker::PhantomData
-            }
+            n.into()
         })
     }
 }
 
-impl<const A: u8, B, C> ::core::ops::Sub<B> for Q<A, B, C>
+impl<const A: u8, B> ::core::ops::Sub<B> for Q<A, B>
 where
-    B: ops::Int,
-    C: Mode,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
+    B: ops::Int {
     type Output = Result<Self>;
     
     #[inline]
     fn sub(self, rhs: B) -> Self::Output {
         let n: B = rhs;
-        let rhs: Self = Self {
-            n,
-            mode: ::core::marker::PhantomData
-        };
+        let rhs: Self = n.into();
         self - rhs
     }
 }
 
-impl<const A: u8, B, C, D> ::core::ops::Sub<Result<Q<A, B, C>>> for Q<A, B, D>
+impl<const A: u8, B> ::core::ops::Sub<Result<Q<A, B>>> for Q<A, B>
 where
-    B: ops::Int,
-    C: Mode,
-    D: Mode,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
+    B: ops::Int {
     type Output = Result<Self>;
 
     #[inline]
-    fn sub(self, rhs: Result<Q<A, B, C>>) -> Self::Output {
+    fn sub(self, rhs: Result<Q<A, B>>) -> Self::Output {
         match rhs {
             Ok(rhs) => self - rhs,
             Err(e) => Err(e)
@@ -108,33 +84,24 @@ where
     }
 }
 
-impl<const A: u8, B, C, D> ::core::ops::Sub<Q<A, B, C>> for Q<A, B, D>
+impl<const A: u8, B> ::core::ops::Sub<Q<A, B>> for Q<A, B>
 where
-    B: ops::Int,
-    C: Mode,
-    D: Mode,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
+    B: ops::Int {
     type Output = Result<Self>;
 
     #[inline]
-    fn sub(self, rhs: Q<A, B, C>) -> Self::Output {
-        let x: B = self.n;
-        let y: B = rhs.n;
+    fn sub(self, rhs: Q<A, B>) -> Self::Output {
+        let x: B = self.0;
+        let y: B = rhs.0;
         sub(x, y).map(|n| {
-            Self {
-                n,
-                mode: ::core::marker::PhantomData
-            }
+            n.into()
         })
     }
 }
 
-impl<const A: u8, B, C> ::core::ops::Mul<B> for Q<A, B, C>
+impl<const A: u8, B> ::core::ops::Mul<B> for Q<A, B>
 where
     B: ops::Int,
-    C: Mode,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
@@ -143,26 +110,21 @@ where
     #[inline]
     fn mul(self, rhs: B) -> Self::Output {
         let n: B = rhs;
-        let rhs: Self = Self {
-            n,
-            mode: ::core::marker::PhantomData
-        };
+        let rhs: Self = n.into();
         self * rhs
     }
 }
 
-impl<const A: u8, B, C, D> ::core::ops::Mul<Result<Q<A, B, C>>> for Q<A, B, D>
+impl<const A: u8, B> ::core::ops::Mul<Result<Q<A, B>>> for Q<A, B>
 where
     B: ops::Int,
-    C: Mode,
-    D: Mode,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
     type Output = Result<Self>;
 
     #[inline]
-    fn mul(self, rhs: Result<Q<A, B, C>>) -> Self::Output {
+    fn mul(self, rhs: Result<Q<A, B>>) -> Self::Output {
         match rhs {
             Ok(rhs) => self * rhs,
             Err(e) => Err(e)
@@ -170,33 +132,27 @@ where
     }
 }
 
-impl<const A: u8, B, C, D> ::core::ops::Mul<Q<A, B, C>> for Q<A, B, D>
+impl<const A: u8, B> ::core::ops::Mul<Q<A, B>> for Q<A, B>
 where
     B: ops::Int,
-    C: Mode,
-    D: Mode,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
     type Output = Result<Self>;
 
     #[inline]
-    fn mul(self, rhs: Q<A, B, C>) -> Self::Output {
-        let x: B = self.n;
-        let y: B = rhs.n;
-        mul(x, y).map(|n| {
-            Self {
-                n,
-                mode: ::core::marker::PhantomData
-            }
+    fn mul(self, rhs: Q<A, B>) -> Self::Output {
+        let x: B = self.0;
+        let y: B = rhs.0;
+        mul::<A, _>(x, y).map(|n| {
+            n.into()
         })
     }
 }
 
-impl<const A: u8, B, C> ::core::ops::Div<B> for Q<A, B, C>
+impl<const A: u8, B> ::core::ops::Div<B> for Q<A, B>
 where
     B: ops::Int,
-    C: Mode,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
@@ -205,26 +161,21 @@ where
     #[inline]
     fn div(self, rhs: B) -> Self::Output {
         let n: B = rhs;
-        let rhs: Self = Self {
-            n,
-            mode: ::core::marker::PhantomData
-        };
+        let rhs: Self = n.into();
         self / rhs
     }
 }
 
-impl<const A: u8, B, C, D> ::core::ops::Div<Result<Q<A, B, C>>> for Q<A, B, D>
+impl<const A: u8, B> ::core::ops::Div<Result<Q<A, B>>> for Q<A, B>
 where
     B: ops::Int,
-    C: Mode,
-    D: Mode,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
     type Output = Result<Self>;
 
     #[inline]
-    fn div(self, rhs: Result<Q<A, B, C>>) -> Self::Output {
+    fn div(self, rhs: Result<Q<A, B>>) -> Self::Output {
         match rhs {
             Ok(rhs) => self / rhs,
             Err(e) => Err(e)
@@ -232,33 +183,27 @@ where
     }
 }
 
-impl<const A: u8, B, C, D> ::core::ops::Div<Q<A, B, C>> for Q<A, B, D>
+impl<const A: u8, B> ::core::ops::Div<Q<A, B>> for Q<A, B>
 where
     B: ops::Int,
-    C: Mode,
-    D: Mode,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
     type Output = Result<Self>;
 
     #[inline]
-    fn div(self, rhs: Q<A, B, C>) -> Self::Output {
-        let x: B = self.n;
-        let y: B = rhs.n;
+    fn div(self, rhs: Q<A, B>) -> Self::Output {
+        let x: B = self.0;
+        let y: B = rhs.0;
         div(x, y).map(|n| {
-            Self {
-                n,
-                mode: ::core::marker::PhantomData
-            }
+            n.into()
         })
     }
 }
 
-impl<const A: u8, B, C> ::core::ops::Rem<B> for Q<A, B, C>
+impl<const A: u8, B> ::core::ops::Rem<B> for Q<A, B>
 where
     B: ops::Int,
-    C: Mode,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
@@ -267,26 +212,21 @@ where
     #[inline]
     fn rem(self, rhs: B) -> Self::Output {
         let n: B = rhs;
-        let rhs: Self = Self {
-            n,
-            mode: ::core::marker::PhantomData
-        };
+        let rhs: Self = n.into();
         self % rhs
     }
 }
 
-impl<const A: u8, B, C, D> ::core::ops::Rem<Result<Q<A, B, C>>> for Q<A, B, D>
+impl<const A: u8, B> ::core::ops::Rem<Result<Q<A, B>>> for Q<A, B>
 where
     B: ops::Int,
-    C: Mode,
-    D: Mode,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
     type Output = Result<Self>;
 
     #[inline]
-    fn rem(self, rhs: Result<Q<A, B, C>>) -> Self::Output {
+    fn rem(self, rhs: Result<Q<A, B>>) -> Self::Output {
         match rhs {
             Ok(rhs) => self % rhs,
             Err(e) => Err(e)
@@ -294,40 +234,32 @@ where
     }
 }
 
-impl<const A: u8, B, C, D> ::core::ops::Rem<Q<A, B, C>> for Q<A, B, D>
+impl<const A: u8, B> ::core::ops::Rem<Q<A, B>> for Q<A, B>
 where
     B: ops::Int,
-    C: Mode,
-    D: Mode,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
     type Output = Result<Self>;
 
     #[inline]
-    fn rem(self, rhs: Q<A, B, C>) -> Self::Output {
-        let x: B = self.n;
-        let y: B = rhs.n;
+    fn rem(self, rhs: Self) -> Self::Output {
+        let x: B = self.0;
+        let y: B = rhs.0;
         rem(x, y).map(|n| {
-            Self {
-                n,
-                mode: ::core::marker::PhantomData
-            }
+            n.into()
         })
     }
 }
 
-impl<const A: u8, B, C> ops::OverflowingAdd for Q<A, B, C> 
+impl<const A: u8, B> ops::OverflowingAdd for Q<A, B> 
 where
-    B: ops::Int,
-    C: Mode,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
+    B: ops::Int {
+    #[inline]
     fn overflowing_add(self, rhs: Self) -> (Self, bool) {
-        let lhs: B = self.n;
+        let lhs: B = self.0;
         let rhs: Self = rhs.into();
-        let rhs: B = rhs.n;
+        let rhs: B = rhs.0;
         let (n, success) = lhs.overflowing_add(rhs);
         let ret: Self = n.into();
         let ret: (Self, bool) = (ret, success);
@@ -335,17 +267,14 @@ where
     }
 }
 
-impl<const A: u8, B, C> ops::OverflowingSub for Q<A, B, C> 
+impl<const A: u8, B> ops::OverflowingSub for Q<A, B> 
 where
-    B: ops::Int,
-    C: Mode,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
+    B: ops::Int {
+    #[inline]
     fn overflowing_sub(self, rhs: Self) -> (Self, bool) {
-        let lhs: B = self.n;
+        let lhs: B = self.0;
         let rhs: Self = rhs.into();
-        let rhs: B = rhs.n;
+        let rhs: B = rhs.0;
         let (n, success) = lhs.overflowing_sub(rhs);
         let ret: Self = n.into();
         let ret: (Self, bool) = (ret, success);
@@ -353,13 +282,13 @@ where
     }
 }
 
-impl<const A: u8, B, C> ops::OverflowingMul for Q<A, B, C> 
+impl<const A: u8, B> ops::OverflowingMul for Q<A, B> 
 where
     B: ops::Int,
-    C: Mode,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
+    #[inline]
     fn overflowing_mul(self, rhs: Self) -> (Self, bool) {
         let lhs: Self = self;
         let rhs: Self = rhs.into();
@@ -373,13 +302,13 @@ where
     }
 }
 
-impl<const A: u8, B, C> ops::OverflowingDiv for Q<A, B, C> 
+impl<const A: u8, B> ops::OverflowingDiv for Q<A, B> 
 where
     B: ops::Int,
-    C: Mode,
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
+    #[inline]
     fn overflowing_div(self, rhs: Self) -> (Self, bool) {
         let lhs: Self = self;
         let rhs: Self = rhs.into();
@@ -396,16 +325,14 @@ where
 #[inline]
 pub(super) fn add<T>(x: T, y: T) -> Result<T>
 where
-    T: ops::Int,
-    (): SupportedInt<T> {
+    T: ops::Int {
     x.checked_add(y).ok_or(Error::Overflow)
 }
 
 #[inline]
 pub(super) fn sub<T>(x: T, y: T) -> Result<T>
 where
-    T: ops::Int,
-    (): SupportedInt<T> {
+    T: ops::Int {
     x.checked_sub(y).ok_or(Error::Underflow)
 }
 
@@ -449,82 +376,4 @@ where
     let n: B = mul::<A, _>(n, y)?;
     let n: B = sub(x, n)?;
     Ok(n)
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[::rstest::rstest]
-    #[case(1_00, 1_00, 2_00)]
-    fn add<A, B, C>(#[case] x: A, #[case] y: B, #[case] ok: C) 
-    where
-        A: Into<Unit2>,
-        B: Into<Unit2>,
-        C: Into<Unit2> {
-        let x: Unit2 = x.into();
-        let y: Unit2 = y.into();
-        let ok: Unit2 = ok.into();
-        let ret: Unit2 = (x + y).unwrap();
-        assert_eq!(ret, ok);
-    }
-
-    #[::rstest::rstest]
-    #[case(1_00, 1_00, 0_00)]
-    #[case(2_00, 1_00, 1_00)]
-    fn sub<A, B, C>(#[case] x: A, #[case] y: B, #[case] ok: C) 
-    where
-        A: Into<Unit2>,
-        B: Into<Unit2>,
-        C: Into<Unit2> {
-        let x: Unit2 = x.into();
-        let y: Unit2 = y.into();
-        let ok: Unit2 = ok.into();
-        let ret: Unit2 = (x - y).unwrap();
-        assert_eq!(ret, ok);
-    }
-
-    #[::rstest::rstest]
-    #[case(1_00, 1_00, 1_00)]
-    #[case(0_50, 0_25, 0_12)]
-    fn mul<A, B, C>(#[case] x: A, #[case] y: B, #[case] ok: C) 
-    where
-        A: Into<Unit2>,
-        B: Into<Unit2>,
-        C: Into<Unit2> {
-        let x: Unit2 = x.into();
-        let y: Unit2 = y.into();
-        let ok: Unit2 = ok.into();
-        let ret: Unit2 = (x * y).unwrap();
-        assert_eq!(ret, ok);
-    }
-
-    #[::rstest::rstest]
-    #[case(1_00_u128, 1_00_u128, 1_00_u128)]
-    #[case(1_00_u128, 0_50_u128, 2_00_u128)]
-    fn div<A, B, C>(#[case] x: A, #[case] y: B, #[case] ok: C) 
-    where
-        A: Into<Unit2<u128>>,
-        B: Into<Unit2<u128>>,
-        C: Into<Unit2<u128>> {
-        let x: Unit2<u128> = x.into();
-        let y: Unit2<u128> = y.into();
-        let ok: Unit2<u128> = ok.into();
-        let ret: Unit2<u128> = (x / y).unwrap();
-        assert_eq!(ret, ok);
-    }
-
-    #[::rstest::rstest]
-    #[case(1_00, 1_00, 1_00)]
-    fn rem<A, B, C>(#[case] x: A, #[case] y: B, #[case] ok: C)
-    where
-        A: Into<Unit2>,
-        B: Into<Unit2>,
-        C: Into<Unit2> {
-        let x: Unit2 = x.into();
-        let y: Unit2 = y.into();
-        let ok: Unit2 = ok.into();
-        let ret: Unit2 = (x % y).unwrap();
-        assert_eq!(ret, ok);
-    }
 }

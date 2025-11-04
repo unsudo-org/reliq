@@ -1,51 +1,27 @@
 use super::*;
-use ops::ToPrim as _;
 
 ::modwire::expose!(
     pub arithmetic
+    pub r#as
+    pub cast
     pub clone
+    pub eq
     pub from
+    pub lerp
     pub muldiv
+    pub ord
+    pub pi
+    pub result
+    pub round
+    pub scale
+    pub sign
+    pub sqrt
     pub supported
+    pub to_prim
+    pub trig
 );
 
 pub type Precision = u8;
-
-pub type Result<T> = ::core::result::Result<T, Error>;
-
-#[repr(u8)]
-#[derive(Debug)]
-#[derive(Clone)]
-#[derive(PartialEq)]
-#[derive(Eq)]
-#[derive(PartialOrd)]
-#[derive(Ord)]
-#[derive(Hash)]
-#[derive(::thiserror::Error)]
-#[derive(::serde::Serialize)]
-#[derive(::serde::Deserialize)]
-pub enum Error {
-    #[error(transparent)]
-    Ops(#[from] ops::Error),
-
-    #[error("Overflow")]
-    Overflow,
-    
-    #[error("Underflow")]
-    Underflow,
-
-    #[error("Division by zero")]
-    DivisionByZero,
-
-    #[error("Modulo by zero")]
-    ModuloByZero,
-
-    #[error("Unsupported conversion")]
-    UnsupportedConversion,
-
-    #[error("Out of bounds")]
-    OutOfBounds
-}
 
 #[repr(transparent)]
 #[derive(::serde::Serialize)]
