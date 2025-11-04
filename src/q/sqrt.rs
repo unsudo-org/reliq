@@ -15,7 +15,7 @@ where
         if n == B::AS_0 || n == B::AS_1 {
             let ret: Self = Self {
                 n,
-                m_0: ::core::marker::PhantomData
+                mode: ::core::marker::PhantomData
             };
             return Ok(ret)
         }
@@ -32,7 +32,7 @@ where
         let n: B = ret;
         let ret: Self = Self {
             n,
-            m_0: ::core::marker::PhantomData
+            mode: ::core::marker::PhantomData
         };
         Ok(ret)
     }

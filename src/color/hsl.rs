@@ -1,6 +1,8 @@
-use crate::{ops::ToPrim, q::r#as};
-
 use super::*;
+use ops::ToPrim as _;
+
+
+// MARK: HslMode
 
 pub struct HslMode<const A: u8, B>
 where
@@ -8,9 +10,9 @@ where
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
-    pub(super) h: u16,
-    pub(super) s: q::Unit<A, B>,
-    pub(super) l: q::Unit<A, B>
+    h: u16,
+    s: q::Unit<A, B>,
+    l: q::Unit<A, B>
 }
 
 impl<const A: u8, B> Mode for HslMode<A, B>
@@ -22,7 +24,9 @@ where
     {}
 
 
-pub type Hsl<const A: u8 = 1, B = usize> = Color<A, B, HslMode<A, B>>;
+// MARK: Hsl
+
+pub type Hsl<const A: u8, B> = Color<A, B, HslMode<A, B>>;
 
 impl<const A: u8, B> Hsl<A, B> 
 where
@@ -34,50 +38,12 @@ where
         self.mode.h
     }
 
-    pub fn s(&self) -> q::Unit<A, B> {
+    pub fn s(&self) -> q::Q<A, B> {
         self.mode.s
     }
 
-    pub fn l(&self) -> q::Unit<A, B> {
+    pub fn l(&self) -> q::Q<A, B> {
         self.mode.l
-    }
-
-    pub fn complement(self) -> Result<Self> {
-        let n180: q::Q<A, B> = r#as::<1, _, u32, _, _, u32>(1800)?;
-        let n360: q::Q<A, B> = r#as::<1, _, u32, _, _, u32>(3600)?;
-        let h: u16 = self.h();
-        let h: B = h.try_into().ok().ok_or(Error::UnsupportedConversion)?;
-        let h: q::Q<A, B> = h.into();
-        let h: q::Q<A, B> = (h + n180)?;
-        let h: q::Q<A, B> = (h % n360)?;
-        let h: u16 = h.to_u16()?;
-        let s: q::Q<A, B> = self.s();
-        let l: q::Q<A, B> = self.l();
-        let ret: Self = Self {
-            mode: HslMode {
-                h,
-                s,
-                l
-            },
-            m_0: ::core::marker::PhantomData
-        };
-        Ok(ret)
-    }
-    
-    #[inline]
-    pub fn lighten<C>(self, percentage: C) -> Result<Self>
-    where
-        C: Into<q::Percentage<A, B>> {
-        let percentage: q::Percentage<A, B> = percentage.into();
-        self.interpolate::<(u8, u8, u8), _>((255, 255, 255), percentage)
-    }
-
-    #[inline]
-    pub fn darken<C>(self, percentage: C) -> Result<Self>
-    where
-        C: Into<q::Percentage<A, B>> {
-        let percentage: q::Percentage<A, B> = percentage.into();
-        self.interpolate::<(u8, u8, u8), _>((0, 0, 0), percentage)
     }
 }
 
@@ -99,7 +65,7 @@ where
     (): q::SupportedInt<B>,
     (): q::Supported<A, B> {
     fn from(value: Hsla<A, B>) -> Self {
-        todo!()
+        
     }
 }
 
@@ -108,14 +74,13 @@ where
     B: ops::Int,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
-    (): q::Supported<A, B> {
+    (): q::Supported<A, B>,
+    (): q::Supported<1, B> {
     type Error = Error;
 
     #[inline]
     fn try_from(value: Rgba<A, B>) -> ::core::result::Result<Self, Self::Error> {
-        let ret: Rgb<A, B> = value.into();
-        let ret: Self = ret.try_into()?;
-        Ok(ret)
+        
     }
 }
 
@@ -202,5 +167,6 @@ where
     B: ops::Int,
     (): q::SupportedPrecision<A>,
     (): q::SupportedInt<B>,
-    (): q::Supported<A, B>
+    (): q::Supported<A, B>,
+    (): q::Supported<1, B>
     {}

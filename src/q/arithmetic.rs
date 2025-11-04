@@ -1,42 +1,28 @@
 use super::*;
 
-impl<const A: u8, B, C> Q<A, B, C> 
+impl<const A: u8, B> Q<A, B> 
 where
-    B: ops::Int,
-    C: Mode,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
+    B: ops::Int {
     fn abs(self) -> Self {
-        let n: B = self.n;
+        let n: B = self.0;
         if n < B::AS_0 {
             let n: B = B::AS_0 - n;
-            let ret: Self = Self {
-                n,
-                m_0: ::core::marker::PhantomData
-            };
+            let ret: Self = n.into();
             return ret
         }
         self
     }
 }
 
-impl<const A: u8, B, C> ::core::ops::Add<B> for Q<A, B, C>
+impl<const A: u8, B> ::core::ops::Add<B> for Q<A, B>
 where
-    B: ops::Int,
-    C: Mode,
-    (): SupportedPrecision<A>,
-    (): SupportedInt<B>,
-    (): Supported<A, B> {
+    B: ops::Int {
     type Output = Result<Self>;
     
     #[inline]
     fn add(self, rhs: B) -> Self::Output {
         let n: B = rhs;
-        let rhs: Self = Self {
-            n,
-            m_0: ::core::marker::PhantomData
-        };
+        let rhs: Self = n.into();
         self + rhs
     }
 }
@@ -77,7 +63,7 @@ where
         add(x, y).map(|n| {
             Self {
                 n,
-                m_0: ::core::marker::PhantomData
+                mode: ::core::marker::PhantomData
             }
         })
     }
@@ -97,7 +83,7 @@ where
         let n: B = rhs;
         let rhs: Self = Self {
             n,
-            m_0: ::core::marker::PhantomData
+            mode: ::core::marker::PhantomData
         };
         self - rhs
     }
@@ -139,7 +125,7 @@ where
         sub(x, y).map(|n| {
             Self {
                 n,
-                m_0: ::core::marker::PhantomData
+                mode: ::core::marker::PhantomData
             }
         })
     }
@@ -159,7 +145,7 @@ where
         let n: B = rhs;
         let rhs: Self = Self {
             n,
-            m_0: ::core::marker::PhantomData
+            mode: ::core::marker::PhantomData
         };
         self * rhs
     }
@@ -201,7 +187,7 @@ where
         mul(x, y).map(|n| {
             Self {
                 n,
-                m_0: ::core::marker::PhantomData
+                mode: ::core::marker::PhantomData
             }
         })
     }
@@ -221,7 +207,7 @@ where
         let n: B = rhs;
         let rhs: Self = Self {
             n,
-            m_0: ::core::marker::PhantomData
+            mode: ::core::marker::PhantomData
         };
         self / rhs
     }
@@ -263,7 +249,7 @@ where
         div(x, y).map(|n| {
             Self {
                 n,
-                m_0: ::core::marker::PhantomData
+                mode: ::core::marker::PhantomData
             }
         })
     }
@@ -283,7 +269,7 @@ where
         let n: B = rhs;
         let rhs: Self = Self {
             n,
-            m_0: ::core::marker::PhantomData
+            mode: ::core::marker::PhantomData
         };
         self % rhs
     }
@@ -325,7 +311,7 @@ where
         rem(x, y).map(|n| {
             Self {
                 n,
-                m_0: ::core::marker::PhantomData
+                mode: ::core::marker::PhantomData
             }
         })
     }

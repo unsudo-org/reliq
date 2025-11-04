@@ -74,7 +74,7 @@ where
     fn from(value: Unit<A, B>) -> Self {
         Self {
             n: value.n,
-            m_0: ::core::marker::PhantomData
+            mode: ::core::marker::PhantomData
         }
     }
 }
@@ -94,7 +94,7 @@ where
         let n: B = n.n;
         let n: Unit<A, B> = Q {
             n,
-            m_0: ::core::marker::PhantomData
+            mode: ::core::marker::PhantomData
         };
         let as_0: Unit<A, B> = as_0();
         let as_1: Unit<A, B> = as_1();
@@ -117,7 +117,7 @@ where
         let n: B = n.n;
         let n: Self = Self {
             n,
-            m_0: ::core::marker::PhantomData
+            mode: ::core::marker::PhantomData
         };
         Ok(n)
     }

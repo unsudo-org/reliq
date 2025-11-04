@@ -7,7 +7,6 @@ where
     (): SupportedPrecision<A>,
     (): SupportedInt<B>,
     (): Supported<A, B> {
-    #[inline]
     pub fn cast<const D: u8>(self) -> Result<Q<D, B, C>> 
     where
         (): SupportedPrecision<D>,

@@ -1,15 +1,4 @@
 use super::*;
-use ops::ToPrim as _;
-
-::modwire::expose!(
-    pub arithmetic
-    pub clone
-    pub from
-    pub muldiv
-    pub supported
-);
-
-pub type Precision = u8;
 
 pub type Result<T> = ::core::result::Result<T, Error>;
 
@@ -46,8 +35,3 @@ pub enum Error {
     #[error("Out of bounds")]
     OutOfBounds
 }
-
-#[repr(transparent)]
-#[derive(::serde::Serialize)]
-#[derive(::serde::Deserialize)]
-pub struct Q<const A: Precision, B>(B);

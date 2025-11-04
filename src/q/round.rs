@@ -57,7 +57,7 @@ where
         let n: B = n * scale;
         let n: Self = Self {
             n,
-            m_0: ::core::marker::PhantomData
+            mode: ::core::marker::PhantomData
         };
         n
     }

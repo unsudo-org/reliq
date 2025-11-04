@@ -18,7 +18,7 @@ where
         let n: B = B::AS_0 - n;
         let ret: Self = Self {
             n,
-            m_0: ::core::marker::PhantomData
+            mode: ::core::marker::PhantomData
         };
         ret
     }
@@ -34,7 +34,7 @@ where
         let n: B = B::AS_0 - n;
         let ret: Self = Self {
             n,
-            m_0: ::core::marker::PhantomData
+            mode: ::core::marker::PhantomData
         };
         ret
     }
