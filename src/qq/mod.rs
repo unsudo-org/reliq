@@ -6,6 +6,7 @@ use super::*;
     pub from
     pub lerp
     pub muldiv
+    pub pi
     pub result
     pub scale
     pub supported

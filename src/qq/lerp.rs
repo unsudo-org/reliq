@@ -3,6 +3,7 @@ use super::*;
 impl<const A: u8, B> Q<A, B>
 where
     B: ops::Int {
+    #[inline]
     pub fn lerp(
         self, 
         rhs: impl Into<Self>, 

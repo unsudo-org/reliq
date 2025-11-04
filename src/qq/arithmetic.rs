@@ -3,6 +3,7 @@ use super::*;
 impl<const A: u8, B> Q<A, B> 
 where
     B: ops::Int {
+    #[inline]
     fn abs(self) -> Self {
         let n: B = self.0;
         if n < B::AS_0 {
@@ -41,7 +42,7 @@ where
     }
 }
 
-impl<const A: u8, B, C, D> ::core::ops::Add<Q<A, B>> for Q<A, B>
+impl<const A: u8, B> ::core::ops::Add<Q<A, B>> for Q<A, B>
 where
     B: ops::Int {
     type Output = Result<Self>;
@@ -227,6 +228,7 @@ where
 impl<const A: u8, B> ops::OverflowingAdd for Q<A, B> 
 where
     B: ops::Int {
+    #[inline]
     fn overflowing_add(self, rhs: Self) -> (Self, bool) {
         let lhs: B = self.0;
         let rhs: Self = rhs.into();
@@ -241,6 +243,7 @@ where
 impl<const A: u8, B> ops::OverflowingSub for Q<A, B> 
 where
     B: ops::Int {
+    #[inline]
     fn overflowing_sub(self, rhs: Self) -> (Self, bool) {
         let lhs: B = self.0;
         let rhs: Self = rhs.into();
@@ -255,6 +258,7 @@ where
 impl<const A: u8, B> ops::OverflowingMul for Q<A, B> 
 where
     B: ops::Int {
+    #[inline]
     fn overflowing_mul(self, rhs: Self) -> (Self, bool) {
         let lhs: Self = self;
         let rhs: Self = rhs.into();
@@ -271,6 +275,7 @@ where
 impl<const A: u8, B> ops::OverflowingDiv for Q<A, B> 
 where
     B: ops::Int {
+    #[inline]
     fn overflowing_div(self, rhs: Self) -> (Self, bool) {
         let lhs: Self = self;
         let rhs: Self = rhs.into();
